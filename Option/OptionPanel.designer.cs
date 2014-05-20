@@ -1,4 +1,4 @@
-﻿using EQuant.Client;
+﻿using System.Windows.Forms;
 namespace OptionMM
 {
     partial class OptionPanel
@@ -48,7 +48,7 @@ namespace OptionMM
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.dataTable = new EQuant.Client.DoubleBufferedDataGridView();
+            this.dataTable = new DataGridView();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.cOptionID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cImpridVolatility = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -333,7 +333,7 @@ namespace OptionMM
 
         #endregion
 
-        public DoubleBufferedDataGridView dataTable;
+        public DataGridView dataTable;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.DataGridViewTextBoxColumn cOptionID;
         private System.Windows.Forms.DataGridViewTextBoxColumn cImpridVolatility;
