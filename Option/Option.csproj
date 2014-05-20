@@ -35,6 +35,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CTP, Version=1.0.5253.17403, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThostTraderApi\CTP.dll</HintPath>
+    </Reference>
     <Reference Include="EQuant.Client.Library">
       <HintPath>..\Libs\EQuant.Client.Library.dll</HintPath>
     </Reference>
@@ -127,15 +131,7 @@
     <None Include="Resources\StopIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Option.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CTP\CTP.VS2010.Net4.0.vcxproj">
-      <Project>{321418dc-afab-4d02-9bc8-9a1d73d7be1c}</Project>
-      <Name>CTP.VS2010.Net4.0</Name>
-    </ProjectReference>
+    <Content Include="Option.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
