@@ -12,11 +12,19 @@ namespace OptionMM
     class Contract
     {
         public Option option = null;
-        public double LongInputLots = 0;
-        public double LongPosiont = 0;
-        public double ShortInputLots = 0;
-        public double ShortPosiont = 0;
+        public int LongInputLots = 0;
+        public int LongPosition = 0;
+        public int ShortInputLots = 0;
+        public int ShortPosition = 0;
         public Instrument instrument = null;
+        public ThostFtdcOrderField CurrentAskOptionOrder = null;
+        public ThostFtdcOrderField CurrentBidOptionOrder = null;
+        public string AskOptionOrderRef = null;
+        public string BidOptionOrderRef = null;
+        private object LongInputLotsLock = new object();
+        private object LongPositionLock = new object();
+        private object ShortInputLotsLock = new object();
+        private object ShortPositionLock = new object();
 
         public Contract(Option op)
         {
@@ -98,22 +106,58 @@ namespace OptionMM
 
         public string Buy(string instrumentID, int lots, double price)
         {
+            AddLongInputLots(lots);
             return TDManager.TD.Buy(instrumentID, lots, price);
         }
 
         public string Sell(string instrumentID, int lots, double price)
         {
+            AddLongInputLots(-1 * lots);
             return TDManager.TD.Sell(instrumentID, lots, price);
         }
 
         public string BuyToCover(string instrumentID, int lots, double price)
         {
+            AddShortInputLots(lots);
             return TDManager.TD.BuyToCover(instrumentID, lots, price);
         }
 
         public string SellShort(string instrumentID, int lots, double price)
         {
+            AddShortInputLots(-1 * lots);
             return TDManager.TD.SellShort(instrumentID, lots, price);
+        }
+
+        public void AddShortInputLots(int Lots)
+        {
+            lock(ShortInputLotsLock)
+            {
+                ShortInputLots = ShortInputLots + Lots;
+            }
+        }
+
+        public void AddLongInputLots(int Lots)
+        {
+            lock (LongInputLotsLock)
+            {
+                LongInputLots = LongInputLots + Lots;
+            }
+        }
+
+        public void AddLongPosition(int Lots)
+        {
+            lock (LongPositionLock)
+            {
+                LongPosition = LongPosition + Lots;
+            }
+        }
+
+        public void AddShortPosition(int Lots)
+        {
+            lock (ShortPositionLock)
+            {
+                ShortPosition = ShortPosition + Lots;
+            }
         }
 
         public void CancelOrder(string OrderRef)
