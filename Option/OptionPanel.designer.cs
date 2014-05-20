@@ -31,8 +31,8 @@ namespace OptionMM
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -48,7 +48,8 @@ namespace OptionMM
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.dataTable = new DataGridView();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.dataTable = new System.Windows.Forms.DataGridView();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.cOptionID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cImpridVolatility = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -104,14 +105,14 @@ namespace OptionMM
             this.cIndexMaximumPositionNum,
             this.cBidPrice,
             this.cAskPrice});
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataTable.DefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle18.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle18.ForeColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataTable.DefaultCellStyle = dataGridViewCellStyle18;
             this.dataTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataTable.EnableHeadersVisualStyles = false;
             this.dataTable.Location = new System.Drawing.Point(0, 0);
@@ -119,9 +120,9 @@ namespace OptionMM
             this.dataTable.MultiSelect = false;
             this.dataTable.Name = "dataTable";
             this.dataTable.RowHeadersVisible = false;
-            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.HotTrack;
-            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataTable.RowsDefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.SystemColors.HotTrack;
+            dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataTable.RowsDefaultCellStyle = dataGridViewCellStyle19;
             this.dataTable.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("宋体", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.dataTable.RowTemplate.Height = 40;
             this.dataTable.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
@@ -185,16 +186,18 @@ namespace OptionMM
             // 
             // cRealPrice
             // 
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.cRealPrice.DefaultCellStyle = dataGridViewCellStyle6;
             this.cRealPrice.HeaderText = "实际价格";
             this.cRealPrice.Name = "cRealPrice";
             // 
             // cOptionPositionThreshold
             // 
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle6.Format = "F6";
-            dataGridViewCellStyle6.NullValue = null;
-            this.cOptionPositionThreshold.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle7.Format = "F6";
+            dataGridViewCellStyle7.NullValue = null;
+            this.cOptionPositionThreshold.DefaultCellStyle = dataGridViewCellStyle7;
             this.cOptionPositionThreshold.HeaderText = "开仓阈值";
             this.cOptionPositionThreshold.Name = "cOptionPositionThreshold";
             this.cOptionPositionThreshold.ReadOnly = true;
@@ -203,10 +206,10 @@ namespace OptionMM
             // 
             // cMiniumOptionOpenPosition
             // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle7.Format = "F6";
-            this.cMiniumOptionOpenPosition.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle8.Format = "F6";
+            this.cMiniumOptionOpenPosition.DefaultCellStyle = dataGridViewCellStyle8;
             this.cMiniumOptionOpenPosition.HeaderText = "最少开仓数";
             this.cMiniumOptionOpenPosition.Name = "cMiniumOptionOpenPosition";
             this.cMiniumOptionOpenPosition.ReadOnly = true;
@@ -215,10 +218,10 @@ namespace OptionMM
             // 
             // cOptionLongPositionNum
             // 
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle8.Format = "F6";
-            this.cOptionLongPositionNum.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle9.Format = "F6";
+            this.cOptionLongPositionNum.DefaultCellStyle = dataGridViewCellStyle9;
             this.cOptionLongPositionNum.HeaderText = "期权多头仓位数";
             this.cOptionLongPositionNum.Name = "cOptionLongPositionNum";
             this.cOptionLongPositionNum.ReadOnly = true;
@@ -228,10 +231,10 @@ namespace OptionMM
             // 
             // cOptionShortPositionNum
             // 
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle9.Format = "F6";
-            this.cOptionShortPositionNum.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle10.Format = "F6";
+            this.cOptionShortPositionNum.DefaultCellStyle = dataGridViewCellStyle10;
             this.cOptionShortPositionNum.HeaderText = "期权空头仓位数";
             this.cOptionShortPositionNum.Name = "cOptionShortPositionNum";
             this.cOptionShortPositionNum.ReadOnly = true;
@@ -241,11 +244,11 @@ namespace OptionMM
             // 
             // cIndexLongPositionNum
             // 
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle10.Format = "F6";
-            dataGridViewCellStyle10.NullValue = null;
-            this.cIndexLongPositionNum.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle11.Format = "F6";
+            dataGridViewCellStyle11.NullValue = null;
+            this.cIndexLongPositionNum.DefaultCellStyle = dataGridViewCellStyle11;
             this.cIndexLongPositionNum.HeaderText = "股指多头仓位数";
             this.cIndexLongPositionNum.Name = "cIndexLongPositionNum";
             this.cIndexLongPositionNum.ReadOnly = true;
@@ -255,11 +258,11 @@ namespace OptionMM
             // 
             // cIndexShortPositionNum
             // 
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle11.Format = "F6";
-            dataGridViewCellStyle11.NullValue = null;
-            this.cIndexShortPositionNum.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle12.Format = "F6";
+            dataGridViewCellStyle12.NullValue = null;
+            this.cIndexShortPositionNum.DefaultCellStyle = dataGridViewCellStyle12;
             this.cIndexShortPositionNum.HeaderText = "股指空头仓位数";
             this.cIndexShortPositionNum.Name = "cIndexShortPositionNum";
             this.cIndexShortPositionNum.ReadOnly = true;
@@ -269,11 +272,11 @@ namespace OptionMM
             // 
             // cPositionProfit
             // 
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle12.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle12.Format = "F6";
-            dataGridViewCellStyle12.NullValue = null;
-            this.cPositionProfit.DefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle13.Format = "F6";
+            dataGridViewCellStyle13.NullValue = null;
+            this.cPositionProfit.DefaultCellStyle = dataGridViewCellStyle13;
             this.cPositionProfit.HeaderText = "持仓盈亏";
             this.cPositionProfit.Name = "cPositionProfit";
             this.cPositionProfit.ReadOnly = true;
@@ -282,11 +285,11 @@ namespace OptionMM
             // 
             // cOptionMaximumPositionNum
             // 
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle13.Format = "F6";
-            dataGridViewCellStyle13.NullValue = null;
-            this.cOptionMaximumPositionNum.DefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle14.Format = "F6";
+            dataGridViewCellStyle14.NullValue = null;
+            this.cOptionMaximumPositionNum.DefaultCellStyle = dataGridViewCellStyle14;
             this.cOptionMaximumPositionNum.HeaderText = "期权限仓数";
             this.cOptionMaximumPositionNum.Name = "cOptionMaximumPositionNum";
             this.cOptionMaximumPositionNum.ReadOnly = true;
@@ -295,10 +298,10 @@ namespace OptionMM
             // 
             // cIndexMaximumPositionNum
             // 
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle14.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle14.Format = "F6";
-            this.cIndexMaximumPositionNum.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle15.Format = "F6";
+            this.cIndexMaximumPositionNum.DefaultCellStyle = dataGridViewCellStyle15;
             this.cIndexMaximumPositionNum.HeaderText = "股指限仓数";
             this.cIndexMaximumPositionNum.Name = "cIndexMaximumPositionNum";
             this.cIndexMaximumPositionNum.ReadOnly = true;
@@ -307,15 +310,15 @@ namespace OptionMM
             // 
             // cBidPrice
             // 
-            dataGridViewCellStyle15.Format = "f6";
-            this.cBidPrice.DefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle16.Format = "f6";
+            this.cBidPrice.DefaultCellStyle = dataGridViewCellStyle16;
             this.cBidPrice.HeaderText = "买入报价";
             this.cBidPrice.Name = "cBidPrice";
             // 
             // cAskPrice
             // 
-            dataGridViewCellStyle16.Format = "f6";
-            this.cAskPrice.DefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle17.Format = "f6";
+            this.cAskPrice.DefaultCellStyle = dataGridViewCellStyle17;
             this.cAskPrice.HeaderText = "卖出报价";
             this.cAskPrice.Name = "cAskPrice";
             // 
@@ -335,22 +338,22 @@ namespace OptionMM
 
         public DataGridView dataTable;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cOptionID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cImpridVolatility;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cDelta;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cTheroricalPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cRealPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cOptionPositionThreshold;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cMiniumOptionOpenPosition;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cOptionLongPositionNum;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cOptionShortPositionNum;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cIndexLongPositionNum;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cIndexShortPositionNum;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cPositionProfit;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cOptionMaximumPositionNum;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cIndexMaximumPositionNum;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cBidPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cAskPrice;
+        private DataGridViewTextBoxColumn cOptionID;
+        private DataGridViewTextBoxColumn cImpridVolatility;
+        private DataGridViewTextBoxColumn cDelta;
+        private DataGridViewTextBoxColumn cTheroricalPrice;
+        private DataGridViewTextBoxColumn cRealPrice;
+        private DataGridViewTextBoxColumn cOptionPositionThreshold;
+        private DataGridViewTextBoxColumn cMiniumOptionOpenPosition;
+        private DataGridViewTextBoxColumn cOptionLongPositionNum;
+        private DataGridViewTextBoxColumn cOptionShortPositionNum;
+        private DataGridViewTextBoxColumn cIndexLongPositionNum;
+        private DataGridViewTextBoxColumn cIndexShortPositionNum;
+        private DataGridViewTextBoxColumn cPositionProfit;
+        private DataGridViewTextBoxColumn cOptionMaximumPositionNum;
+        private DataGridViewTextBoxColumn cIndexMaximumPositionNum;
+        private DataGridViewTextBoxColumn cBidPrice;
+        private DataGridViewTextBoxColumn cAskPrice;
 
     }
 }
