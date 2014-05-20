@@ -163,10 +163,12 @@ namespace OptionMM
         {
             if (Contracts[0].BidOptionOrderRef == order.OrderRef)
             {
+                Contracts[0].AddLongPosition(order.VolumeTraded - Contracts[0].CurrentBidOptionOrder.VolumeTraded);
                 Contracts[0].CurrentBidOptionOrder = order;
             }
             else if (Contracts[0].AskOptionOrderRef == order.OrderRef)
             {
+                Contracts[0].AddShortPosition(order.VolumeTraded - Contracts[0].CurrentAskOptionOrder.VolumeTraded);
                 Contracts[0].CurrentAskOptionOrder = order;
             }
         }
