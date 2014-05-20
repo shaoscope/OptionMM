@@ -50,6 +50,11 @@ namespace OptionMM
             return ContractDictionary[i];
         }
 
+        public static List<Contract> GetContract(string strUnderlyingID)
+        {
+            return UnderlyingMap[strUnderlyingID];
+        }
+
         public static void Init()
         {
             ContractDictionary.Clear();
