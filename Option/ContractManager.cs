@@ -24,6 +24,7 @@ namespace OptionMM
                 {
                     List<Contract> contractList = new List<Contract>();
                     contractList.Add(contract);
+                    UnderlyingMap.Add(op.underlyingInstrumentID, contractList);
                 }
             }
             catch
