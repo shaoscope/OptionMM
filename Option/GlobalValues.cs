@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace OptionMM
+{
+    class GlobalValues
+    {
+        //当前日期衡量类型
+        public static TimeMeasurementTypeEnum TimeMeasurementType = TimeMeasurementTypeEnum.交易日;
+
+        //一年的日历天数
+        public static readonly int GeneralDaysPerYear = 365;
+
+        //一年的交易天数
+        public static readonly int TradingDaysPerYear = 252;
+
+    }
+
+    public enum OptionTypeEnum : int
+    {
+        call = 1,
+        put = 2
+    }
+
+    public enum TimeMeasurementTypeEnum : int
+    {
+        交易日 = 1,
+        日历日 = 2
+
+    }
+}
