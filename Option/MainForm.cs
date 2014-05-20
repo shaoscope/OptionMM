@@ -57,11 +57,19 @@ namespace OptionMM
                 Option op = (Option)optionPanel.dataTable.Rows[i];
                 ContractManager.CreatContract(op);
             }
-            //生成策略实例
+            //生成策略实例(期权）
             for (int i = 0; i < optionPanel.dataTable.Rows.Count; i++)
             {
-                Contract[] contracts = new Contract[2]{ ContractManager.GetContract(i + 1 + optionPanel.dataTable.Rows.Count), ContractManager.GetContract(i + 1)};
+                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i + UnderlyingCount + optionPanel.dataTable.Rows.Count) };
                 myTS1 ts = new myTS1(contracts[0].option.instrumentID);
+                ts.SetContracts(contracts);
+                tsList.Add((TSBase)ts);
+            }
+            //生成策略实例(期货）
+            for (int i = 0; i < UnderlyingCount; i++)
+            {
+                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i) };
+                myTS2 ts = new myTS2(contracts[0].instrument.InstrumentID);
                 ts.SetContracts(contracts);
                 tsList.Add((TSBase)ts);
             }
@@ -100,6 +108,7 @@ namespace OptionMM
             }
         }
 
+        int UnderlyingCount = 0;
         private void InitFromXML(string strFile)
         {
             
@@ -154,12 +163,18 @@ namespace OptionMM
                             {
                                 Property[5] = xmlRder.Value;
                                 InstrumentManager.CreatInstrument(xmlRder.Value);
-                                ContractManager.CreatContract(InstrumentManager.GetInstrument(xmlRder.Value));
+                                //ContractManager.CreatContract(InstrumentManager.GetInstrument(xmlRder.Value));
                             }
                         }
                         configValues.Add(strID, Property);
-                        
                     }
+                }
+                //每个标的物只生成一个CONTRACT
+                Dictionary<string, Instrument> instrumentTemp = InstrumentManager.GetAllInstrument();
+                UnderlyingCount = instrumentTemp.Count;
+                foreach (Instrument inst in instrumentTemp.Values)
+                {
+                    ContractManager.CreatContract(inst);
                 }
             }
             catch
