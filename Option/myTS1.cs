@@ -41,9 +41,10 @@ namespace OptionMM
 
         public override void Run()
         {
-            string[] inst = new string[1] { Contracts[0].option.underlyingInstrumentID };
+            string[] inst = new string[1] { Contracts[0].option.instrumentID };
             Contracts[0].SubMD(inst);
-            inst = new string[1] { Contracts[0].option.instrumentID };
+            inst = new string[1] { Contracts[0].option.underlyingInstrumentID };
+            Contracts[0].UnSubMD(inst);
             Contracts[0].SubMD(inst);
             bRun = true;
         }
@@ -78,12 +79,20 @@ namespace OptionMM
                     {
                         //double MMBid = Math.Round(Contracts[0].option.price, 2);
                         MMAsk = Math.Round(md.AskPrice1 + 0.1, 2);
-                        if (MMAsk < 0.6)
-                        {
-                            MMAsk = 0.6;
-                        }
-                        MMBid = MMPrice.GetBidPriceThisMonth(MMAsk);
+                        MMBid = MMPrice.GetBidPriceThisMonth(ref MMAsk);
                     }
+                    else if (Contracts[0].option.optionValue.Price > Contracts[0].option.price)
+                    {
+                        MMBid = Math.Round(Contracts[0].option.optionValue.Price - Contracts[0].option.optionPositionThreshold);
+                        MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
+                    }
+                    else if (Contracts[0].option.optionValue.Price > Contracts[0].option.price)
+                    {
+                        MMAsk = Math.Round(Contracts[0].option.optionValue.Price + Contracts[0].option.optionPositionThreshold);
+                        MMBid = MMPrice.GetBidPriceThisMonth(ref MMAsk);
+                    }
+                    else
+                        return;
                     Contracts[0].option.mmQuotation.AskPrice = MMAsk;
                     Contracts[0].option.mmQuotation.BidPrice = MMBid;
                     Contracts[0].option.mmQuotation.AskLots = 10;
@@ -163,15 +172,30 @@ namespace OptionMM
         {
             if (Contracts[0].BidOptionOrderRef == order.OrderRef)
             {
-                Contracts[0].AddLongPosition(order.VolumeTraded - Contracts[0].CurrentBidOptionOrder.VolumeTraded);
-                Contracts[0].CurrentBidOptionOrder = order;
+                if (order.VolumeTraded == 0 || Contracts[0].CurrentBidOptionOrder == null)
+                {
+                    Contracts[0].CurrentBidOptionOrder = order;
+                }
+                else
+                {
+                    Contracts[0].AddLongPosition(order.VolumeTraded - Contracts[0].CurrentBidOptionOrder.VolumeTraded);
+                    Contracts[0].CurrentBidOptionOrder = order;
+                }
             }
             else if (Contracts[0].AskOptionOrderRef == order.OrderRef)
             {
-                Contracts[0].AddShortPosition(order.VolumeTraded - Contracts[0].CurrentAskOptionOrder.VolumeTraded);
-                Contracts[0].CurrentAskOptionOrder = order;
+                if (order.VolumeTraded == 0 || Contracts[0].CurrentAskOptionOrder == null)
+                {
+                    Contracts[0].CurrentAskOptionOrder = order;
+                }
+                else
+                {
+                    Contracts[0].AddShortPosition(order.VolumeTraded - Contracts[0].CurrentAskOptionOrder.VolumeTraded);
+                    Contracts[0].CurrentAskOptionOrder = order;
+                }
             }
         }
+
 
         void OnUnderlyingTrading(ThostFtdcOrderField order)
         {

@@ -49,6 +49,11 @@ namespace OptionMM
             MDManager.MD.SubscribeMarketData(inst);
         }
 
+        public void UnSubMD(string[] inst)
+        {
+            MDManager.MD.UnSubscribeMarketData(inst);
+        }
+
         void OnDepthMarketData(ThostFtdcDepthMarketDataField md)
         {
             if ((option != null && md.InstrumentID == option.instrumentID) || (instrument != null && md.InstrumentID == instrument.InstrumentID))

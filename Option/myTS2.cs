@@ -40,9 +40,8 @@ namespace OptionMM
 
         public override void Run()
         {
-            string[] inst = new string[1] { Contracts[0].option.underlyingInstrumentID };
-            Contracts[0].SubMD(inst);
-            inst = new string[1] { Contracts[0].option.instrumentID };
+            string[] inst = new string[1] { Contracts[0].instrument.InstrumentID };
+            Contracts[0].UnSubMD(inst);
             Contracts[0].SubMD(inst);
             bRun = true;
         }
@@ -133,7 +132,7 @@ namespace OptionMM
             else if (order.CombOffsetFlag_0 == EnumOffsetFlagType.CloseToday && order.Direction == EnumDirectionType.Buy)
             {
                 //买平
-                int nonTraded = order.VolumeTotal;
+
                 Contracts[0].AddShortInputLots(order.VolumeTotal);
             }
             else if (order.CombOffsetFlag_0 == EnumOffsetFlagType.CloseToday && order.Direction == EnumDirectionType.Sell)
@@ -143,16 +142,31 @@ namespace OptionMM
             }
         }
 
-
         void OnUnderlyingTrading(ThostFtdcOrderField order)
         {
             if (Contracts[0].BidOptionOrderRef == order.OrderRef)
             {
-                Contracts[0].CurrentBidOptionOrder = order;
+                if (order.VolumeTraded == 0 || Contracts[0].CurrentBidOptionOrder == null)
+                {
+                    Contracts[0].CurrentBidOptionOrder = order;
+                }
+                else
+                {
+                    Contracts[0].AddLongPosition(order.VolumeTraded - Contracts[0].CurrentBidOptionOrder.VolumeTraded);
+                    Contracts[0].CurrentBidOptionOrder = order;
+                }
             }
             else if (Contracts[0].AskOptionOrderRef == order.OrderRef)
             {
-                Contracts[0].CurrentAskOptionOrder = order;
+                if (order.VolumeTraded == 0 || Contracts[0].CurrentAskOptionOrder == null)
+                {
+                    Contracts[0].CurrentAskOptionOrder = order;
+                }
+                else
+                {
+                    Contracts[0].AddShortPosition(order.VolumeTraded - Contracts[0].CurrentAskOptionOrder.VolumeTraded);
+                    Contracts[0].CurrentAskOptionOrder = order;
+                }
             }
         }
 
@@ -160,6 +174,5 @@ namespace OptionMM
         {
 
         }
-
     }
 }

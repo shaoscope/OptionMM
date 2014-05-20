@@ -60,7 +60,7 @@ namespace OptionMM
             //生成策略实例(期权）
             for (int i = 0; i < optionPanel.dataTable.Rows.Count; i++)
             {
-                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i + UnderlyingCount + optionPanel.dataTable.Rows.Count) };
+                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i + 1 + UnderlyingCount) };
                 myTS1 ts = new myTS1(contracts[0].option.instrumentID);
                 ts.SetContracts(contracts);
                 tsList.Add((TSBase)ts);
@@ -68,10 +68,11 @@ namespace OptionMM
             //生成策略实例(期货）
             for (int i = 0; i < UnderlyingCount; i++)
             {
-                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i) };
+                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i + 1) };
                 myTS2 ts = new myTS2(contracts[0].instrument.InstrumentID);
                 ts.SetContracts(contracts);
                 tsList.Add((TSBase)ts);
+                ts.Run();
             }
             this.flushTimer = new System.Threading.Timer(this.flushTimerCallback, null, 1000, 1000);
         }
