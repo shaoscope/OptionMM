@@ -7,5 +7,6 @@ namespace OptionMM
 {
     static class Test
     {
+        //
     }
 }
