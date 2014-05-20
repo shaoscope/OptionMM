@@ -146,7 +146,6 @@ namespace OptionMM
             else if (order.CombOffsetFlag_0 == EnumOffsetFlagType.CloseToday && order.Direction == EnumDirectionType.Buy)
             {
                 //买平
-                int nonTraded = order.VolumeTotal;
                 Contracts[0].AddShortInputLots(order.VolumeTotal);
             }
             else if (order.CombOffsetFlag_0 == EnumOffsetFlagType.CloseToday && order.Direction == EnumDirectionType.Sell)
