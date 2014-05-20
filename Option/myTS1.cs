@@ -74,13 +74,13 @@ namespace OptionMM
                     {
                         ////计算开仓手数 股指手数定义 期权手数 = 1/隐含波动率 向上取整 * 3, 买入期权，//卖出股指。
                         //报10手期权
-                        MMBid = Math.Round(md.BidPrice1, 2);
+                        MMBid = Math.Round(md.BidPrice1 - 0.1, 2);
                         MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
                     }
                     else if (Contracts[0].option.price - Contracts[0].option.optionValue.Price > Contracts[0].option.optionPositionThreshold)
                     {
                         //double MMBid = Math.Round(Contracts[0].option.price, 2);
-                        MMAsk = Math.Round(md.AskPrice1, 2);
+                        MMAsk = Math.Round(md.AskPrice1 + 0.1, 2);
                         if (MMAsk < 0.6)
                         {
                             MMAsk = 0.6;
@@ -94,20 +94,24 @@ namespace OptionMM
                     //判断是否撤单
                     if (CurrentBidOptionOrder != null && (Contracts[0].option.mmQuotation.BidPrice != CurrentBidOptionOrder.LimitPrice || CurrentBidOptionOrder.VolumeTraded > 0))
                     {
-                        if (CurrentBidOptionOrder.VolumeTraded != CurrentBidOptionOrder.VolumeTotal)
+                        //需要重新报单
+                        if (CurrentBidOptionOrder.VolumeTraded != CurrentBidOptionOrder.VolumeTotalOriginal)
                         {
                             Contracts[0].CancelOrder(BidOptionOrderRef);
                         }
                         BidOptionOrderRef = null;
+                        CurrentBidOptionOrder = null;
                     }
-                    if (CurrentAskOptionOrder != null && (Contracts[0].option.mmQuotation.AskPrice != CurrentAskOptionOrder.LimitPrice || CurrentBidOptionOrder.VolumeTraded > 0))
+                    if (CurrentAskOptionOrder != null && (Contracts[0].option.mmQuotation.AskPrice != CurrentAskOptionOrder.LimitPrice || CurrentAskOptionOrder.VolumeTraded > 0))
                     {
-                        if (CurrentBidOptionOrder.VolumeTraded != CurrentBidOptionOrder.VolumeTotal)
+                        if (CurrentAskOptionOrder.VolumeTraded != CurrentAskOptionOrder.VolumeTotalOriginal)
                         {
                             Contracts[0].CancelOrder(AskOptionOrderRef);
                         }
                         AskOptionOrderRef = null;
+                        CurrentAskOptionOrder = null;
                     }
+                    //没有报出报单
                     if (BidOptionOrderRef == null)
                     {
                         BidOptionOrderRef = Contracts[0].Buy(Contracts[0].option.instrumentID, Contracts[0].option.mmQuotation.BidLots, Contracts[0].option.mmQuotation.BidPrice);

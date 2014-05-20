@@ -21,7 +21,7 @@ namespace OptionMM
             {
                 if (underlyingPrice != 0)
                 {
-                    return new OptionProperties(optionType, underlyingPrice, strikePrice, 0.05, 0.1, 30);
+                    return new OptionProperties(optionType, underlyingPrice, strikePrice, GlobalValues.InterestRate, GlobalValues.Volatility, GlobalValues.DaysToMaturity);
                 }
                 else return null;
             }

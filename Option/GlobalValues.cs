@@ -16,6 +16,14 @@ namespace OptionMM
         //一年的交易天数
         public static readonly int TradingDaysPerYear = 252;
 
+        //无风险利率
+        public static readonly double InterestRate = 0.05;
+
+        //股指波动率
+        public static readonly double Volatility = 0.3;
+
+        //到期天数
+        public static readonly int DaysToMaturity = 22;
     }
 
     public enum OptionTypeEnum : int
