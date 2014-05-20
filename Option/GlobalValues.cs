@@ -26,7 +26,7 @@ namespace OptionMM
         public static readonly int DaysToMaturity = 22;
 
         //test
-
+        //test
     }
 
     public enum OptionTypeEnum : int
