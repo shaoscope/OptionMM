@@ -127,7 +127,9 @@
     <None Include="Resources\StopIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Option.xml" />
+    <Content Include="Option.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CTP\CTP.VS2010.Net4.0.vcxproj">
