@@ -23,11 +23,24 @@ namespace OptionMM
 
             }
         }
+
         public static Instrument GetInstrument(string strID)
         {
             Instrument insRet = null;
             insRet = InstrumentMap[strID];
             return insRet;
+        }
+
+        public static Dictionary<string, Instrument> GetAllInstrument()
+        {
+            if(InstrumentMap.Count > 0)
+            {
+                return InstrumentMap;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
