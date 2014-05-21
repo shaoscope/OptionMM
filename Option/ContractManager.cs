@@ -7,14 +7,14 @@ namespace OptionMM
 {
     class ContractManager
     {
-        static Dictionary<int, Contract> ContractDictionary = new Dictionary<int, Contract>();
-        static Dictionary<string, List<Contract>> UnderlyingMap = new Dictionary<string, List<Contract>>();
+        static Dictionary<int, CTPEvents> ContractDictionary = new Dictionary<int, CTPEvents>();
+        static Dictionary<string, List<CTPEvents>> UnderlyingMap = new Dictionary<string, List<CTPEvents>>();
 
-        public static void CreatContract(Option op)
+        public static void CreatContract(Strategy op)
         {
             try
             {
-                Contract contract = new Contract(op);
+                CTPEvents contract = new CTPEvents(op);
                 ContractDictionary.Add(ContractDictionary.Count + 1, contract);
                 if(UnderlyingMap.Keys.Contains(op.underlyingInstrumentID))
                 {
@@ -22,7 +22,7 @@ namespace OptionMM
                 }
                 else
                 {
-                    List<Contract> contractList = new List<Contract>();
+                    List<CTPEvents> contractList = new List<CTPEvents>();
                     contractList.Add(contract);
                     UnderlyingMap.Add(op.underlyingInstrumentID, contractList);
                 }
@@ -37,7 +37,7 @@ namespace OptionMM
         {
             try
             {
-                Contract contract = new Contract(instrument);
+                CTPEvents contract = new CTPEvents(instrument);
                 ContractDictionary.Add(ContractDictionary.Count + 1, contract);
             }
             catch
@@ -46,12 +46,12 @@ namespace OptionMM
             }
         }
 
-        public static Contract GetContract(int i)
+        public static CTPEvents GetContract(int i)
         {
             return ContractDictionary[i];
         }
 
-        public static List<Contract> GetContract(string strUnderlyingID)
+        public static List<CTPEvents> GetContract(string strUnderlyingID)
         {
             return UnderlyingMap[strUnderlyingID];
         }

@@ -1,70 +1,197 @@
-﻿using System;
+﻿using CTP;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 
 namespace OptionMM
 {
-    class Option : DataGridViewRow
+    class Option : CTPEvents
     {
+        //期权合约代码
+        private string instrumentID;
 
-        public OptionValue optionValue; //动态理论值
-
-        private OptionProperties optionProperties;   //属性
-
-        public MMQuotation mmQuotation;
-
-        public OptionProperties OptionProperties
+        public string InstrumentID
         {
-            get
-            {
-                if (underlyingPrice != 0)
-                {
-                    return new OptionProperties(optionType, underlyingPrice, strikePrice, GlobalValues.InterestRate, GlobalValues.Volatility, GlobalValues.DaysToMaturity);
-                }
-                else return null;
-            }
+            get { return this.instrumentID; }
+            set { this.instrumentID = value; }
         }
 
-
-        public string instrumentID;
-
-        public double price;    //当前价格
-
-        public OptionTypeEnum optionType;
-
-        public double strikePrice;
-
-        public double underlyingPrice = 0;  //标的物当前价格
-
-        public double impridVolatility; //隐含波动率
-
-        public double optionPositionThreshold;  //开仓阈值
-
-        public double minOptionOpenLots;    //最小开仓数
-
-        public double maxOptionOpenLots;    //最大开仓数
-
-        public string underlyingInstrumentID;   //标的物
-
-        public Option()
-        {
-            optionValue = new OptionValue();
-            optionProperties = new OptionProperties();
-            mmQuotation = new MMQuotation();
-        }
-
-        //所属面板控件
-        private OptionPanel optionPanel;
+        //期权的价格
+        private double theoreticalPrice;
 
         /// <summary>
-        /// 设置对冲明细应该显示的面板
+        /// 获取或者设置期权的价格
         /// </summary>
-        /// <param name="panel"></param>
-        public void SetPanel(OptionPanel optionPanel)
+        public double TheoreticalPrice
         {
-            this.optionPanel = optionPanel;
+            get { return this.theoreticalPrice; }
+            set { this.theoreticalPrice = value; }
+        }
+
+        //Delta
+        private double delta;
+
+        /// <summary>
+        /// 获取或者设置Delta
+        /// </summary>
+        public double Delta
+        {
+            get { return this.delta; }
+            set { this.delta = value; }
+        }
+
+        //Gamma
+        private double gamma;
+
+        /// <summary>
+        /// 获取或者设置Gamma
+        /// </summary>
+        public double Gamma
+        {
+            get { return this.gamma; }
+            set { this.gamma = value; }
+        }
+
+        //Vega
+        private double vega;
+
+        /// <summary>
+        /// 获取或者设置期权的Vega
+        /// </summary>
+        public double Vega
+        {
+            get { return this.vega; }
+            set { this.vega = value; }
+        }
+
+        //Theta
+        private double theta;
+
+        /// <summary>
+        /// 获取或者设置期权的Theta
+        /// </summary>
+        public double Theta
+        {
+            get { return this.theta; }
+            set { this.theta = value; }
+        }
+
+        //Rho
+        private double rho;
+
+        /// <summary>
+        /// 获取或者设置期权的Rho
+        /// </summary>
+        public double Rho
+        {
+            get { return this.rho; }
+            set { this.rho = value; }
+        }
+
+        //距离期权到期日
+        private double maturity;
+
+        /// <summary>
+        /// 获取或者设置距离期权的到期日
+        /// </summary>
+        public double Maturity
+        {
+            get { return this.maturity; }
+            set { this.maturity = value; }
+        }
+
+        /// <summary>
+        /// 期权类型
+        /// </summary>
+        private OptionTypeEnum optionType;
+
+        /// <summary>
+        /// 获取期权类型
+        /// </summary>
+        public OptionTypeEnum OptionType
+        {
+            get { return this.optionType; }
+            set { this.optionType = value; }
+        }
+
+        /// <summary>
+        /// 标的物的价格
+        /// </summary>
+        private double underlyingPrice;
+
+        /// <summary>
+        /// 获取标的物的价格
+        /// </summary>
+        public double UnderlyingPrice
+        {
+            get { return this.underlyingPrice; }
+            set { this.underlyingPrice = value; }
+        }
+
+        /// <summary>
+        /// 执行价
+        /// </summary>
+        private double strikePrice;
+
+        /// <summary>
+        /// 获取执行价
+        /// </summary>
+        public double StrikePrice
+        {
+            get { return this.strikePrice; }
+            set { this.strikePrice = value; }
+        }
+
+        /// <summary>
+        /// 无风险利率
+        /// </summary>
+        private double interestRate;
+
+        /// <summary>
+        /// 获取无风险利率
+        /// </summary>
+        public double InterestRate
+        {
+            get { return this.interestRate; }
+        }
+
+        /// <summary>
+        /// 波动率
+        /// </summary>
+        private double volatility;
+
+        /// <summary>
+        /// 获取波动率
+        /// </summary>
+        public double Volatility
+        {
+            get { return this.volatility; }
+        }
+
+        /// <summary>
+        /// 隐含波动率
+        /// </summary>
+        private double impridVolatility;
+
+        /// <summary>
+        /// 获取或者设置隐含波动率
+        /// </summary>
+        public double ImpridVolatility
+        {
+            get { return this.impridVolatility; }
+            set { this.impridVolatility = value; }
+        }
+
+        /// <summary>
+        /// 期权合约最后行情
+        /// </summary>
+        private ThostFtdcDepthMarketDataField lastMarket;
+
+
+        public ThostFtdcDepthMarketDataField LastMarket
+        {
+            get { return this.lastMarket; }
         }
 
     }

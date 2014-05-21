@@ -9,9 +9,9 @@ namespace OptionMM
     public delegate void TickHandle(ThostFtdcDepthMarketDataField md);
     public delegate void OrderHandle(ThostFtdcOrderField order);
 
-    class Contract
+    class CTPEvents
     {
-        public Option option = null;
+        public Strategy stragety = null;
         public int LongInputLots = 0;
         public int LongPosition = 0;
         public int ShortInputLots = 0;
@@ -26,16 +26,16 @@ namespace OptionMM
         private object ShortInputLotsLock = new object();
         private object ShortPositionLock = new object();
 
-        public Contract(Option op)
+        public CTPEvents(Strategy op)
         {
-            option = op;
+            stragety = op;
             MDManager.MD.OnDepthMarketData += new DepthMarketDataHandle(OnDepthMarketData);
             TDManager.TD.OnCanceled += new CanceledHandle(OnOrderCanceled);
             TDManager.TD.OnTraded += new TradedHandle(OnOrderTraded);
             TDManager.TD.OnTrading += new TradingHandle(OnOrderTrading);
         }
 
-        public Contract(Instrument instrment)
+        public CTPEvents(Instrument instrment)
         {
             instrument = instrment;
             MDManager.MD.OnDepthMarketData += new DepthMarketDataHandle(OnDepthMarketData);
@@ -56,28 +56,28 @@ namespace OptionMM
 
         void OnDepthMarketData(ThostFtdcDepthMarketDataField md)
         {
-            if ((option != null && md.InstrumentID == option.instrumentID) || (instrument != null && md.InstrumentID == instrument.InstrumentID))
+            if ((stragety != null && md.InstrumentID == stragety.instrumentID) || (instrument != null && md.InstrumentID == instrument.InstrumentID))
             {
                 PushTick(md);
             }
         }
         void OnOrderCanceled(ThostFtdcOrderField order)
         {
-            if ((option != null && order.InstrumentID == option.instrumentID) || (instrument != null && order.InstrumentID == instrument.InstrumentID))
+            if ((stragety != null && order.InstrumentID == stragety.instrumentID) || (instrument != null && order.InstrumentID == instrument.InstrumentID))
             {
                 PushTrading(order);
             }
         }
         void OnOrderTraded(ThostFtdcOrderField order)
         {
-            if ((option != null && order.InstrumentID == option.instrumentID) || (instrument != null && order.InstrumentID == instrument.InstrumentID))
+            if ((stragety != null && order.InstrumentID == stragety.instrumentID) || (instrument != null && order.InstrumentID == instrument.InstrumentID))
             {
                 PushTrading(order);
             }
         }
         void OnOrderTrading(ThostFtdcOrderField order)
         {
-            if ((option != null && order.InstrumentID == option.instrumentID) || (instrument != null && order.InstrumentID == instrument.InstrumentID))
+            if ((stragety != null && order.InstrumentID == stragety.instrumentID) || (instrument != null && order.InstrumentID == instrument.InstrumentID))
             {
                 PushTrading(order);
             }

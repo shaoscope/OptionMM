@@ -7,6 +7,6 @@ namespace OptionMM
 {
     class OptionMap
     {
-        public static Dictionary<string, Option> OptionList = new Dictionary<string, Option>();
+        public static Dictionary<string, Strategy> OptionList = new Dictionary<string, Strategy>();
     }
 }

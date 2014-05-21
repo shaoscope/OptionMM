@@ -28,8 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.optionPanel = new OptionPanel();
+            this.optionPanel = new OptionMM.OptionPanel();
             this.SuspendLayout();
             // 
             // optionPanel
@@ -56,7 +55,6 @@
 
         #endregion
 
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private OptionPanel optionPanel;
 
     }

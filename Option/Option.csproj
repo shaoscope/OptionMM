@@ -7,8 +7,8 @@
     <ProjectGuid>{C2C27F09-4DE6-4FFE-8399-07F3A9927FC8}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Option</RootNamespace>
-    <AssemblyName>Option</AssemblyName>
+    <RootNamespace>OptionMM</RootNamespace>
+    <AssemblyName>OptionMM</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -49,11 +49,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContractManager.cs" />
-    <Compile Include="Contract.cs" />
+    <Compile Include="CTPEvents.cs" />
+    <Compile Include="Future.cs" />
     <Compile Include="InstrumentManager.cs" />
     <Compile Include="Instrument.cs" />
+    <Compile Include="IStrategyBase.cs" />
     <Compile Include="MMPrice.cs" />
     <Compile Include="MMQuotation.cs" />
+    <Compile Include="Option.cs" />
     <Compile Include="OptionMap.cs" />
     <Compile Include="OptionPanel.cs">
       <SubType>UserControl</SubType>
@@ -61,7 +64,7 @@
     <Compile Include="OptionPanel.designer.cs">
       <DependentUpon>OptionPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Option.cs" />
+    <Compile Include="Strategy.cs" />
     <Compile Include="GlobalValues.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

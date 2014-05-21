@@ -12,7 +12,7 @@ namespace OptionMM
 {
     class myTS2 : TSBase
     {
-        Contract[] Contracts = null;
+        CTPEvents[] Contracts = null;
 
         public myTS2(string TSName)
             : base(TSName)
@@ -20,7 +20,7 @@ namespace OptionMM
 
         }
 
-        public void SetContracts(Contract[] contracts)
+        public void SetContracts(CTPEvents[] contracts)
         {
             Contracts = contracts;
             Contracts[0].OnTick += new TickHandle(OnUnderlyingTick);
@@ -63,15 +63,15 @@ namespace OptionMM
             if (bRun)
             {
                 //CallPut 分开算
-                List<Contract> optionContracts = ContractManager.GetContract(md.InstrumentID);
+                List<CTPEvents> optionContracts = ContractManager.GetContract(md.InstrumentID);
                 //本期货对应的期权合约的净对冲头寸
                 double netLots = 0;
-                foreach (Contract cont in optionContracts)
+                foreach (CTPEvents cont in optionContracts)
                 {
                     //实时计算BS
-                    cont.option.underlyingPrice = md.LastPrice;
-                    cont.option.optionValue = OptionPricingModel.EuropeanBS(cont.option.OptionProperties);
-                    netLots = netLots - cont.option.optionValue.Delta * (cont.LongPosition - cont.ShortPosition);
+                    cont.stragety.underlyingPrice = md.LastPrice;
+                    cont.stragety.optionValue = OptionPricingModel.EuropeanBS(cont.stragety.OptionProperties);
+                    netLots = netLots - cont.stragety.optionValue.Delta * (cont.LongPosition - cont.ShortPosition);
                     //netLots = netLots + cont.LongPosition - cont.ShortPosition;
                 }
                 //头寸对冲

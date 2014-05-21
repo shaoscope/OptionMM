@@ -18,16 +18,14 @@ namespace OptionMM
     {
         public static List<TSBase> tsList = new List<TSBase>();
 
-        private List<Option> optionList = new List<Option>();
+        private List<Strategy> optionList = new List<Strategy>();
         public MainForm()
         {
             InitializeComponent();
         }
 
         private Dictionary<string, string[]> configValues = new Dictionary<string, string[]>();
-
-        private System.Threading.Timer flushTimer;
-
+        
         //同步对象
         private readonly object gSyncRoot = new object();
 
@@ -36,76 +34,43 @@ namespace OptionMM
             InitFromXML("Option.xml");
             foreach (string instrumentID in configValues.Keys)
             {
-                Option option = new Option();
-                option.instrumentID = instrumentID;
+                Strategy strategy = new Strategy();
+                strategy.Option.InstrumentID = instrumentID;
                 string[] strTemp = instrumentID.Split('-');
-                option.strikePrice = double.Parse(strTemp[2]);
-                option.optionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
-                option.impridVolatility = Double.Parse(configValues[instrumentID][0]);
-                option.optionPositionThreshold = Double.Parse(configValues[instrumentID][1]);
-                option.minOptionOpenLots = Double.Parse(configValues[instrumentID][2]);
+                strategy.Option.StrikePrice = double.Parse(strTemp[2]);
+                strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
+                strategy.Option.ImpridVolatility = Double.Parse(configValues[instrumentID][0]);
+                strategy.optionPositionThreshold = Double.Parse(configValues[instrumentID][1]);
+                strategy.minOptionOpenLots = Double.Parse(configValues[instrumentID][2]);
                 //option.maxOptionOpenLots = Double.Parse(configValues[instrumentID][3]);   //开仓点数
-                option.maxOptionOpenLots = Double.Parse(configValues[instrumentID][4]);
-                option.underlyingInstrumentID = configValues[instrumentID][5];
-                this.optionPanel.AddOption(option);
-                optionList.Add(option);
+                strategy.maxOptionOpenLots = Double.Parse(configValues[instrumentID][4]);
+                strategy.Future.InstrumentID = configValues[instrumentID][5];
+                this.optionPanel.AddOption(strategy);
+                optionList.Add(strategy);
             }
             
             //从optionPanel中初始化策略实例
             for (int i = 0; i < optionPanel.dataTable.Rows.Count; i++)
             {
-                Option op = (Option)optionPanel.dataTable.Rows[i];
+                Strategy op = (Strategy)optionPanel.dataTable.Rows[i];
                 ContractManager.CreatContract(op);
             }
             //生成策略实例(期权）
             for (int i = 0; i < optionPanel.dataTable.Rows.Count; i++)
             {
-                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i + 1 + UnderlyingCount) };
-                myTS1 ts = new myTS1(contracts[0].option.instrumentID);
+                CTPEvents[] contracts = new CTPEvents[1] { ContractManager.GetContract(i + 1 + UnderlyingCount) };
+                myTS1 ts = new myTS1(contracts[0].stragety.instrumentID);
                 ts.SetContracts(contracts);
                 tsList.Add((TSBase)ts);
             }
             //生成策略实例(期货）
             for (int i = 0; i < UnderlyingCount; i++)
             {
-                Contract[] contracts = new Contract[1] { ContractManager.GetContract(i + 1) };
+                CTPEvents[] contracts = new CTPEvents[1] { ContractManager.GetContract(i + 1) };
                 myTS2 ts = new myTS2(contracts[0].instrument.InstrumentID);
                 ts.SetContracts(contracts);
                 tsList.Add((TSBase)ts);
                 ts.Run();
-            }
-            this.flushTimer = new System.Threading.Timer(this.flushTimerCallback, null, 1000, 1000);
-        }
-
-        /// <summary>
-        /// 刷新定时器回调
-        /// </summary>
-        private void flushTimerCallback(object state)
-        {
-            try
-            {
-                lock (this.gSyncRoot)
-                {
-                    if (!this.IsDisposed)
-                    {
-                        this.BeginInvoke(new Action(this.RefreshMainForm));
-                    }
-                }
-            }
-            catch
-            { }
-        }
-
-        //刷新主面板
-        public void RefreshMainForm()
-        {
-            for (int i = 0; i < optionList.Count; i++)
-            {
-                optionPanel.dataTable.Rows[i].Cells["cDelta"].Value = optionList[i].optionValue.Delta;
-                optionPanel.dataTable.Rows[i].Cells["cTheroricalPrice"].Value = optionList[i].optionValue.Price;
-                optionPanel.dataTable.Rows[i].Cells["cRealPrice"].Value = optionList[i].price;
-                optionPanel.dataTable.Rows[i].Cells["cAskPrice"].Value = optionList[i].mmQuotation.AskPrice;
-                optionPanel.dataTable.Rows[i].Cells["cBidPrice"].Value = optionList[i].mmQuotation.BidPrice;
             }
         }
 

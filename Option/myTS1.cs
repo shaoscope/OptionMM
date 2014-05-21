@@ -12,7 +12,7 @@ namespace OptionMM
 {
     class myTS1 : TSBase
     {
-        Contract[] Contracts = null;
+        CTPEvents[] Contracts = null;
 
 
         public myTS1(string TSName)
@@ -21,7 +21,7 @@ namespace OptionMM
             //初始化合约contracts
         }
 
-        public void SetContracts(Contract[] contracts)
+        public void SetContracts(CTPEvents[] contracts)
         {
             Contracts = contracts;
             Contracts[0].OnTick += new TickHandle(OnOptionTick);
@@ -41,9 +41,9 @@ namespace OptionMM
 
         public override void Run()
         {
-            string[] inst = new string[1] { Contracts[0].option.instrumentID };
+            string[] inst = new string[1] { Contracts[0].stragety.instrumentID };
             Contracts[0].SubMD(inst);
-            inst = new string[1] { Contracts[0].option.underlyingInstrumentID };
+            inst = new string[1] { Contracts[0].stragety.underlyingInstrumentID };
             Contracts[0].UnSubMD(inst);
             Contracts[0].SubMD(inst);
             bRun = true;
@@ -58,8 +58,8 @@ namespace OptionMM
         {
             if(bRun)
             {
-                Contracts[0].option.price = md.LastPrice;
-                if (Contracts[0].option.OptionProperties != null)
+                Contracts[0].stragety.price = md.LastPrice;
+                if (Contracts[0].stragety.OptionProperties != null)
                 {
                     //计算出的做市价格。
                     double MMBid = 0;
@@ -68,37 +68,37 @@ namespace OptionMM
                     //根据理论价格和实际价格报价
                     //Contracts[0].Buy(Contracts[0].option.instrumentID, );
 
-                    if (Contracts[0].option.optionValue.Price - Contracts[0].option.price > Contracts[0].option.optionPositionThreshold)
+                    if (Contracts[0].stragety.optionValue.Price - Contracts[0].stragety.price > Contracts[0].stragety.optionPositionThreshold)
                     {
                         ////计算开仓手数 股指手数定义 期权手数 = 1/隐含波动率 向上取整 * 3, 买入期权，//卖出股指。
                         //报10手期权
                         MMBid = Math.Round(md.BidPrice1 - 0.1, 2);
                         MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
                     }
-                    else if (Contracts[0].option.price - Contracts[0].option.optionValue.Price > Contracts[0].option.optionPositionThreshold)
+                    else if (Contracts[0].stragety.price - Contracts[0].stragety.optionValue.Price > Contracts[0].stragety.optionPositionThreshold)
                     {
                         //double MMBid = Math.Round(Contracts[0].option.price, 2);
                         MMAsk = Math.Round(md.AskPrice1 + 0.1, 2);
                         MMBid = MMPrice.GetBidPriceThisMonth(ref MMAsk);
                     }
-                    else if (Contracts[0].option.optionValue.Price > Contracts[0].option.price)
+                    else if (Contracts[0].stragety.optionValue.Price > Contracts[0].stragety.price)
                     {
-                        MMBid = Math.Round(Contracts[0].option.optionValue.Price - Contracts[0].option.optionPositionThreshold);
+                        MMBid = Math.Round(Contracts[0].stragety.optionValue.Price - Contracts[0].stragety.optionPositionThreshold);
                         MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
                     }
-                    else if (Contracts[0].option.optionValue.Price > Contracts[0].option.price)
+                    else if (Contracts[0].stragety.optionValue.Price > Contracts[0].stragety.price)
                     {
-                        MMAsk = Math.Round(Contracts[0].option.optionValue.Price + Contracts[0].option.optionPositionThreshold);
+                        MMAsk = Math.Round(Contracts[0].stragety.optionValue.Price + Contracts[0].stragety.optionPositionThreshold);
                         MMBid = MMPrice.GetBidPriceThisMonth(ref MMAsk);
                     }
                     else
                         return;
-                    Contracts[0].option.mmQuotation.AskPrice = MMAsk;
-                    Contracts[0].option.mmQuotation.BidPrice = MMBid;
-                    Contracts[0].option.mmQuotation.AskLots = 10;
-                    Contracts[0].option.mmQuotation.BidLots = 10;
+                    Contracts[0].stragety.mmQuotation.AskPrice = MMAsk;
+                    Contracts[0].stragety.mmQuotation.BidPrice = MMBid;
+                    Contracts[0].stragety.mmQuotation.AskLots = 10;
+                    Contracts[0].stragety.mmQuotation.BidLots = 10;
                     //判断是否撤单
-                    if (Contracts[0].CurrentBidOptionOrder != null && (Contracts[0].option.mmQuotation.BidPrice != Contracts[0].CurrentBidOptionOrder.LimitPrice || Contracts[0].CurrentBidOptionOrder.VolumeTraded > 0))
+                    if (Contracts[0].CurrentBidOptionOrder != null && (Contracts[0].stragety.mmQuotation.BidPrice != Contracts[0].CurrentBidOptionOrder.LimitPrice || Contracts[0].CurrentBidOptionOrder.VolumeTraded > 0))
                     {
                         //需要重新报单
                         if (Contracts[0].CurrentBidOptionOrder.VolumeTraded != Contracts[0].CurrentBidOptionOrder.VolumeTotalOriginal)
@@ -108,7 +108,7 @@ namespace OptionMM
                         Contracts[0].BidOptionOrderRef = null;
                         Contracts[0].CurrentBidOptionOrder = null;
                     }
-                    if (Contracts[0].CurrentAskOptionOrder != null && (Contracts[0].option.mmQuotation.AskPrice != Contracts[0].CurrentAskOptionOrder.LimitPrice || Contracts[0].CurrentAskOptionOrder.VolumeTraded > 0))
+                    if (Contracts[0].CurrentAskOptionOrder != null && (Contracts[0].stragety.mmQuotation.AskPrice != Contracts[0].CurrentAskOptionOrder.LimitPrice || Contracts[0].CurrentAskOptionOrder.VolumeTraded > 0))
                     {
                         if (Contracts[0].CurrentAskOptionOrder.VolumeTraded != Contracts[0].CurrentAskOptionOrder.VolumeTotalOriginal)
                         {
@@ -120,11 +120,11 @@ namespace OptionMM
                     //没有报出报单
                     if (Contracts[0].BidOptionOrderRef == null)
                     {
-                        Contracts[0].BidOptionOrderRef = Contracts[0].Buy(Contracts[0].option.instrumentID, Contracts[0].option.mmQuotation.BidLots, Contracts[0].option.mmQuotation.BidPrice);
+                        Contracts[0].BidOptionOrderRef = Contracts[0].Buy(Contracts[0].stragety.instrumentID, Contracts[0].stragety.mmQuotation.BidLots, Contracts[0].stragety.mmQuotation.BidPrice);
                     }
                     if (Contracts[0].AskOptionOrderRef == null)
                     {
-                        Contracts[0].AskOptionOrderRef = Contracts[0].SellShort(Contracts[0].option.instrumentID, Contracts[0].option.mmQuotation.AskLots, Contracts[0].option.mmQuotation.AskPrice);
+                        Contracts[0].AskOptionOrderRef = Contracts[0].SellShort(Contracts[0].stragety.instrumentID, Contracts[0].stragety.mmQuotation.AskLots, Contracts[0].stragety.mmQuotation.AskPrice);
                     }
                 }
             }
@@ -134,8 +134,8 @@ namespace OptionMM
         {
             if (bRun)
             {
-                Contracts[0].option.underlyingPrice = md.LastPrice;
-                Contracts[0].option.optionValue = OptionPricingModel.EuropeanBS(Contracts[0].option.OptionProperties);
+                Contracts[0].stragety.underlyingPrice = md.LastPrice;
+                Contracts[0].stragety.optionValue = OptionPricingModel.EuropeanBS(Contracts[0].stragety.OptionProperties);
             }
         }
 

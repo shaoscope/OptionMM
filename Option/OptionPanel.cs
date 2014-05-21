@@ -47,18 +47,18 @@ namespace OptionMM
                 row.Dispose();
         }
 
-        public void AddOption(Option option)
+        public void AddOption(Strategy strategy)
         {
-            option.SetPanel(this);
-            option.CreateCells(this.dataTable);
-            DataGridViewCellCollection cells = option.Cells;
-            cells[0].Value = option.instrumentID;               //合约名 cOptionID
-            cells[1].Value = option.impridVolatility;                     //隐含波动率 cImpridVolatility
-            cells[2].Value = option.optionValue.Delta;      //Delta cDelta
-            cells[3].Value = option.optionValue.Price;      //理论价格 cTheroricalPrice
-            cells[4].Value = option.price;      //实际价格 cRealPrice
-            cells[5].Value = option.optionPositionThreshold;        //开仓阈值 cOptionPositionThreshold
-            cells[6].Value = option.minOptionOpenLots;     //最少开仓数 cMiniumOptionOpenPosition
+            strategy.SetPanel(this);
+            strategy.CreateCells(this.dataTable);
+            DataGridViewCellCollection cells = strategy.Cells;
+            cells[0].Value = strategy.Option.InstrumentID;               //合约名 cOptionID
+            cells[1].Value = strategy.Option.ImpridVolatility;                     //隐含波动率 cImpridVolatility
+            cells[2].Value = strategy.Option.Delta;      //Delta cDelta
+            cells[3].Value = strategy.Option.TheoreticalPrice;      //理论价格 cTheroricalPrice
+            cells[4].Value = strategy.Option.LastMarket.LastPrice;      //实际价格 cRealPrice
+            cells[5].Value = strategy.optionPositionThreshold;        //开仓阈值 cOptionPositionThreshold
+            cells[6].Value = strategy.minOptionOpenLots;     //最少开仓数 cMiniumOptionOpenPosition
             //cells[7].Value = hedgeRecord.AdjustVolume;        //期权多头仓位数 cOptionLongPositionNum
             //cells[8].Value = hedgeRecord.StrikePrice;     //期权空头仓位数 cOptionShortPositionNum
             //cells[9].Value = hedgeRecord.UnderlyingPrice;     //股指多头仓位数 cIndexLongPositionNum
@@ -66,7 +66,7 @@ namespace OptionMM
             //cells[11].Value = hedgeRecord.CloseProfit;        //持仓盈亏 cPositionProfit
             //cells[12].Value = hedgeRecord.PositionProfit;     //期权限仓数 cOptionMaximumPositionNum
             //cells[13].Value = hedgeRecord.Commission;             //股指限仓数 cIndexMaximumPositionNum
-            this.dataTable.Rows.Add(option);
+            this.dataTable.Rows.Add(strategy);
         }
 
         private void dataTabel_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
