@@ -49,7 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContractManager.cs" />
-    <Compile Include="CTPEvents.cs" />
+    <Compile Include="PositionHedge.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Future.cs" />
     <Compile Include="InstrumentManager.cs" />
     <Compile Include="Instrument.cs" />
@@ -81,9 +82,8 @@
     <Compile Include="MDAPI.cs" />
     <Compile Include="MDManager.cs" />
     <Compile Include="myTS2.cs" />
-    <Compile Include="myTS1.cs" />
     <Compile Include="OptionPricingModel.cs" />
-    <Compile Include="OptionProperties.cs" />
+    <Compile Include="OptionPricingModelParams.cs" />
     <Compile Include="OptionValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

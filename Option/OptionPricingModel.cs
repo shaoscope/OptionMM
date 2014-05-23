@@ -7,7 +7,7 @@ namespace OptionMM
 {
     class OptionPricingModel
     {
-        public static OptionValue EuropeanBS(OptionProperties optionProperties)
+        public static OptionValue EuropeanBS(OptionPricingModelParams optionProperties)
         {
             double sigmaTimesSqrtMaturity = optionProperties.Volatility * Math.Sqrt(optionProperties.Maturity);
             double d1 = (Math.Log(optionProperties.UnderlyingPrice / optionProperties.StrikePrice) + (optionProperties.Volatility * optionProperties.Volatility / 2) *

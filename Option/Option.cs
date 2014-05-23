@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OptionMM
 {
-    class Option : CTPEvents
+    class Option : Position
     {
         //期权合约代码
         private string instrumentID;
@@ -184,15 +184,37 @@ namespace OptionMM
         }
 
         /// <summary>
-        /// 期权合约最后行情
+        /// 合约最后行情
         /// </summary>
         private ThostFtdcDepthMarketDataField lastMarket;
 
-
+        /// <summary>
+        /// 获取或者设置合约最后行情
+        /// </summary>
         public ThostFtdcDepthMarketDataField LastMarket
         {
             get { return this.lastMarket; }
+            set { this.lastMarket = value; }
         }
 
+        /// <summary>
+        /// 期权报价信息
+        /// </summary>
+        private MMQuotation mmQuotation;
+
+        /// <summary>
+        /// 获取或者设置期权报价信息
+        /// </summary>
+        public MMQuotation MMQuotation
+        {
+            get { return this.mmQuotation; }
+            set { this.mmQuotation = value; }
+        }
+
+        public Option()
+        {
+            this.mmQuotation = new MMQuotation();
+        }
+        
     }
 }

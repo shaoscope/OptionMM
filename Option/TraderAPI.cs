@@ -8,9 +8,9 @@ using System.Reflection;
 
 namespace CTP
 {
-    public delegate void TradingHandle(ThostFtdcOrderField pOrder);
-    public delegate void CanceledHandle(ThostFtdcOrderField pOrder);
-    public delegate void TradedHandle(ThostFtdcOrderField pOrder);
+    public delegate void OrderHandle(ThostFtdcOrderField pOrder);
+
+    public delegate void PositionHandle(ThostFtdcInvestorPositionField position);
     
     public class OrderInstert
     {
@@ -49,25 +49,41 @@ namespace CTP
 
     public class TraderAPI
     {
-        public event TradingHandle OnTrading;
+        public event OrderHandle OnTrading;
         public void Trading(ThostFtdcOrderField pOrder)
         {
             if (OnTrading != null)
+            {
                 OnTrading(pOrder);
+            }
         }
 
-        public event CanceledHandle OnCanceled;
+        public event OrderHandle OnCanceled;
         public void Canceled(ThostFtdcOrderField pOrder)
         {
             if (OnCanceled != null)
+            {
                 OnCanceled(pOrder);
+            }
         }
 
-        public event TradedHandle OnTraded;
+        public event OrderHandle OnTraded;
         public void Traded(ThostFtdcOrderField pOrder)
         {
             if (OnTraded != null)
+            {
                 OnTraded(pOrder);
+            }
+        }
+
+        public event PositionHandle onReqPosition;
+
+        public void ReqPosition(ThostFtdcInvestorPositionField position)
+        {
+            if(onReqPosition != null)
+            {
+                onReqPosition(position);
+            }
         }
 
         public bool bCanReq = false; //投资者结算确认后的查询控制
@@ -301,10 +317,11 @@ namespace CTP
         void OnRspQryInvestorPosition(ThostFtdcInvestorPositionField pInvestorPosition, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             //__DEBUGPF__();
-            if (!IsErrorRspInfo(pRspInfo))
-            {
-                positionList.Add(pInvestorPosition);
-            }
+            //if (!IsErrorRspInfo(pRspInfo))
+            //{
+            //    positionDictionary.Add(pInvestorPosition.InstrumentID, pInvestorPosition);
+            //}
+            positionList.Add(pInvestorPosition);
             if (bIsLast)
             { 
                 bCanReq = true;
@@ -873,8 +890,6 @@ namespace CTP
             MethodBase mb = ss.GetFrame(1).GetMethod();
             string str = "--->>> " + mb.DeclaringType.Name + "." + mb.Name + "()";
             Debug.WriteLine(str);
-            //Console.WriteLine(str);
-            //GUIRefresh.UpdateListBox2(str);
         }
 
         public string Buy(string instrumentID, int lots, double price)
@@ -907,12 +922,15 @@ namespace CTP
             {
                 if (order._req.OrderRef == OrderRef && !(order._state == OrderInstertState.Canceling))
                 {
-                    //td.ReqOrderAction(CurrentOrder);
                     ReqOrderAction(order._req.InstrumentID, OrderRef);
                     order._state = OrderInstertState.Canceling;
-                    //GUIRefresh.UpdateListBox1(string.Format("撤单：{0}，单号：{1}", CurrentInstrumentID, CurrentOrderRef));
                 }
             }
+        }
+
+        public void CancelOrder(ThostFtdcOrderField order)  
+        {
+            ReqOrderAction(order);
         }
     }
 }

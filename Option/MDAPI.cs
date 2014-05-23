@@ -6,8 +6,8 @@ using System.Threading;
 
 namespace CTP
 {
-    public delegate void DepthMarketDataHandle(ThostFtdcDepthMarketDataField md);
-
+   // public delegate void DepthMarketDataHandle(ThostFtdcDepthMarketDataField md);
+    public delegate void TickHandle(ThostFtdcDepthMarketDataField md);
     public class MDAPI
     {   
         public bool bLogin = false;
@@ -168,11 +168,21 @@ namespace CTP
             return bResult;
         }
 
+        public event TickHandle OnTick;
+        public void PushTick(ThostFtdcDepthMarketDataField md)
+        {
+            if (OnTick != null)
+            {
+                OnTick(md);
+            }
+        }
+
         void OnRtnDepthMarketData(ThostFtdcDepthMarketDataField pDepthMarketData)
         {
             if (pDepthMarketData != null)
             {
-                DepthMarketData(pDepthMarketData);
+                //DepthMarketData(pDepthMarketData);
+                PushTick(pDepthMarketData);
             }
         }
 
@@ -190,12 +200,12 @@ namespace CTP
             return dRet;
         }
 
-        public event DepthMarketDataHandle OnDepthMarketData;
+        /*public event DepthMarketDataHandle OnDepthMarketData;
         public void DepthMarketData(ThostFtdcDepthMarketDataField md)
         {
             if (OnDepthMarketData != null)
                 OnDepthMarketData(md);
-        }
+        }*/
 
     }
 }

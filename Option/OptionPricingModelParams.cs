@@ -8,17 +8,17 @@ namespace OptionMM
     /// <summary>
     /// 计算模型输入参数类
     /// </summary>
-    class OptionProperties
+    class OptionPricingModelParams
     {
         /// <summary>
         /// 构造函数
         /// </summary>
-        public OptionProperties()
+        public OptionPricingModelParams()
         {
 
         }
 
-        public OptionProperties(OptionTypeEnum optionType, double underlyingPrice, double strikePrice, double interestRate, double volatility, double daysToMaturity)
+        public OptionPricingModelParams(OptionTypeEnum optionType, double underlyingPrice, double strikePrice, double interestRate, double volatility, double daysToMaturity)
         {
             this.optionType = optionType;
             this.underlyingPrice = underlyingPrice;

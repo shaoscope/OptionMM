@@ -20,7 +20,7 @@ namespace OptionMM
         public static readonly double InterestRate = 0.05;
         
         //股指波动率
-        public static readonly double Volatility = 0.36;
+        public static readonly double Volatility = 0.25;
 
         //到期天数
         public static readonly int DaysToMaturity = 22;

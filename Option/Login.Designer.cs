@@ -119,7 +119,7 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(304, 21);
             this.textBox4.TabIndex = 8;
-            this.textBox4.Text = "tcp://115.238.108.173:41215";
+            this.textBox4.Text = "tcp://27.115.78.201:31213";
             // 
             // textBox5
             // 
@@ -128,7 +128,7 @@
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(304, 21);
             this.textBox5.TabIndex = 9;
-            this.textBox5.Text = "tcp://115.238.108.173:41207";
+            this.textBox5.Text = "tcp://27.115.78.201:31205";
             // 
             // button1
             // 

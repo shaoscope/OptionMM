@@ -16,21 +16,31 @@ namespace OptionMM
 {
     internal partial class MainForm : Form
     {
-        public static List<TSBase> tsList = new List<TSBase>();
-
-        private List<Strategy> optionList = new List<Strategy>();
         public MainForm()
         {
             InitializeComponent();
         }
 
         private Dictionary<string, string[]> configValues = new Dictionary<string, string[]>();
+
+        public static List<ThostFtdcInvestorPositionField> PositionList = new List<ThostFtdcInvestorPositionField>();
         
         //同步对象
         private readonly object gSyncRoot = new object();
 
+        //仓位对冲定时器
+        private System.Threading.Timer positionHedgeTimer;
+
         private void MainForm_Load(object sender, EventArgs e)
         {
+            //查持仓
+            TDManager.TD.ReqQryInvestorPosition();
+            while (!TDManager.TD.bCanReq)
+            {
+                Thread.Sleep(50);
+            }
+            PositionList = TDManager.TD.positionList;
+            //加载面板
             InitFromXML("Option.xml");
             foreach (string instrumentID in configValues.Keys)
             {
@@ -45,34 +55,26 @@ namespace OptionMM
                 //option.maxOptionOpenLots = Double.Parse(configValues[instrumentID][3]);   //开仓点数
                 strategy.maxOptionOpenLots = Double.Parse(configValues[instrumentID][4]);
                 strategy.Future.InstrumentID = configValues[instrumentID][5];
-                this.optionPanel.AddOption(strategy);
-                optionList.Add(strategy);
+                this.optionPanel.AddStrategy(strategy);
             }
-            
-            //从optionPanel中初始化策略实例
-            for (int i = 0; i < optionPanel.dataTable.Rows.Count; i++)
-            {
-                Strategy op = (Strategy)optionPanel.dataTable.Rows[i];
-                ContractManager.CreatContract(op);
-            }
-            //生成策略实例(期权）
-            for (int i = 0; i < optionPanel.dataTable.Rows.Count; i++)
-            {
-                CTPEvents[] contracts = new CTPEvents[1] { ContractManager.GetContract(i + 1 + UnderlyingCount) };
-                myTS1 ts = new myTS1(contracts[0].stragety.instrumentID);
-                ts.SetContracts(contracts);
-                tsList.Add((TSBase)ts);
-            }
-            //生成策略实例(期货）
-            for (int i = 0; i < UnderlyingCount; i++)
-            {
-                CTPEvents[] contracts = new CTPEvents[1] { ContractManager.GetContract(i + 1) };
-                myTS2 ts = new myTS2(contracts[0].instrument.InstrumentID);
-                ts.SetContracts(contracts);
-                tsList.Add((TSBase)ts);
-                ts.Run();
-            }
+
+            //仓位对冲
+            //this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 5 * 60 * 1000, 5 * 60 * 1000);
+
+            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 1 * 60 * 1000, Timeout.Infinite);
+
         }
+
+        /// <summary>
+        /// 仓位对冲回调
+        /// </summary>
+        /// <param name="state"></param>
+        private void positionHedgeCallBack(object state)
+        {            
+            PositionHedge positionHedge = new PositionHedge(PositionList, this.optionPanel.dataTable);
+            //positionHedge.DoHedge();
+        }
+
 
         int UnderlyingCount = 0;
         private void InitFromXML(string strFile)
@@ -153,10 +155,30 @@ namespace OptionMM
             }
         }
 
-        private void optionPanel_DoubleClick(object sender, EventArgs e)
+        private bool areAllRunning = false;
+
+        private void startAllButton_Click(object sender, EventArgs e)
         {
-            //启动停止策略
-            //例：tsList[0].bRun = false;
+            if (!areAllRunning)
+            {
+                foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+                {
+                    Strategy strategy = (Strategy)dataRow.Tag;
+                    strategy.Start();
+                }
+                areAllRunning = true;
+                this.startAllButton.Text = "全部停止";
+            }
+            else
+            {
+                foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+                {
+                    Strategy strategy = (Strategy)dataRow.Tag;
+                    strategy.Stop();
+                }
+                areAllRunning = false;
+                this.startAllButton.Text = "全部启动";
+            }
         }
     }
 }
