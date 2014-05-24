@@ -34,6 +34,7 @@ namespace OptionMM
         private void MainForm_Load(object sender, EventArgs e)
         {
             //查持仓
+            Thread.Sleep(500);
             TDManager.TD.ReqQryInvestorPosition();
             while (!TDManager.TD.bCanReq)
             {
