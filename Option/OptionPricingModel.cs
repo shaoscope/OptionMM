@@ -7,6 +7,11 @@ namespace OptionMM
 {
     class OptionPricingModel
     {
+        /// <summary>
+        /// 期权定价模型
+        /// </summary>
+        /// <param name="optionProperties"></param>
+        /// <returns></returns>
         public static OptionValue EuropeanBS(OptionPricingModelParams optionProperties)
         {
             double sigmaTimesSqrtMaturity = optionProperties.Volatility * Math.Sqrt(optionProperties.Maturity);
