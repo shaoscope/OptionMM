@@ -19,10 +19,21 @@ namespace OptionMM
         public MainForm()
         {
             InitializeComponent();
+            //查持仓
+            Thread.Sleep(500);
+            TDManager.TD.ReqQryInvestorPosition();
+            while (!TDManager.TD.bCanReq)
+            {
+                Thread.Sleep(50);
+            }
+            PositionList = TDManager.TD.positionList;
         }
 
         private Dictionary<string, string[]> configValues = new Dictionary<string, string[]>();
 
+        /// <summary>
+        /// 所有仓位信息
+        /// </summary>
         public static List<ThostFtdcInvestorPositionField> PositionList = new List<ThostFtdcInvestorPositionField>();
         
         //同步对象
@@ -33,14 +44,6 @@ namespace OptionMM
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            //查持仓
-            Thread.Sleep(500);
-            TDManager.TD.ReqQryInvestorPosition();
-            while (!TDManager.TD.bCanReq)
-            {
-                Thread.Sleep(50);
-            }
-            PositionList = TDManager.TD.positionList;
             //加载面板
             InitFromXML("Option.xml");
             foreach (string instrumentID in configValues.Keys)
@@ -56,6 +59,19 @@ namespace OptionMM
                 //option.maxOptionOpenLots = Double.Parse(configValues[instrumentID][3]);   //开仓点数
                 strategy.maxOptionOpenLots = Double.Parse(configValues[instrumentID][4]);
                 strategy.Future.InstrumentID = configValues[instrumentID][5];
+                //加入仓位信息
+                foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
+                {
+                    if(position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
+                    {
+                        strategy.Option.longPosition = position;
+                    }
+                    else if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
+                    {
+                        strategy.Option.shortPosition = position;
+                    }
+                }
+                //插入策略
                 this.optionPanel.AddStrategy(strategy);
             }
 

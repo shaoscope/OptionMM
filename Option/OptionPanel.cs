@@ -65,8 +65,8 @@ namespace OptionMM
             cells[4].Value = strategy.Option.LastMarket != null ? strategy.Option.LastMarket.LastPrice : 0;     //实际价格 cRealPrice
             cells[5].Value = strategy.optionPositionThreshold;        //开仓阈值 cOptionPositionThreshold
             cells[6].Value = strategy.minOptionOpenLots;     //最少开仓数 cMiniumOptionOpenPosition
-            //cells[7].Value = hedgeRecord.AdjustVolume;        //期权多头仓位数 cOptionLongPositionNum
-            //cells[8].Value = hedgeRecord.StrikePrice;     //期权空头仓位数 cOptionShortPositionNum
+            cells[7].Value = strategy.Option.longPosition != null ? strategy.Option.longPosition.Position : 0;        //期权多头仓位数 cOptionLongPositionNum
+            cells[8].Value = strategy.Option.shortPosition != null ? strategy.Option.shortPosition.Position : 0;     //期权空头仓位数 cOptionShortPositionNum
             //cells[9].Value = hedgeRecord.UnderlyingPrice;     //股指多头仓位数 cIndexLongPositionNum
             //cells[10].Value = hedgeRecord.OptionProfit;        //股指空头仓位数 cIndexShortPositionNum
             //cells[11].Value = hedgeRecord.CloseProfit;        //持仓盈亏 cPositionProfit

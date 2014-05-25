@@ -8,10 +8,8 @@ namespace OptionMM
 {
     class Position
     {
-        public int LongInputLots = 0;
-        public int LongPositionVolume = 0;
-        public int ShortInputLots = 0;
-        public int ShortPositionVolume = 0;
+        public ThostFtdcInvestorPositionField longPosition = null;
+        public ThostFtdcInvestorPositionField shortPosition = null;
         public ThostFtdcOrderField ShortOptionOrder = null;
         public ThostFtdcOrderField LongOptionOrder = null;
         public ThostFtdcOrderField CloseLongOptionOrder = null;
@@ -27,44 +25,22 @@ namespace OptionMM
 
         public Position()
         {
-            //MDManager.MD.OnDepthMarketData += new DepthMarketDataHandle(OnDepthMarketData);
-            //MDManager.MD.OnTick += new TickHandle()
-            //TDManager.TD.OnCanceled += new CanceledHandle(OnOrderCanceled);
-            //TDManager.TD.OnTraded += new TradedHandle(OnOrderTraded);
-            //TDManager.TD.OnTrading += new TradingHandle(OnOrderTrading);
+
         }
 
-        public void AddShortInputLots(int Lots)
+        /// <summary>
+        /// 清空保单信息
+        /// </summary>
+        public void clearOrderInfo()
         {
-            lock(ShortInputLotsLock)
-            {
-                ShortInputLots = ShortInputLots + Lots;
-            }
+            ShortOptionOrder = null;
+            LongOptionOrder = null;
+            CloseLongOptionOrder = null;
+            CloseShortOptionOrder = null;
+            PlaceShortOptionOrderRef = null;
+            PlaceLongOptionOrderRef = null;
+            CloseLongOptionOrderRef = null;
+            CloseShortOptionOrderRef = null;
         }
-
-        public void AddLongInputLots(int Lots)
-        {
-            lock (LongInputLotsLock)
-            {
-                LongInputLots = LongInputLots + Lots;
-            }
-        }
-
-        public void AddLongPosition(int Lots)
-        {
-            lock (LongPositionLock)
-            {
-                LongPositionVolume = LongPositionVolume + Lots;
-            }
-        }
-
-        public void AddShortPosition(int Lots)
-        {
-            lock (ShortPositionLock)
-            {
-                ShortPositionVolume = ShortPositionVolume + Lots;
-            }
-        }
-
     }
 }

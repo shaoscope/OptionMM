@@ -67,7 +67,7 @@ namespace OptionMM
                     }
                 }
             }
-            Console.WriteLine(System.DateTime.Now.ToShortTimeString() + ":" + "IF1406" + futureHedgeVolume["IF1406"] + "," + "IF1407" + futureHedgeVolume["IF1407"]);
+            Console.WriteLine(System.DateTime.Now.ToShortTimeString() + ":" + "IF1406 " + futureHedgeVolume["IF1406"] + "," + "IF1407 " + futureHedgeVolume["IF1407"]);
         }
 
         /// <summary>
