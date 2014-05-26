@@ -39,6 +39,8 @@ namespace OptionMM
         /// </summary>
         private int updateMilliSeconds = 0;
 
+        private DateTime lastUpdateDateTime = new DateTime();
+
         public double optionPositionThreshold;  //开仓阈值
 
         public double minOptionOpenLots;    //最小开仓数
@@ -92,7 +94,7 @@ namespace OptionMM
         /// <summary>
         /// 撤单再下单的时间间隔(秒)
         /// </summary>
-        private int ReplaceOrderDuration = 30;
+        private int ReplaceOrderDuration = 10;
 
         /// <summary>
         /// 策略是否运行标记位
@@ -147,6 +149,7 @@ namespace OptionMM
                 {
                     if(this.option.LongOptionOrder == null)
                     {
+                        this.option.LongOptionOrder = pOrder;
                         this.Option.longPosition.Position += pOrder.VolumeTraded;
                     }
                     else
@@ -154,31 +157,13 @@ namespace OptionMM
                         this.Option.longPosition.Position += pOrder.VolumeTraded - this.option.LongOptionOrder.VolumeTraded;
                         this.option.LongOptionOrder = pOrder;
                     }
-                    //if (pOrder.VolumeTraded == 0 && this.option.LongOptionOrder == null)
-                    //{
-                    //    this.option.LongOptionOrder = pOrder;
-                    //    this.cancelLongOrderTimer = new System.Threading.Timer(this.cancelLongOrderCallBack, null, (long)ReplaceOrderDuration * 1000, Timeout.Infinite);
-                    //}
-                    //else
-                    //{
-                    //    if(this.option.LongOptionOrder == null)
-                    //    {
-                    //        this.option.LongPositionVolume = pOrder.VolumeTraded;
-                    //    }
-                    //    else
-                    //    {
-                    //        int tradedVolume = pOrder.VolumeTraded - this.option.LongOptionOrder.VolumeTraded;
-                    //        TDManager.TD.Buy(this.option.InstrumentID, tradedVolume, this.option.MMQuotation.BidPrice);
-                    //        this.option.LongPositionVolume += tradedVolume;
-                    //        this.option.LongOptionOrder = pOrder;
-                    //    }
-                    //}
                 }
                 else if (this.option.PlaceShortOptionOrderRef == pOrder.OrderRef)
                 {
 
                     if (this.option.ShortOptionOrder == null)
                     {
+                        this.option.ShortOptionOrder = pOrder;
                         this.Option.shortPosition.Position += pOrder.VolumeTraded;
                     }
                     else
@@ -186,30 +171,12 @@ namespace OptionMM
                         this.Option.shortPosition.Position += pOrder.VolumeTraded - this.option.ShortOptionOrder.VolumeTraded;
                         this.option.ShortOptionOrder = pOrder;
                     }
-                    //if (pOrder.VolumeTraded == 0 && this.option.ShortOptionOrder == null)
-                    //{
-                    //    this.option.ShortOptionOrder = pOrder;
-                    //    this.cancelShortOrderTimer = new System.Threading.Timer(this.cancelShortOrderCallBack, null, (long)ReplaceOrderDuration * 1000, Timeout.Infinite);
-                    //}
-                    //else
-                    //{
-                    //    if (this.option.ShortOptionOrder == null)
-                    //    {
-                    //        this.option.ShortPositionVolume = pOrder.VolumeTraded;
-                    //    }
-                    //    else
-                    //    {
-                    //        int tradedVolume = pOrder.VolumeTraded - this.option.ShortOptionOrder.VolumeTraded;
-                    //        TDManager.TD.SellShort(this.option.InstrumentID, tradedVolume, this.option.MMQuotation.AskPrice);
-                    //        this.option.ShortPositionVolume += tradedVolume;
-                    //        this.option.ShortOptionOrder = pOrder;
-                    //    }
-                    //}
                 }
                 else if(this.option.CloseLongOptionOrderRef == pOrder.OrderRef)
                 {
                     if (this.option.CloseLongOptionOrder == null)
                     {
+                        this.option.CloseLongOptionOrder = pOrder;
                         this.Option.longPosition.Position -= pOrder.VolumeTraded;
                     }
                     else
@@ -217,20 +184,12 @@ namespace OptionMM
                         this.Option.longPosition.Position -= pOrder.VolumeTraded - this.option.CloseLongOptionOrder.VolumeTraded;
                         this.option.CloseLongOptionOrder = pOrder;
                     }
-                    //if(pOrder.VolumeTraded == 0 && this.option.CloseLongOptionOrder == null)
-                    //{
-                    //    this.option.CloseLongOptionOrder = pOrder;
-                    //    this.cancelCloseLongOrderTimer = new System.Threading.Timer(this.cancelCloseLongOrderCallBack, null, (long)ReplaceOrderDuration * 1000, Timeout.Infinite);
-                    //}
-                    //else
-                    //{
-
-                    //}
                 }
                 else if(this.option.CloseShortOptionOrderRef == pOrder.OrderRef)
                 {
                     if (this.option.CloseShortOptionOrder == null)
                     {
+                        this.option.CloseShortOptionOrder = pOrder;
                         this.Option.shortPosition.Position -= pOrder.VolumeTraded;
                     }
                     else
@@ -238,11 +197,6 @@ namespace OptionMM
                         this.Option.shortPosition.Position -= pOrder.VolumeTraded - this.option.CloseShortOptionOrder.VolumeTraded;
                         this.option.CloseShortOptionOrder = pOrder;
                     }
-                    //if(pOrder.VolumeTraded == 0 && this.option.CloseShortOptionOrder == null)
-                    //{
-                    //    this.option.CloseShortOptionOrder = pOrder;
-                    //    this.cancelCloseShortOrderTimer = new System.Threading.Timer(this.cancelCloseShortOrderCallBack, null, (long)ReplaceOrderDuration * 1000, Timeout.Infinite);
-                    //}
                 }
             }
             else if(pOrder.InstrumentID == this.future.InstrumentID)
@@ -310,8 +264,14 @@ namespace OptionMM
             }
             else if (this.option.InstrumentID == md.InstrumentID)
             {
-                if (this.updateMilliSeconds == 0 || md.UpdateMillisec - this.updateMilliSeconds >= this.ReplaceOrderDuration * 1000)
+                string[] updateDateTimeString = md.UpdateTime.Split(':');
+                DateTime updateDateTime = new DateTime();
+                updateDateTime = updateDateTime.AddHours(double.Parse(updateDateTimeString[0]));
+                updateDateTime = updateDateTime.AddMinutes(double.Parse(updateDateTimeString[1]));
+                updateDateTime = updateDateTime.AddSeconds(double.Parse(updateDateTimeString[2]));
+                if (this.lastUpdateDateTime == new DateTime() || (updateDateTime - lastUpdateDateTime).Seconds >= this.ReplaceOrderDuration)
                 {
+                    this.lastUpdateDateTime = updateDateTime;
                     this.option.LastMarket = md;
                     //计算出的做市价格
                     double MMBid = 0;
@@ -379,64 +339,32 @@ namespace OptionMM
         /// </summary>
         private void PlaceOrder()
         {
-            //清空保单信息
+            //清空报单信息
             this.option.clearOrderInfo();
             //保单手数
             this.option.MMQuotation.AskLots = 10;
             this.option.MMQuotation.BidLots = 10;
 
-            #region 如何保单 待确认并完成代码
-            //挂买单 先平卖单
-            if(this.option.longPosition.Position >= 10)
+            if (this.option.shortPosition.Position >= this.option.MMQuotation.BidLots)
             {
-
+                //平空单
+                this.option.CloseShortOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, this.option.MMQuotation.BidLots, this.option.MMQuotation.AskPrice);
             }
-
-            foreach(ThostFtdcInvestorPositionField optionPosition in MainForm.PositionList)
+            else
             {
-                if(this.option.InstrumentID == optionPosition.InstrumentID)
-                {
-                    //平卖单逻辑 
-                    if(optionPosition.PosiDirection == EnumPosiDirectionType.Short)
-                    {
-                        if (optionPosition.Position != 0)
-                        {
-                            int shortSellVlume = optionPosition.Position >=
-                                this.option.MMQuotation.BidLots ? this.option.MMQuotation.BidLots : optionPosition.Position;
-                            this.option.CloseShortOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, shortSellVlume, this.option.MMQuotation.AskPrice);
-                        }
-                        else
-                        {
-                            //this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, this.option.MMQuotation.BidLots, this.option.MMQuotation.BidPrice);
-                        }
-                    }
-                }
+                //开多单
+                this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, this.option.MMQuotation.BidLots, this.option.MMQuotation.BidPrice);
             }
-            //挂卖单 先平买单
-            foreach (ThostFtdcInvestorPositionField optionPosition in MainForm.PositionList)
+            if (this.option.longPosition.Position >= this.option.MMQuotation.AskLots)
             {
-                if (this.option.InstrumentID == optionPosition.InstrumentID)
-                {
-                    //平买单逻辑
-                    if (optionPosition.PosiDirection == EnumPosiDirectionType.Long)
-                    {
-                        if (optionPosition.Position != 0)
-                        {
-                            int longCallVlume = optionPosition.Position >=
-                                this.option.MMQuotation.AskLots ? this.option.MMQuotation.AskLots : optionPosition.Position;
-                            this.option.CloseLongOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, longCallVlume, this.option.MMQuotation.BidPrice);
-                        }
-                        else
-                        {
-                            //this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, this.option.MMQuotation.AskLots, this.option.MMQuotation.AskPrice);
-                        }
-                    }
-                }
+                //平多单
+                this.option.CloseLongOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, this.option.MMQuotation.AskLots, this.option.MMQuotation.BidPrice);
             }
-            #endregion
-
-            //this.option.BidOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, this.option.MMQuotation.BidLots, this.option.MMQuotation.BidPrice);
-            //this.option.AskOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, this.option.MMQuotation.AskLots, this.option.MMQuotation.AskPrice);
+            else
+            {
+                //开空单
+                this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, this.option.MMQuotation.AskLots, this.option.MMQuotation.AskPrice);
+            }
         }
 
         /// <summary>

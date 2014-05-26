@@ -19,14 +19,7 @@ namespace OptionMM
         public MainForm()
         {
             InitializeComponent();
-            //查持仓
-            Thread.Sleep(500);
-            TDManager.TD.ReqQryInvestorPosition();
-            while (!TDManager.TD.bCanReq)
-            {
-                Thread.Sleep(50);
-            }
-            PositionList = TDManager.TD.positionList;
+            this.WindowState = FormWindowState.Maximized;
         }
 
         private Dictionary<string, string[]> configValues = new Dictionary<string, string[]>();
@@ -78,7 +71,7 @@ namespace OptionMM
             //仓位对冲
             //this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 5 * 60 * 1000, 5 * 60 * 1000);
 
-            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 1 * 60 * 1000, Timeout.Infinite);
+            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 60 * 1000, 3 * 60 * 1000);
 
         }
 

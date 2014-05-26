@@ -8,8 +8,8 @@ namespace OptionMM
 {
     class Position
     {
-        public ThostFtdcInvestorPositionField longPosition = null;
-        public ThostFtdcInvestorPositionField shortPosition = null;
+        public ThostFtdcInvestorPositionField longPosition = new ThostFtdcInvestorPositionField();
+        public ThostFtdcInvestorPositionField shortPosition = new ThostFtdcInvestorPositionField();
         public ThostFtdcOrderField ShortOptionOrder = null;
         public ThostFtdcOrderField LongOptionOrder = null;
         public ThostFtdcOrderField CloseLongOptionOrder = null;

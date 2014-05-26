@@ -160,7 +160,6 @@ namespace OptionMM
             this.cImpridVolatility.ReadOnly = true;
             this.cImpridVolatility.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.cImpridVolatility.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cImpridVolatility.Width = 120;
             // 
             // cDelta
             // 
@@ -174,12 +173,13 @@ namespace OptionMM
             this.cDelta.ReadOnly = true;
             this.cDelta.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.cDelta.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cDelta.Width = 80;
             // 
             // cTheroricalPrice
             // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle5.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle5.Format = "F6";
+            dataGridViewCellStyle5.Format = "F1";
             dataGridViewCellStyle5.NullValue = null;
             this.cTheroricalPrice.DefaultCellStyle = dataGridViewCellStyle5;
             this.cTheroricalPrice.HeaderText = "理论价格";
@@ -190,16 +190,17 @@ namespace OptionMM
             // 
             // cRealPrice
             // 
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.Format = "F1";
             this.cRealPrice.DefaultCellStyle = dataGridViewCellStyle6;
             this.cRealPrice.HeaderText = "实际价格";
             this.cRealPrice.Name = "cRealPrice";
             // 
             // cOptionPositionThreshold
             // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle7.Format = "F6";
+            dataGridViewCellStyle7.Format = "N1";
             dataGridViewCellStyle7.NullValue = null;
             this.cOptionPositionThreshold.DefaultCellStyle = dataGridViewCellStyle7;
             this.cOptionPositionThreshold.HeaderText = "开仓阈值";
@@ -210,9 +211,10 @@ namespace OptionMM
             // 
             // cMiniumOptionOpenPosition
             // 
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle8.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle8.Format = "F6";
+            dataGridViewCellStyle8.Format = "N0";
+            dataGridViewCellStyle8.NullValue = null;
             this.cMiniumOptionOpenPosition.DefaultCellStyle = dataGridViewCellStyle8;
             this.cMiniumOptionOpenPosition.HeaderText = "最少开仓数";
             this.cMiniumOptionOpenPosition.Name = "cMiniumOptionOpenPosition";
@@ -222,9 +224,10 @@ namespace OptionMM
             // 
             // cOptionLongPositionNum
             // 
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle9.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle9.Format = "F6";
+            dataGridViewCellStyle9.Format = "N0";
+            dataGridViewCellStyle9.NullValue = null;
             this.cOptionLongPositionNum.DefaultCellStyle = dataGridViewCellStyle9;
             this.cOptionLongPositionNum.HeaderText = "期权多头仓位数";
             this.cOptionLongPositionNum.Name = "cOptionLongPositionNum";
@@ -235,9 +238,10 @@ namespace OptionMM
             // 
             // cOptionShortPositionNum
             // 
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle10.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle10.Format = "F6";
+            dataGridViewCellStyle10.Format = "N0";
+            dataGridViewCellStyle10.NullValue = null;
             this.cOptionShortPositionNum.DefaultCellStyle = dataGridViewCellStyle10;
             this.cOptionShortPositionNum.HeaderText = "期权空头仓位数";
             this.cOptionShortPositionNum.Name = "cOptionShortPositionNum";
@@ -248,9 +252,9 @@ namespace OptionMM
             // 
             // cIndexLongPositionNum
             // 
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle11.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle11.Format = "F6";
+            dataGridViewCellStyle11.Format = "N0";
             dataGridViewCellStyle11.NullValue = null;
             this.cIndexLongPositionNum.DefaultCellStyle = dataGridViewCellStyle11;
             this.cIndexLongPositionNum.HeaderText = "股指多头仓位数";
@@ -262,9 +266,9 @@ namespace OptionMM
             // 
             // cIndexShortPositionNum
             // 
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle12.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle12.Format = "F6";
+            dataGridViewCellStyle12.Format = "N0";
             dataGridViewCellStyle12.NullValue = null;
             this.cIndexShortPositionNum.DefaultCellStyle = dataGridViewCellStyle12;
             this.cIndexShortPositionNum.HeaderText = "股指空头仓位数";

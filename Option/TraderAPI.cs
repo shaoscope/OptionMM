@@ -298,7 +298,7 @@ namespace CTP
 
         public void ReqQryInvestorPosition()
         {
-            //Thread.Sleep(1000);
+            Thread.Sleep(1000);
             while (!bCanReq)
             {
                 Thread.Sleep(50);
@@ -605,13 +605,11 @@ namespace CTP
                 //撤单失败
                 if (pRspInfo.ErrorID == 26 || pRspInfo.ErrorID == 25 || pRspInfo.ErrorID == 24)
                 {
-                    foreach (OrderInstert order in orderInstert)
-                    {
-                        if (order._req.OrderRef == pInputOrderAction.OrderRef)
-                            order._state = OrderInstertState.Insterted;
-                    }
-                    
-                    //GUIRefresh.UpdateListBox1(pRspInfo.ErrorMsg);
+                    //foreach (OrderInstert order in orderInstert)
+                    //{
+                    //    if (order._req.OrderRef == pInputOrderAction.OrderRef)
+                    //        order._state = OrderInstertState.Insterted;
+                    //}
                 }
             }
         }
@@ -930,7 +928,10 @@ namespace CTP
 
         public void CancelOrder(ThostFtdcOrderField order)  
         {
-            ReqOrderAction(order);
+            if (order != null)
+            {
+                ReqOrderAction(order);
+            }
         }
     }
 }

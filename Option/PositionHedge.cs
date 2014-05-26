@@ -39,35 +39,37 @@ namespace OptionMM
         public PositionHedge(List<ThostFtdcInvestorPositionField> positionList, DataGridView dataTable)
         {
             futureHedgeVolume.Add("IF1406", 0);
-            futureHedgeVolume.Add("IF1407", 0);
             this.positionDictionary = positionList;
             foreach(DataGridViewRow dataRow in dataTable.Rows)
             {
                 Strategy strategy = (Strategy)dataRow.Tag;
-                foreach(ThostFtdcInvestorPositionField optionPosition in positionList)
-                {
-                    if(strategy.Option.InstrumentID == optionPosition.InstrumentID)
-                    {
-                        if (optionPosition.PosiDirection == EnumPosiDirectionType.Long && strategy.Option.OptionType == OptionTypeEnum.call)
-                        {
-                            futureHedgeVolume[strategy.Future.InstrumentID] += -strategy.Option.Delta * optionPosition.Position / 3;
-                        }
-                        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Short && strategy.Option.OptionType == OptionTypeEnum.call)
-                        {
-                            futureHedgeVolume[strategy.Future.InstrumentID] += strategy.Option.Delta * optionPosition.Position / 3;
-                        }
-                        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Long && strategy.Option.OptionType == OptionTypeEnum.put)
-                        {
-                            futureHedgeVolume[strategy.Future.InstrumentID] += -strategy.Option.Delta * optionPosition.Position / 3;
-                        }
-                        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Short && strategy.Option.OptionType == OptionTypeEnum.put)
-                        {
-                            futureHedgeVolume[strategy.Future.InstrumentID] += strategy.Option.Delta * optionPosition.Position / 3;
-                        }
-                    }
-                }
+                futureHedgeVolume["IF1406"] += -strategy.Option.Delta * strategy.Option.longPosition.Position / 3;
+                futureHedgeVolume["IF1406"] += strategy.Option.Delta * strategy.Option.shortPosition.Position / 3;
+                //foreach(ThostFtdcInvestorPositionField optionPosition in positionList)
+                //{
+                //    if(strategy.Option.InstrumentID == optionPosition.InstrumentID)
+                //    {
+                //        if (optionPosition.PosiDirection == EnumPosiDirectionType.Long && strategy.Option.OptionType == OptionTypeEnum.call)
+                //        {
+                //            futureHedgeVolume[strategy.Future.InstrumentID] += -strategy.Option.Delta * optionPosition.Position / 3;
+                //        }
+                //        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Short && strategy.Option.OptionType == OptionTypeEnum.call)
+                //        {
+                //            futureHedgeVolume[strategy.Future.InstrumentID] += strategy.Option.Delta * optionPosition.Position / 3;
+                //        }
+                //        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Long && strategy.Option.OptionType == OptionTypeEnum.put)
+                //        {
+                //            futureHedgeVolume[strategy.Future.InstrumentID] += -strategy.Option.Delta * optionPosition.Position / 3;
+                //        }
+                //        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Short && strategy.Option.OptionType == OptionTypeEnum.put)
+                //        {
+                //            futureHedgeVolume[strategy.Future.InstrumentID] += strategy.Option.Delta * optionPosition.Position / 3;
+                //        }
+                //    }
+                //}
             }
-            Console.WriteLine(System.DateTime.Now.ToShortTimeString() + ":" + "IF1406 " + futureHedgeVolume["IF1406"] + "," + "IF1407 " + futureHedgeVolume["IF1407"]);
+            //输出期货对冲的数量
+            Console.WriteLine(System.DateTime.Now.ToShortTimeString() + ":" + "IF1406 " + futureHedgeVolume["IF1406"]);
         }
 
         /// <summary>

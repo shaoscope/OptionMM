@@ -26,9 +26,9 @@ namespace OptionMM
 
         MDAPI md = null;
         TraderAPI td = null;
+
         private void button1_Click(object sender, EventArgs e)
         {
-            button1.Text = "登陆中...";
             button1.Enabled = false;
             if (td != null)
                 td = null;
@@ -36,19 +36,26 @@ namespace OptionMM
                 md = null;
             td = new TraderAPI(textBox5.Text,textBox3.Text,textBox1.Text,textBox2.Text);
             md = new MDAPI(textBox4.Text, textBox3.Text, textBox1.Text, textBox2.Text);
+            this.loginStatusLabel.Text = "正在验证登陆信息...";
             md.Connect();
             td.Connect();
-            //Thread.Sleep(5000);
             if (td.g_logined)
             {
                 //登陆成功
+                this.loginStatusLabel.Text = "交易登陆成功！";
                 TDManager.TD = td;
                 MDManager.MD = md;
-                //this.DialogResult = DialogResult.OK;
-                //this.Close();
-                MainForm form = new MainForm();
-                form.WindowState = FormWindowState.Maximized;
-                form.Show();
+                //查持仓
+                TDManager.TD.ReqQryInvestorPosition();
+                while (!TDManager.TD.bCanReq)
+                {
+                    this.loginStatusLabel.Text = "正在查持仓...";
+                    Thread.Sleep(50);
+                }
+                this.loginStatusLabel.Text = "查询持仓成功！";
+                MainForm.PositionList = TDManager.TD.positionList;
+                //登陆成功
+                this.DialogResult = DialogResult.OK;
             }
             else
             {
@@ -57,11 +64,6 @@ namespace OptionMM
                 button1.Enabled = true;
                 this.DialogResult = DialogResult.No;
             }
-        }
-
-        private void Login_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
