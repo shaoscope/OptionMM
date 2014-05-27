@@ -64,9 +64,24 @@ namespace Native
 		p_OnRspUnSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast);
 	};
 
+	///订阅询价应答
+	void CMdSpi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		p_OnRspSubForQuoteRsp(pSpecificInstrument, pRspInfo, nRequestID, bIsLast);
+	};
+
+	///取消订阅询价应答
+	void CMdSpi::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		p_OnRspUnSubForQuoteRsp(pSpecificInstrument, pRspInfo, nRequestID, bIsLast);
+	};
+
 	///深度行情通知
 	void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData){
 		p_OnRtnDepthMarketData(pDepthMarketData);
+	};
+	
+	///询价通知
+	void CMdSpi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp){
+		p_OnRtnForQuoteRsp(pForQuoteRsp);
 	};
 #else
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
@@ -91,11 +106,9 @@ namespace Native
 		m_pAdapter->OnHeartBeatWarning(nTimeLapse);
 	};
 
-
 	///登录请求响应
 	void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-		ThostFtdcRspUserLoginField^ field = MNConv<ThostFtdcRspUserLoginField^, CThostFtdcRspUserLoginField>::N2M(pRspUserLogin);
-		m_pAdapter->OnRspUserLogin(field, RspInfoField(pRspInfo), nRequestID, bIsLast);
+		m_pAdapter->OnRspUserLogin(MNConv<ThostFtdcRspUserLoginField^, CThostFtdcRspUserLoginField>::N2M(pRspUserLogin), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	};
 
 	///登出请求响应
@@ -118,11 +131,26 @@ namespace Native
 		m_pAdapter->OnRspUnSubMarketData(MNConv<ThostFtdcSpecificInstrumentField^, CThostFtdcSpecificInstrumentField>::N2M(pSpecificInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	};
 
+	///订阅询价应答
+	void CMdSpi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		m_pAdapter->OnRspSubForQuoteRsp(MNConv<ThostFtdcSpecificInstrumentField^, CThostFtdcSpecificInstrumentField>::N2M(pSpecificInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	};
+
+	///取消订阅询价应答
+	void CMdSpi::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		m_pAdapter->OnRspUnSubForQuoteRsp(MNConv<ThostFtdcSpecificInstrumentField^, CThostFtdcSpecificInstrumentField>::N2M(pSpecificInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	};
+
 	///深度行情通知
 	void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData){
-		ThostFtdcDepthMarketDataField^ field = safe_cast<ThostFtdcDepthMarketDataField^>(Marshal::PtrToStructure(IntPtr(pDepthMarketData), ThostFtdcDepthMarketDataField::typeid));
-		m_pAdapter->OnRtnDepthMarketData(field);
+		m_pAdapter->OnRtnDepthMarketData(MNConv<ThostFtdcDepthMarketDataField^, CThostFtdcDepthMarketDataField>::N2M(pDepthMarketData));
 	};
+
+	///询价通知
+	void CMdSpi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp){
+		m_pAdapter->OnRtnForQuoteRsp(MNConv<ThostFtdcForQuoteRspField^, CThostFtdcForQuoteRspField>::N2M(pForQuoteRsp));
+	};
+
 #endif
 };	// end of namespace
 

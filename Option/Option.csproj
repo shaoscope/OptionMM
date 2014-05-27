@@ -48,17 +48,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContractManager.cs" />
+    <Compile Include="GreeksPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GreeksPanel.designer.cs">
+      <DependentUpon>GreeksPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Position.cs" />
     <Compile Include="PositionHedge.cs" />
     <Compile Include="Future.cs" />
-    <Compile Include="InstrumentManager.cs" />
-    <Compile Include="Instrument.cs" />
     <Compile Include="IStrategyBase.cs" />
     <Compile Include="MMPrice.cs" />
     <Compile Include="MMQuotation.cs" />
     <Compile Include="Option.cs" />
-    <Compile Include="OptionMap.cs" />
     <Compile Include="OptionPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -80,18 +82,25 @@
     </Compile>
     <Compile Include="MDAPI.cs" />
     <Compile Include="MDManager.cs" />
-    <Compile Include="myTS2.cs" />
     <Compile Include="OptionPricingModel.cs" />
     <Compile Include="OptionPricingModelParams.cs" />
     <Compile Include="OptionValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RiskManagementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RiskManagementForm.Designer.cs">
+      <DependentUpon>RiskManagementForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="StaticFunction.cs" />
+    <Compile Include="Greeks.cs" />
     <Compile Include="Strategy.cs" />
     <Compile Include="TDManager.cs" />
-    <Compile Include="Test.cs" />
     <Compile Include="TraderAPI.cs" />
-    <Compile Include="TSBase.cs" />
+    <EmbeddedResource Include="GreeksPanel.resx">
+      <DependentUpon>GreeksPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="OptionPanel.resx">
       <DependentUpon>OptionPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -111,6 +120,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="RiskManagementForm.resx">
+      <DependentUpon>RiskManagementForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

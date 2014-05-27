@@ -18,10 +18,10 @@ namespace CTP
 		m_pApi->RegisterSpi((CThostFtdcTraderSpi*)m_pSpi);
 	}
 
-	CTPTraderAdapter::CTPTraderAdapter(String^ pszFlowPath, bool bIsUsingUdp)
+	CTPTraderAdapter::CTPTraderAdapter(String^ pszFlowPath)
 	{
 		CAutoStrPtr asp(pszFlowPath);
-		m_pApi = CThostFtdcTraderApi::CreateFtdcTraderApi(asp.m_pChar, bIsUsingUdp);
+		m_pApi = CThostFtdcTraderApi::CreateFtdcTraderApi(asp.m_pChar);
 		m_pSpi = new CTraderSpi(this);
 #ifdef __CTP_MA__
 		RegisterCallbacks();
@@ -56,6 +56,14 @@ namespace CTP
 	{
 		CAutoStrPtr asp = CAutoStrPtr(pszNsAddress);
 		m_pApi->RegisterNameServer(asp.m_pChar);
+	}
+
+	///注册名字服务器用户信息
+	void CTPTraderAdapter::RegisterFensUserInfo(ThostFtdcFensUserInfoField^ pFensUserInfo)
+	{
+		CThostFtdcFensUserInfoField native;
+		MNConv<ThostFtdcFensUserInfoField^, CThostFtdcFensUserInfoField>::M2N(pFensUserInfo, &native);
+		m_pApi->RegisterFensUserInfo(&native);
 	}
 
 	///订阅私有流。
@@ -189,6 +197,28 @@ namespace CTP
 		return m_pApi->ReqExecOrderAction(&native, nRequestID);
 	}
 
+	///询价录入请求
+	int CTPTraderAdapter::ReqForQuoteInsert(ThostFtdcInputForQuoteField^ pInputForQuote, int nRequestID)
+	{
+		CThostFtdcInputForQuoteField native;
+		MNConv<ThostFtdcInputForQuoteField^, CThostFtdcInputForQuoteField>::M2N(pInputForQuote, &native);
+		return m_pApi->ReqForQuoteInsert(&native, nRequestID);
+	}
+	///报价录入请求
+	int CTPTraderAdapter::ReqQuoteInsert(ThostFtdcInputQuoteField^ pInputQuote, int nRequestID)
+	{
+		CThostFtdcInputQuoteField native;
+		MNConv<ThostFtdcInputQuoteField^, CThostFtdcInputQuoteField>::M2N(pInputQuote, &native);
+		return m_pApi->ReqQuoteInsert(&native, nRequestID);
+	}
+	///报价操作请求
+	int CTPTraderAdapter::ReqQuoteAction(ThostFtdcInputQuoteActionField^ pInputQuoteAction, int nRequestID)
+	{
+		CThostFtdcInputQuoteActionField native;
+		MNConv<ThostFtdcInputQuoteActionField^, CThostFtdcInputQuoteActionField>::M2N(pInputQuoteAction, &native);
+		return m_pApi->ReqQuoteAction(&native, nRequestID);
+	}
+
 	///请求查询报单
 	int CTPTraderAdapter::ReqQryOrder(ThostFtdcQryOrderField^ pQryOrder, int nRequestID)
 	{
@@ -251,6 +281,13 @@ namespace CTP
 		CThostFtdcQryExchangeField native;
 		MNConv<ThostFtdcQryExchangeField^, CThostFtdcQryExchangeField>::M2N(pQryExchange, &native);
 		return m_pApi->ReqQryExchange(&native, nRequestID);
+	}
+	///请求查询产品
+	int CTPTraderAdapter::ReqQryProduct(ThostFtdcQryProductField^ pQryProduct, int nRequestID)
+	{
+		CThostFtdcQryProductField native;
+		MNConv<ThostFtdcQryProductField^, CThostFtdcQryProductField>::M2N(pQryProduct, &native);
+		return m_pApi->ReqQryProduct(&native, nRequestID);
 	}
 	///请求查询合约
 	int CTPTraderAdapter::ReqQryInstrument(ThostFtdcQryInstrumentField^ pQryInstrument, int nRequestID)
@@ -323,6 +360,43 @@ namespace CTP
 		return m_pApi->ReqQryEWarrantOffset(&native, nRequestID);
 	}
 
+	///请求查询投资者品种/跨品种保证金
+	int CTPTraderAdapter::ReqQryInvestorProductGroupMargin(ThostFtdcQryInvestorProductGroupMarginField^ pQryInvestorProductGroupMargin, int nRequestID)
+	{
+		CThostFtdcQryInvestorProductGroupMarginField native;
+		MNConv<ThostFtdcQryInvestorProductGroupMarginField^, CThostFtdcQryInvestorProductGroupMarginField>::M2N(pQryInvestorProductGroupMargin, &native);
+		return m_pApi->ReqQryInvestorProductGroupMargin(&native, nRequestID);
+	}
+	///请求查询交易所保证金率
+	int CTPTraderAdapter::ReqQryExchangeMarginRate(ThostFtdcQryExchangeMarginRateField^ pQryExchangeMarginRate, int nRequestID)
+	{
+		CThostFtdcQryExchangeMarginRateField native;
+		MNConv<ThostFtdcQryExchangeMarginRateField^, CThostFtdcQryExchangeMarginRateField>::M2N(pQryExchangeMarginRate, &native);
+		return m_pApi->ReqQryExchangeMarginRate(&native, nRequestID);
+	}
+	///请求查询交易所调整保证金率
+	int CTPTraderAdapter::ReqQryExchangeMarginRateAdjust(ThostFtdcQryExchangeMarginRateAdjustField^ pQryExchangeMarginRateAdjust, int nRequestID)
+	{
+		CThostFtdcQryExchangeMarginRateAdjustField native;
+		MNConv<ThostFtdcQryExchangeMarginRateAdjustField^, CThostFtdcQryExchangeMarginRateAdjustField>::M2N(pQryExchangeMarginRateAdjust, &native);
+		return m_pApi->ReqQryExchangeMarginRateAdjust(&native, nRequestID);
+	}
+	///请求查询汇率
+	int CTPTraderAdapter::ReqQryExchangeRate(ThostFtdcQryExchangeRateField^ pQryExchangeRate, int nRequestID)
+	{
+		CThostFtdcQryExchangeRateField native;
+		MNConv<ThostFtdcQryExchangeRateField^, CThostFtdcQryExchangeRateField>::M2N(pQryExchangeRate, &native);
+		return m_pApi->ReqQryExchangeRate(&native, nRequestID);
+	}
+
+	///请求查询二级代理操作员银期权限
+	int CTPTraderAdapter::ReqQrySecAgentACIDMap(ThostFtdcQrySecAgentACIDMapField^ pQrySecAgentACIDMap, int nRequestID)
+	{
+		CThostFtdcQrySecAgentACIDMapField native;
+		MNConv<ThostFtdcQrySecAgentACIDMapField^, CThostFtdcQrySecAgentACIDMapField>::M2N(pQrySecAgentACIDMap, &native);
+		return m_pApi->ReqQrySecAgentACIDMap(&native, nRequestID);
+	}
+
 	///请求查询期权交易成本
 	int CTPTraderAdapter::ReqQryOptionInstrTradeCost(ThostFtdcQryOptionInstrTradeCostField^ pQryOptionInstrTradeCost, int nRequestID)
 	{
@@ -343,6 +417,21 @@ namespace CTP
 		CThostFtdcQryExecOrderField native;
 		MNConv<ThostFtdcQryExecOrderField^, CThostFtdcQryExecOrderField>::M2N(pQryExecOrder, &native);
 		return m_pApi->ReqQryExecOrder(&native, nRequestID);
+	}
+
+	///请求查询询价
+	int CTPTraderAdapter::ReqQryForQuote(ThostFtdcQryForQuoteField^ pQryForQuote, int nRequestID)
+	{
+		CThostFtdcQryForQuoteField native;
+		MNConv<ThostFtdcQryForQuoteField^, CThostFtdcQryForQuoteField>::M2N(pQryForQuote, &native);
+		return m_pApi->ReqQryForQuote(&native, nRequestID);
+	}
+	///请求查询报价
+	int CTPTraderAdapter::ReqQryQuote(ThostFtdcQryQuoteField^ pQryQuote, int nRequestID)
+	{
+		CThostFtdcQryQuoteField native;
+		MNConv<ThostFtdcQryQuoteField^, CThostFtdcQryQuoteField>::M2N(pQryQuote, &native);
+		return m_pApi->ReqQryQuote(&native, nRequestID);
 	}
 
 	///请求查询转帐流水
@@ -428,253 +517,295 @@ namespace CTP
 	//------------------------------------ Callbacks ------------------------------------
 
 	void CTPTraderAdapter::cbk_OnFrontConnected(){
-		this->OnFrontConnected();
+		thisOnFrontConnected();
 	}
 	void CTPTraderAdapter::cbk_OnFrontDisconnected(int nReason){
-		this->OnFrontDisconnected(nReason);
+		thisOnFrontDisconnected(nReason);
 	}
 	void CTPTraderAdapter::cbk_OnHeartBeatWarning(int nTimeLapse){
-		this->OnHeartBeatWarning(nTimeLapse);
+		thisOnHeartBeatWarning(nTimeLapse);
 	}
-	void CTPTraderAdapter::cbk_OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspAuthenticate(MNConv<ThostFtdcRspAuthenticateField^,CThostFtdcRspAuthenticateField>::N2M(pRspAuthenticateField), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspAuthenticate(MNConv<ThostFtdcRspAuthenticateField^, CThostFtdcRspAuthenticateField>::N2M(pRspAuthenticateField), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspUserLogin(MNConv<ThostFtdcRspUserLoginField^,CThostFtdcRspUserLoginField>::N2M(pRspUserLogin), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspUserLogin(MNConv<ThostFtdcRspUserLoginField^, CThostFtdcRspUserLoginField>::N2M(pRspUserLogin), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspUserLogout(MNConv<ThostFtdcUserLogoutField^,CThostFtdcUserLogoutField>::N2M(pUserLogout), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspUserLogout(MNConv<ThostFtdcUserLogoutField^, CThostFtdcUserLogoutField>::N2M(pUserLogout), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspUserPasswordUpdate(MNConv<ThostFtdcUserPasswordUpdateField^,CThostFtdcUserPasswordUpdateField>::N2M(pUserPasswordUpdate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspUserPasswordUpdate(MNConv<ThostFtdcUserPasswordUpdateField^, CThostFtdcUserPasswordUpdateField>::N2M(pUserPasswordUpdate), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspTradingAccountPasswordUpdate(CThostFtdcTradingAccountPasswordUpdateField *pTradingAccountPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspTradingAccountPasswordUpdate(MNConv<ThostFtdcTradingAccountPasswordUpdateField^,CThostFtdcTradingAccountPasswordUpdateField>::N2M(pTradingAccountPasswordUpdate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspTradingAccountPasswordUpdate(CThostFtdcTradingAccountPasswordUpdateField *pTradingAccountPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspTradingAccountPasswordUpdate(MNConv<ThostFtdcTradingAccountPasswordUpdateField^, CThostFtdcTradingAccountPasswordUpdateField>::N2M(pTradingAccountPasswordUpdate), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspOrderInsert(MNConv<ThostFtdcInputOrderField^,CThostFtdcInputOrderField>::N2M(pInputOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspOrderInsert(MNConv<ThostFtdcInputOrderField^, CThostFtdcInputOrderField>::N2M(pInputOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspParkedOrderInsert(CThostFtdcParkedOrderField *pParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspParkedOrderInsert(MNConv<ThostFtdcParkedOrderField^,CThostFtdcParkedOrderField>::N2M(pParkedOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspParkedOrderInsert(CThostFtdcParkedOrderField *pParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspParkedOrderInsert(MNConv<ThostFtdcParkedOrderField^, CThostFtdcParkedOrderField>::N2M(pParkedOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspParkedOrderAction(MNConv<ThostFtdcParkedOrderActionField^,CThostFtdcParkedOrderActionField>::N2M(pParkedOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspParkedOrderAction(MNConv<ThostFtdcParkedOrderActionField^, CThostFtdcParkedOrderActionField>::N2M(pParkedOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspOrderAction(MNConv<ThostFtdcInputOrderActionField^,CThostFtdcInputOrderActionField>::N2M(pInputOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspOrderAction(MNConv<ThostFtdcInputOrderActionField^, CThostFtdcInputOrderActionField>::N2M(pInputOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQueryMaxOrderVolume(CThostFtdcQueryMaxOrderVolumeField *pQueryMaxOrderVolume, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQueryMaxOrderVolume(MNConv<ThostFtdcQueryMaxOrderVolumeField^,CThostFtdcQueryMaxOrderVolumeField>::N2M(pQueryMaxOrderVolume), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQueryMaxOrderVolume(CThostFtdcQueryMaxOrderVolumeField *pQueryMaxOrderVolume, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQueryMaxOrderVolume(MNConv<ThostFtdcQueryMaxOrderVolumeField^, CThostFtdcQueryMaxOrderVolumeField>::N2M(pQueryMaxOrderVolume), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspSettlementInfoConfirm(MNConv<ThostFtdcSettlementInfoConfirmField^,CThostFtdcSettlementInfoConfirmField>::N2M(pSettlementInfoConfirm), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspSettlementInfoConfirm(MNConv<ThostFtdcSettlementInfoConfirmField^, CThostFtdcSettlementInfoConfirmField>::N2M(pSettlementInfoConfirm), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspRemoveParkedOrder(CThostFtdcRemoveParkedOrderField *pRemoveParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspRemoveParkedOrder(MNConv<ThostFtdcRemoveParkedOrderField^,CThostFtdcRemoveParkedOrderField>::N2M(pRemoveParkedOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspRemoveParkedOrder(CThostFtdcRemoveParkedOrderField *pRemoveParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspRemoveParkedOrder(MNConv<ThostFtdcRemoveParkedOrderField^, CThostFtdcRemoveParkedOrderField>::N2M(pRemoveParkedOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspRemoveParkedOrderAction(CThostFtdcRemoveParkedOrderActionField *pRemoveParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspRemoveParkedOrderAction(MNConv<ThostFtdcRemoveParkedOrderActionField^,CThostFtdcRemoveParkedOrderActionField>::N2M(pRemoveParkedOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspRemoveParkedOrderAction(CThostFtdcRemoveParkedOrderActionField *pRemoveParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspRemoveParkedOrderAction(MNConv<ThostFtdcRemoveParkedOrderActionField^, CThostFtdcRemoveParkedOrderActionField>::N2M(pRemoveParkedOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-
-	void CTPTraderAdapter::cbk_OnRspExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspExecOrderInsert(MNConv<ThostFtdcInputExecOrderField^,CThostFtdcInputExecOrderField>::N2M(pInputExecOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspExecOrderInsert(MNConv<ThostFtdcInputExecOrderField^, CThostFtdcInputExecOrderField>::N2M(pInputExecOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspExecOrderAction(CThostFtdcInputExecOrderActionField *pInputExecOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspExecOrderAction(MNConv<ThostFtdcInputExecOrderActionField^,CThostFtdcInputExecOrderActionField>::N2M(pInputExecOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspExecOrderAction(CThostFtdcInputExecOrderActionField *pInputExecOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspExecOrderAction(MNConv<ThostFtdcInputExecOrderActionField^, CThostFtdcInputExecOrderActionField>::N2M(pInputExecOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-
-	void CTPTraderAdapter::cbk_OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryOrder(MNConv<ThostFtdcOrderField^,CThostFtdcOrderField>::N2M(pOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspForQuoteInsert(CThostFtdcInputForQuoteField *pInputForQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspForQuoteInsert(MNConv<ThostFtdcInputForQuoteField^, CThostFtdcInputForQuoteField>::N2M(pInputForQuote), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryTrade(MNConv<ThostFtdcTradeField^,CThostFtdcTradeField>::N2M(pTrade), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQuoteInsert(MNConv<ThostFtdcInputQuoteField^, CThostFtdcInputQuoteField>::N2M(pInputQuote), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryInvestorPosition(MNConv<ThostFtdcInvestorPositionField^,CThostFtdcInvestorPositionField>::N2M(pInvestorPosition), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQuoteAction(MNConv<ThostFtdcInputQuoteActionField^, CThostFtdcInputQuoteActionField>::N2M(pInputQuoteAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryTradingAccount(MNConv<ThostFtdcTradingAccountField^,CThostFtdcTradingAccountField>::N2M(pTradingAccount), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryOrder(MNConv<ThostFtdcOrderField^, CThostFtdcOrderField>::N2M(pOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryInvestor(MNConv<ThostFtdcInvestorField^,CThostFtdcInvestorField>::N2M(pInvestor), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryTrade(MNConv<ThostFtdcTradeField^, CThostFtdcTradeField>::N2M(pTrade), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryTradingCode(CThostFtdcTradingCodeField *pTradingCode, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryTradingCode(MNConv<ThostFtdcTradingCodeField^,CThostFtdcTradingCodeField>::N2M(pTradingCode), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInvestorPosition(MNConv<ThostFtdcInvestorPositionField^, CThostFtdcInvestorPositionField>::N2M(pInvestorPosition), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryInstrumentMarginRate(MNConv<ThostFtdcInstrumentMarginRateField^,CThostFtdcInstrumentMarginRateField>::N2M(pInstrumentMarginRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryTradingAccount(MNConv<ThostFtdcTradingAccountField^, CThostFtdcTradingAccountField>::N2M(pTradingAccount), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryInstrumentCommissionRate(MNConv<ThostFtdcInstrumentCommissionRateField^,CThostFtdcInstrumentCommissionRateField>::N2M(pInstrumentCommissionRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInvestor(MNConv<ThostFtdcInvestorField^, CThostFtdcInvestorField>::N2M(pInvestor), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryExchange(MNConv<ThostFtdcExchangeField^,CThostFtdcExchangeField>::N2M(pExchange), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryTradingCode(CThostFtdcTradingCodeField *pTradingCode, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryTradingCode(MNConv<ThostFtdcTradingCodeField^, CThostFtdcTradingCodeField>::N2M(pTradingCode), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryInstrument(MNConv<ThostFtdcInstrumentField^,CThostFtdcInstrumentField>::N2M(pInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInstrumentMarginRate(MNConv<ThostFtdcInstrumentMarginRateField^, CThostFtdcInstrumentMarginRateField>::N2M(pInstrumentMarginRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryDepthMarketData(MNConv<ThostFtdcDepthMarketDataField^,CThostFtdcDepthMarketDataField>::N2M(pDepthMarketData), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInstrumentCommissionRate(MNConv<ThostFtdcInstrumentCommissionRateField^, CThostFtdcInstrumentCommissionRateField>::N2M(pInstrumentCommissionRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQrySettlementInfo(MNConv<ThostFtdcSettlementInfoField^,CThostFtdcSettlementInfoField>::N2M(pSettlementInfo), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryExchange(MNConv<ThostFtdcExchangeField^, CThostFtdcExchangeField>::N2M(pExchange), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryTransferBank(CThostFtdcTransferBankField *pTransferBank, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryTransferBank(MNConv<ThostFtdcTransferBankField^,CThostFtdcTransferBankField>::N2M(pTransferBank), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryProduct(CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryProduct(MNConv<ThostFtdcProductField^, CThostFtdcProductField>::N2M(pProduct), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryInvestorPositionDetail(MNConv<ThostFtdcInvestorPositionDetailField^,CThostFtdcInvestorPositionDetailField>::N2M(pInvestorPositionDetail), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInstrument(MNConv<ThostFtdcInstrumentField^, CThostFtdcInstrumentField>::N2M(pInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryNotice(CThostFtdcNoticeField *pNotice, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryNotice(MNConv<ThostFtdcNoticeField^,CThostFtdcNoticeField>::N2M(pNotice), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryDepthMarketData(MNConv<ThostFtdcDepthMarketDataField^, CThostFtdcDepthMarketDataField>::N2M(pDepthMarketData), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQrySettlementInfoConfirm(MNConv<ThostFtdcSettlementInfoConfirmField^,CThostFtdcSettlementInfoConfirmField>::N2M(pSettlementInfoConfirm), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQrySettlementInfo(MNConv<ThostFtdcSettlementInfoField^, CThostFtdcSettlementInfoField>::N2M(pSettlementInfo), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryInvestorPositionCombineDetail(CThostFtdcInvestorPositionCombineDetailField *pInvestorPositionCombineDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryInvestorPositionCombineDetail(MNConv<ThostFtdcInvestorPositionCombineDetailField^,CThostFtdcInvestorPositionCombineDetailField>::N2M(pInvestorPositionCombineDetail), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryTransferBank(CThostFtdcTransferBankField *pTransferBank, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryTransferBank(MNConv<ThostFtdcTransferBankField^, CThostFtdcTransferBankField>::N2M(pTransferBank), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryCFMMCTradingAccountKey(CThostFtdcCFMMCTradingAccountKeyField *pCFMMCTradingAccountKey, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryCFMMCTradingAccountKey(MNConv<ThostFtdcCFMMCTradingAccountKeyField^,CThostFtdcCFMMCTradingAccountKeyField>::N2M(pCFMMCTradingAccountKey), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInvestorPositionDetail(MNConv<ThostFtdcInvestorPositionDetailField^, CThostFtdcInvestorPositionDetailField>::N2M(pInvestorPositionDetail), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryEWarrantOffset(CThostFtdcEWarrantOffsetField *pEWarrantOffset, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryEWarrantOffset(MNConv<ThostFtdcEWarrantOffsetField^,CThostFtdcEWarrantOffsetField>::N2M(pEWarrantOffset), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryNotice(CThostFtdcNoticeField *pNotice, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryNotice(MNConv<ThostFtdcNoticeField^, CThostFtdcNoticeField>::N2M(pNotice), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-
-	void CTPTraderAdapter::cbk_OnRspQryOptionInstrTradeCost(CThostFtdcOptionInstrTradeCostField *pOptionInstrTradeCost, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryOptionInstrTradeCost(MNConv<ThostFtdcOptionInstrTradeCostField^,CThostFtdcOptionInstrTradeCostField>::N2M(pOptionInstrTradeCost), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQrySettlementInfoConfirm(MNConv<ThostFtdcSettlementInfoConfirmField^, CThostFtdcSettlementInfoConfirmField>::N2M(pSettlementInfoConfirm), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryOptionInstrCommRate(MNConv<ThostFtdcOptionInstrCommRateField^,CThostFtdcOptionInstrCommRateField>::N2M(pOptionInstrCommRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInvestorPositionCombineDetail(CThostFtdcInvestorPositionCombineDetailField *pInvestorPositionCombineDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInvestorPositionCombineDetail(MNConv<ThostFtdcInvestorPositionCombineDetailField^, CThostFtdcInvestorPositionCombineDetailField>::N2M(pInvestorPositionCombineDetail), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryExecOrder(CThostFtdcExecOrderField *pExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryExecOrder(MNConv<ThostFtdcExecOrderField^,CThostFtdcExecOrderField>::N2M(pExecOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryCFMMCTradingAccountKey(CThostFtdcCFMMCTradingAccountKeyField *pCFMMCTradingAccountKey, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryCFMMCTradingAccountKey(MNConv<ThostFtdcCFMMCTradingAccountKeyField^, CThostFtdcCFMMCTradingAccountKeyField>::N2M(pCFMMCTradingAccountKey), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-
-	void CTPTraderAdapter::cbk_OnRspQryTransferSerial(CThostFtdcTransferSerialField *pTransferSerial, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryTransferSerial(MNConv<ThostFtdcTransferSerialField^,CThostFtdcTransferSerialField>::N2M(pTransferSerial), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryEWarrantOffset(CThostFtdcEWarrantOffsetField *pEWarrantOffset, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryEWarrantOffset(MNConv<ThostFtdcEWarrantOffsetField^, CThostFtdcEWarrantOffsetField>::N2M(pEWarrantOffset), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspQryAccountregister(CThostFtdcAccountregisterField *pAccountregister, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryAccountregister(MNConv<ThostFtdcAccountregisterField^,CThostFtdcAccountregisterField>::N2M(pAccountregister), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryInvestorProductGroupMargin(CThostFtdcInvestorProductGroupMarginField *pInvestorProductGroupMargin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryInvestorProductGroupMargin(MNConv<ThostFtdcInvestorProductGroupMarginField^, CThostFtdcInvestorProductGroupMarginField>::N2M(pInvestorProductGroupMargin), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+	void CTPTraderAdapter::cbk_OnRspQryExchangeMarginRate(CThostFtdcExchangeMarginRateField *pExchangeMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryExchangeMarginRate(MNConv<ThostFtdcExchangeMarginRateField^, CThostFtdcExchangeMarginRateField>::N2M(pExchangeMarginRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryExchangeMarginRateAdjust(CThostFtdcExchangeMarginRateAdjustField *pExchangeMarginRateAdjust, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryExchangeMarginRateAdjust(MNConv<ThostFtdcExchangeMarginRateAdjustField^, CThostFtdcExchangeMarginRateAdjustField>::N2M(pExchangeMarginRateAdjust), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryExchangeRate(CThostFtdcExchangeRateField *pExchangeRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryExchangeRate(MNConv<ThostFtdcExchangeRateField^, CThostFtdcExchangeRateField>::N2M(pExchangeRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQrySecAgentACIDMap(CThostFtdcSecAgentACIDMapField *pSecAgentACIDMap, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQrySecAgentACIDMap(MNConv<ThostFtdcSecAgentACIDMapField^, CThostFtdcSecAgentACIDMapField>::N2M(pSecAgentACIDMap), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryOptionInstrTradeCost(CThostFtdcOptionInstrTradeCostField *pOptionInstrTradeCost, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryOptionInstrTradeCost(MNConv<ThostFtdcOptionInstrTradeCostField^, CThostFtdcOptionInstrTradeCostField>::N2M(pOptionInstrTradeCost), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryOptionInstrCommRate(MNConv<ThostFtdcOptionInstrCommRateField^, CThostFtdcOptionInstrCommRateField>::N2M(pOptionInstrCommRate), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryExecOrder(CThostFtdcExecOrderField *pExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryExecOrder(MNConv<ThostFtdcExecOrderField^, CThostFtdcExecOrderField>::N2M(pExecOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryForQuote(CThostFtdcForQuoteField *pForQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryForQuote(MNConv<ThostFtdcForQuoteField^, CThostFtdcForQuoteField>::N2M(pForQuote), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryQuote(CThostFtdcQuoteField *pQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryQuote(MNConv<ThostFtdcQuoteField^, CThostFtdcQuoteField>::N2M(pQuote), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryTransferSerial(CThostFtdcTransferSerialField *pTransferSerial, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryTransferSerial(MNConv<ThostFtdcTransferSerialField^, CThostFtdcTransferSerialField>::N2M(pTransferSerial), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQryAccountregister(CThostFtdcAccountregisterField *pAccountregister, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryAccountregister(MNConv<ThostFtdcAccountregisterField^, CThostFtdcAccountregisterField>::N2M(pAccountregister), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
 		this->OnRspError(RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRtnOrder(CThostFtdcOrderField *pOrder) {
-		this->OnRtnOrder(MNConv<ThostFtdcOrderField^,CThostFtdcOrderField>::N2M(pOrder));
+	void CTPTraderAdapter::cbk_OnRtnOrder(CThostFtdcOrderField *pOrder){
+		this->OnRtnOrder(MNConv<ThostFtdcOrderField^, CThostFtdcOrderField>::N2M(pOrder));
 	}
-	void CTPTraderAdapter::cbk_OnRtnTrade(CThostFtdcTradeField *pTrade) {
-		this->OnRtnTrade(MNConv<ThostFtdcTradeField^,CThostFtdcTradeField>::N2M(pTrade));
+	void CTPTraderAdapter::cbk_OnRtnTrade(CThostFtdcTradeField *pTrade){
+		this->OnRtnTrade(MNConv<ThostFtdcTradeField^, CThostFtdcTradeField>::N2M(pTrade));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnOrderInsert(MNConv<ThostFtdcInputOrderField^,CThostFtdcInputOrderField>::N2M(pInputOrder), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnOrderInsert(MNConv<ThostFtdcInputOrderField^, CThostFtdcInputOrderField>::N2M(pInputOrder), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnOrderAction(MNConv<ThostFtdcOrderActionField^,CThostFtdcOrderActionField>::N2M(pOrderAction), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnOrderAction(MNConv<ThostFtdcOrderActionField^, CThostFtdcOrderActionField>::N2M(pOrderAction), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
-		this->OnRtnInstrumentStatus(MNConv<ThostFtdcInstrumentStatusField^,CThostFtdcInstrumentStatusField>::N2M(pInstrumentStatus));
+	void CTPTraderAdapter::cbk_OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus){
+		this->OnRtnInstrumentStatus(MNConv<ThostFtdcInstrumentStatusField^, CThostFtdcInstrumentStatusField>::N2M(pInstrumentStatus));
 	}
-	void CTPTraderAdapter::cbk_OnRtnTradingNotice(CThostFtdcTradingNoticeInfoField *pTradingNoticeInfo) {
-		this->OnRtnTradingNotice(MNConv<ThostFtdcTradingNoticeInfoField^,CThostFtdcTradingNoticeInfoField>::N2M(pTradingNoticeInfo));
+	void CTPTraderAdapter::cbk_OnRtnTradingNotice(CThostFtdcTradingNoticeInfoField *pTradingNoticeInfo){
+		this->OnRtnTradingNotice(MNConv<ThostFtdcTradingNoticeInfoField^, CThostFtdcTradingNoticeInfoField>::N2M(pTradingNoticeInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRtnErrorConditionalOrder(CThostFtdcErrorConditionalOrderField *pErrorConditionalOrder) {
-		this->OnRtnErrorConditionalOrder(MNConv<ThostFtdcErrorConditionalOrderField^,CThostFtdcErrorConditionalOrderField>::N2M(pErrorConditionalOrder));
+	void CTPTraderAdapter::cbk_OnRtnErrorConditionalOrder(CThostFtdcErrorConditionalOrderField *pErrorConditionalOrder){
+		this->OnRtnErrorConditionalOrder(MNConv<ThostFtdcErrorConditionalOrderField^, CThostFtdcErrorConditionalOrderField>::N2M(pErrorConditionalOrder));
 	}
-
-	void CTPTraderAdapter::cbk_OnRtnExecOrder(CThostFtdcExecOrderField *pExecOrder) {
-		this->OnRtnExecOrder(MNConv<ThostFtdcExecOrderField^,CThostFtdcExecOrderField>::N2M(pExecOrder));
+	void CTPTraderAdapter::cbk_OnRtnExecOrder(CThostFtdcExecOrderField *pExecOrder){
+		this->OnRtnExecOrder(MNConv<ThostFtdcExecOrderField^, CThostFtdcExecOrderField>::N2M(pExecOrder));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnExecOrderInsert(MNConv<ThostFtdcInputExecOrderField^,CThostFtdcInputExecOrderField>::N2M(pInputExecOrder), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnErrRtnExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnExecOrderInsert(MNConv<ThostFtdcInputExecOrderField^, CThostFtdcInputExecOrderField>::N2M(pInputExecOrder), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnExecOrderAction(CThostFtdcExecOrderActionField *pExecOrderAction, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnExecOrderAction(MNConv<ThostFtdcExecOrderActionField^,CThostFtdcExecOrderActionField>::N2M(pExecOrderAction), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnErrRtnExecOrderAction(CThostFtdcExecOrderActionField *pExecOrderAction, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnExecOrderAction(MNConv<ThostFtdcExecOrderActionField^, CThostFtdcExecOrderActionField>::N2M(pExecOrderAction), RspInfoField(pRspInfo));
 	}
-
-	void CTPTraderAdapter::cbk_OnRspQryContractBank(CThostFtdcContractBankField *pContractBank, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryContractBank(MNConv<ThostFtdcContractBankField^,CThostFtdcContractBankField>::N2M(pContractBank), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnErrRtnForQuoteInsert(CThostFtdcInputForQuoteField *pInputForQuote, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnForQuoteInsert(MNConv<ThostFtdcInputForQuoteField^, CThostFtdcInputForQuoteField>::N2M(pInputForQuote), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRspQryParkedOrder(CThostFtdcParkedOrderField *pParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryParkedOrder(MNConv<ThostFtdcParkedOrderField^,CThostFtdcParkedOrderField>::N2M(pParkedOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRtnQuote(CThostFtdcQuoteField *pQuote){
+		this->OnRtnQuote(MNConv<ThostFtdcQuoteField^, CThostFtdcQuoteField>::N2M(pQuote));
 	}
-	void CTPTraderAdapter::cbk_OnRspQryParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryParkedOrderAction(MNConv<ThostFtdcParkedOrderActionField^,CThostFtdcParkedOrderActionField>::N2M(pParkedOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnErrRtnQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnQuoteInsert(MNConv<ThostFtdcInputQuoteField^, CThostFtdcInputQuoteField>::N2M(pInputQuote), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRspQryTradingNotice(CThostFtdcTradingNoticeField *pTradingNotice, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryTradingNotice(MNConv<ThostFtdcTradingNoticeField^,CThostFtdcTradingNoticeField>::N2M(pTradingNotice), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnQuoteAction(MNConv<ThostFtdcQuoteActionField^, CThostFtdcQuoteActionField>::N2M(pQuoteAction), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRspQryBrokerTradingParams(CThostFtdcBrokerTradingParamsField *pBrokerTradingParams, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryBrokerTradingParams(MNConv<ThostFtdcBrokerTradingParamsField^,CThostFtdcBrokerTradingParamsField>::N2M(pBrokerTradingParams), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp){
+		this->OnRtnForQuoteRsp(MNConv<ThostFtdcForQuoteRspField^, CThostFtdcForQuoteRspField>::N2M(pForQuoteRsp));
 	}
-	void CTPTraderAdapter::cbk_OnRspQryBrokerTradingAlgos(CThostFtdcBrokerTradingAlgosField *pBrokerTradingAlgos, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQryBrokerTradingAlgos(MNConv<ThostFtdcBrokerTradingAlgosField^,CThostFtdcBrokerTradingAlgosField>::N2M(pBrokerTradingAlgos), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnRspQryContractBank(CThostFtdcContractBankField *pContractBank, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryContractBank(MNConv<ThostFtdcContractBankField^, CThostFtdcContractBankField>::N2M(pContractBank), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRtnFromBankToFutureByBank(CThostFtdcRspTransferField *pRspTransfer) {
-		this->OnRtnFromBankToFutureByBank(MNConv<ThostFtdcRspTransferField^,CThostFtdcRspTransferField>::N2M(pRspTransfer));
+	void CTPTraderAdapter::cbk_OnRspQryParkedOrder(CThostFtdcParkedOrderField *pParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryParkedOrder(MNConv<ThostFtdcParkedOrderField^, CThostFtdcParkedOrderField>::N2M(pParkedOrder), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRtnFromFutureToBankByBank(CThostFtdcRspTransferField *pRspTransfer) {
-		this->OnRtnFromFutureToBankByBank(MNConv<ThostFtdcRspTransferField^,CThostFtdcRspTransferField>::N2M(pRspTransfer));
+	void CTPTraderAdapter::cbk_OnRspQryParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryParkedOrderAction(MNConv<ThostFtdcParkedOrderActionField^, CThostFtdcParkedOrderActionField>::N2M(pParkedOrderAction), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRtnRepealFromBankToFutureByBank(CThostFtdcRspRepealField *pRspRepeal) {
-		this->OnRtnRepealFromBankToFutureByBank(MNConv<ThostFtdcRspRepealField^,CThostFtdcRspRepealField>::N2M(pRspRepeal));
+	void CTPTraderAdapter::cbk_OnRspQryTradingNotice(CThostFtdcTradingNoticeField *pTradingNotice, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryTradingNotice(MNConv<ThostFtdcTradingNoticeField^, CThostFtdcTradingNoticeField>::N2M(pTradingNotice), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRtnRepealFromFutureToBankByBank(CThostFtdcRspRepealField *pRspRepeal) {
-		this->OnRtnRepealFromFutureToBankByBank(MNConv<ThostFtdcRspRepealField^,CThostFtdcRspRepealField>::N2M(pRspRepeal));
+	void CTPTraderAdapter::cbk_OnRspQryBrokerTradingParams(CThostFtdcBrokerTradingParamsField *pBrokerTradingParams, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryBrokerTradingParams(MNConv<ThostFtdcBrokerTradingParamsField^, CThostFtdcBrokerTradingParamsField>::N2M(pBrokerTradingParams), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRtnFromBankToFutureByFuture(CThostFtdcRspTransferField *pRspTransfer) {
-		this->OnRtnFromBankToFutureByFuture(MNConv<ThostFtdcRspTransferField^,CThostFtdcRspTransferField>::N2M(pRspTransfer));
+	void CTPTraderAdapter::cbk_OnRspQryBrokerTradingAlgos(CThostFtdcBrokerTradingAlgosField *pBrokerTradingAlgos, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQryBrokerTradingAlgos(MNConv<ThostFtdcBrokerTradingAlgosField^, CThostFtdcBrokerTradingAlgosField>::N2M(pBrokerTradingAlgos), RspInfoField(pRspInfo), nRequestID, bIsLast);
 	}
-	void CTPTraderAdapter::cbk_OnRtnFromFutureToBankByFuture(CThostFtdcRspTransferField *pRspTransfer) {
-		this->OnRtnFromFutureToBankByFuture(MNConv<ThostFtdcRspTransferField^,CThostFtdcRspTransferField>::N2M(pRspTransfer));
+	void CTPTraderAdapter::cbk_OnRtnFromBankToFutureByBank(CThostFtdcRspTransferField *pRspTransfer){
+		this->OnRtnFromBankToFutureByBank(MNConv<ThostFtdcRspTransferField^, CThostFtdcRspTransferField>::N2M(pRspTransfer));
 	}
-	void CTPTraderAdapter::cbk_OnRtnRepealFromBankToFutureByFutureManual(CThostFtdcRspRepealField *pRspRepeal) {
-		this->OnRtnRepealFromBankToFutureByFutureManual(MNConv<ThostFtdcRspRepealField^,CThostFtdcRspRepealField>::N2M(pRspRepeal));
+	void CTPTraderAdapter::cbk_OnRtnFromFutureToBankByBank(CThostFtdcRspTransferField *pRspTransfer){
+		this->OnRtnFromFutureToBankByBank(MNConv<ThostFtdcRspTransferField^, CThostFtdcRspTransferField>::N2M(pRspTransfer));
 	}
-	void CTPTraderAdapter::cbk_OnRtnRepealFromFutureToBankByFutureManual(CThostFtdcRspRepealField *pRspRepeal) {
-		this->OnRtnRepealFromFutureToBankByFutureManual(MNConv<ThostFtdcRspRepealField^,CThostFtdcRspRepealField>::N2M(pRspRepeal));
+	void CTPTraderAdapter::cbk_OnRtnRepealFromBankToFutureByBank(CThostFtdcRspRepealField *pRspRepeal){
+		this->OnRtnRepealFromBankToFutureByBank(MNConv<ThostFtdcRspRepealField^, CThostFtdcRspRepealField>::N2M(pRspRepeal));
 	}
-	void CTPTraderAdapter::cbk_OnRtnQueryBankBalanceByFuture(CThostFtdcNotifyQueryAccountField *pNotifyQueryAccount) {
-		this->OnRtnQueryBankBalanceByFuture(MNConv<ThostFtdcNotifyQueryAccountField^,CThostFtdcNotifyQueryAccountField>::N2M(pNotifyQueryAccount));
+	void CTPTraderAdapter::cbk_OnRtnRepealFromFutureToBankByBank(CThostFtdcRspRepealField *pRspRepeal){
+		this->OnRtnRepealFromFutureToBankByBank(MNConv<ThostFtdcRspRepealField^, CThostFtdcRspRepealField>::N2M(pRspRepeal));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnBankToFutureByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnBankToFutureByFuture(MNConv<ThostFtdcReqTransferField^,CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnRtnFromBankToFutureByFuture(CThostFtdcRspTransferField *pRspTransfer){
+		this->OnRtnFromBankToFutureByFuture(MNConv<ThostFtdcRspTransferField^, CThostFtdcRspTransferField>::N2M(pRspTransfer));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnFutureToBankByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnFutureToBankByFuture(MNConv<ThostFtdcReqTransferField^,CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnRtnFromFutureToBankByFuture(CThostFtdcRspTransferField *pRspTransfer){
+		this->OnRtnFromFutureToBankByFuture(MNConv<ThostFtdcRspTransferField^, CThostFtdcRspTransferField>::N2M(pRspTransfer));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnRepealBankToFutureByFutureManual(CThostFtdcReqRepealField *pReqRepeal, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnRepealBankToFutureByFutureManual(MNConv<ThostFtdcReqRepealField^,CThostFtdcReqRepealField>::N2M(pReqRepeal), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnRtnRepealFromBankToFutureByFutureManual(CThostFtdcRspRepealField *pRspRepeal){
+		this->OnRtnRepealFromBankToFutureByFutureManual(MNConv<ThostFtdcRspRepealField^, CThostFtdcRspRepealField>::N2M(pRspRepeal));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnRepealFutureToBankByFutureManual(CThostFtdcReqRepealField *pReqRepeal, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnRepealFutureToBankByFutureManual(MNConv<ThostFtdcReqRepealField^,CThostFtdcReqRepealField>::N2M(pReqRepeal), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnRtnRepealFromFutureToBankByFutureManual(CThostFtdcRspRepealField *pRspRepeal){
+		this->OnRtnRepealFromFutureToBankByFutureManual(MNConv<ThostFtdcRspRepealField^, CThostFtdcRspRepealField>::N2M(pRspRepeal));
 	}
-	void CTPTraderAdapter::cbk_OnErrRtnQueryBankBalanceByFuture(CThostFtdcReqQueryAccountField *pReqQueryAccount, CThostFtdcRspInfoField *pRspInfo) {
-		this->OnErrRtnQueryBankBalanceByFuture(MNConv<ThostFtdcReqQueryAccountField^,CThostFtdcReqQueryAccountField>::N2M(pReqQueryAccount), RspInfoField(pRspInfo));
+	void CTPTraderAdapter::cbk_OnRtnQueryBankBalanceByFuture(CThostFtdcNotifyQueryAccountField *pNotifyQueryAccount){
+		this->OnRtnQueryBankBalanceByFuture(MNConv<ThostFtdcNotifyQueryAccountField^, CThostFtdcNotifyQueryAccountField>::N2M(pNotifyQueryAccount));
 	}
-	void CTPTraderAdapter::cbk_OnRtnRepealFromBankToFutureByFuture(CThostFtdcRspRepealField *pRspRepeal) {
-		this->OnRtnRepealFromBankToFutureByFuture(MNConv<ThostFtdcRspRepealField^,CThostFtdcRspRepealField>::N2M(pRspRepeal));
+	void CTPTraderAdapter::cbk_OnErrRtnBankToFutureByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnBankToFutureByFuture(MNConv<ThostFtdcReqTransferField^, CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRtnRepealFromFutureToBankByFuture(CThostFtdcRspRepealField *pRspRepeal) {
-		this->OnRtnRepealFromFutureToBankByFuture(MNConv<ThostFtdcRspRepealField^,CThostFtdcRspRepealField>::N2M(pRspRepeal));
+	void CTPTraderAdapter::cbk_OnErrRtnFutureToBankByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnFutureToBankByFuture(MNConv<ThostFtdcReqTransferField^, CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRspFromBankToFutureByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspFromBankToFutureByFuture(MNConv<ThostFtdcReqTransferField^,CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnErrRtnRepealBankToFutureByFutureManual(CThostFtdcReqRepealField *pReqRepeal, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnRepealBankToFutureByFutureManual(MNConv<ThostFtdcReqRepealField^, CThostFtdcReqRepealField>::N2M(pReqRepeal), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRspFromFutureToBankByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspFromFutureToBankByFuture(MNConv<ThostFtdcReqTransferField^,CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnErrRtnRepealFutureToBankByFutureManual(CThostFtdcReqRepealField *pReqRepeal, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnRepealFutureToBankByFutureManual(MNConv<ThostFtdcReqRepealField^, CThostFtdcReqRepealField>::N2M(pReqRepeal), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRspQueryBankAccountMoneyByFuture(CThostFtdcReqQueryAccountField *pReqQueryAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-		this->OnRspQueryBankAccountMoneyByFuture(MNConv<ThostFtdcReqQueryAccountField^,CThostFtdcReqQueryAccountField>::N2M(pReqQueryAccount), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	void CTPTraderAdapter::cbk_OnErrRtnQueryBankBalanceByFuture(CThostFtdcReqQueryAccountField *pReqQueryAccount, CThostFtdcRspInfoField *pRspInfo){
+		this->OnErrRtnQueryBankBalanceByFuture(MNConv<ThostFtdcReqQueryAccountField^, CThostFtdcReqQueryAccountField>::N2M(pReqQueryAccount), RspInfoField(pRspInfo));
 	}
-	void CTPTraderAdapter::cbk_OnRtnOpenAccountByBank(CThostFtdcOpenAccountField *pOpenAccount) {
-		this->OnRtnOpenAccountByBank(MNConv<ThostFtdcOpenAccountField^,CThostFtdcOpenAccountField>::N2M(pOpenAccount));
+	void CTPTraderAdapter::cbk_OnRtnRepealFromBankToFutureByFuture(CThostFtdcRspRepealField *pRspRepeal){
+		this->OnRtnRepealFromBankToFutureByFuture(MNConv<ThostFtdcRspRepealField^, CThostFtdcRspRepealField>::N2M(pRspRepeal));
 	}
-	void CTPTraderAdapter::cbk_OnRtnCancelAccountByBank(CThostFtdcCancelAccountField *pCancelAccount) {
-		this->OnRtnCancelAccountByBank(MNConv<ThostFtdcCancelAccountField^,CThostFtdcCancelAccountField>::N2M(pCancelAccount));
+	void CTPTraderAdapter::cbk_OnRtnRepealFromFutureToBankByFuture(CThostFtdcRspRepealField *pRspRepeal){
+		this->OnRtnRepealFromFutureToBankByFuture(MNConv<ThostFtdcRspRepealField^, CThostFtdcRspRepealField>::N2M(pRspRepeal));
 	}
-	void CTPTraderAdapter::cbk_OnRtnChangeAccountByBank(CThostFtdcChangeAccountField *pChangeAccount) {
-		this->OnRtnChangeAccountByBank(MNConv<ThostFtdcChangeAccountField^,CThostFtdcChangeAccountField>::N2M(pChangeAccount));
+	void CTPTraderAdapter::cbk_OnRspFromBankToFutureByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspFromBankToFutureByFuture(MNConv<ThostFtdcReqTransferField^, CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspFromFutureToBankByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspFromFutureToBankByFuture(MNConv<ThostFtdcReqTransferField^, CThostFtdcReqTransferField>::N2M(pReqTransfer), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRspQueryBankAccountMoneyByFuture(CThostFtdcReqQueryAccountField *pReqQueryAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+		this->OnRspQueryBankAccountMoneyByFuture(MNConv<ThostFtdcReqQueryAccountField^, CThostFtdcReqQueryAccountField>::N2M(pReqQueryAccount), RspInfoField(pRspInfo), nRequestID, bIsLast);
+	}
+	void CTPTraderAdapter::cbk_OnRtnOpenAccountByBank(CThostFtdcOpenAccountField *pOpenAccount){
+		this->OnRtnOpenAccountByBank(MNConv<ThostFtdcOpenAccountField^, CThostFtdcOpenAccountField>::N2M(pOpenAccount));
+	}
+	void CTPTraderAdapter::cbk_OnRtnCancelAccountByBank(CThostFtdcCancelAccountField *pCancelAccount){
+		this->OnRtnCancelAccountByBank(MNConv<ThostFtdcCancelAccountField^, CThostFtdcCancelAccountField>::N2M(pCancelAccount));
+	}
+	void CTPTraderAdapter::cbk_OnRtnChangeAccountByBank(CThostFtdcChangeAccountField *pChangeAccount){
+		this->OnRtnChangeAccountByBank(MNConv<ThostFtdcChangeAccountField^, CThostFtdcChangeAccountField>::N2M(pChangeAccount));
 	}
 
 	// 将所有回调函数地址传递给SPI，并保存对delegate的引用
@@ -728,13 +859,20 @@ namespace CTP
 		m_pSpi->d_RspRemoveParkedOrderAction = gcnew Internal_RspRemoveParkedOrderAction(this, &CTPTraderAdapter::cbk_OnRspRemoveParkedOrderAction);
 		m_pSpi->p_OnRspRemoveParkedOrderAction = (Callback_OnRspRemoveParkedOrderAction)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspRemoveParkedOrderAction).ToPointer();
 
-
 		m_pSpi->d_RspExecOrderInsert = gcnew Internal_RspExecOrderInsert(this, &CTPTraderAdapter::cbk_OnRspExecOrderInsert);
 		m_pSpi->p_OnRspExecOrderInsert = (Callback_OnRspExecOrderInsert)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspExecOrderInsert).ToPointer();
 
 		m_pSpi->d_RspExecOrderAction = gcnew Internal_RspExecOrderAction(this, &CTPTraderAdapter::cbk_OnRspExecOrderAction);
 		m_pSpi->p_OnRspExecOrderAction = (Callback_OnRspExecOrderAction)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspExecOrderAction).ToPointer();
 
+		m_pSpi->d_RspForQuoteInsert = gcnew Internal_RspForQuoteInsert(this, &CTPTraderAdapter::cbk_OnRspForQuoteInsert);
+		m_pSpi->p_OnRspForQuoteInsert = (Callback_OnRspForQuoteInsert)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspForQuoteInsert).ToPointer();
+
+		m_pSpi->d_RspQuoteInsert = gcnew Internal_RspQuoteInsert(this, &CTPTraderAdapter::cbk_OnRspQuoteInsert);
+		m_pSpi->p_OnRspQuoteInsert = (Callback_OnRspQuoteInsert)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQuoteInsert).ToPointer();
+
+		m_pSpi->d_RspQuoteAction = gcnew Internal_RspQuoteAction(this, &CTPTraderAdapter::cbk_OnRspQuoteAction);
+		m_pSpi->p_OnRspQuoteAction = (Callback_OnRspQuoteAction)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQuoteAction).ToPointer();
 
 		m_pSpi->d_RspQryOrder = gcnew Internal_RspQryOrder(this, &CTPTraderAdapter::cbk_OnRspQryOrder);
 		m_pSpi->p_OnRspQryOrder = (Callback_OnRspQryOrder)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryOrder).ToPointer();
@@ -762,6 +900,9 @@ namespace CTP
 
 		m_pSpi->d_RspQryExchange = gcnew Internal_RspQryExchange(this, &CTPTraderAdapter::cbk_OnRspQryExchange);
 		m_pSpi->p_OnRspQryExchange = (Callback_OnRspQryExchange)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryExchange).ToPointer();
+
+		m_pSpi->d_RspQryProduct = gcnew Internal_RspQryProduct(this, &CTPTraderAdapter::cbk_OnRspQryProduct);
+		m_pSpi->p_OnRspQryProduct = (Callback_OnRspQryProduct)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryProduct).ToPointer();
 
 		m_pSpi->d_RspQryInstrument = gcnew Internal_RspQryInstrument(this, &CTPTraderAdapter::cbk_OnRspQryInstrument);
 		m_pSpi->p_OnRspQryInstrument = (Callback_OnRspQryInstrument)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryInstrument).ToPointer();
@@ -793,8 +934,22 @@ namespace CTP
 		m_pSpi->d_RspQryEWarrantOffset = gcnew Internal_RspQryEWarrantOffset(this, &CTPTraderAdapter::cbk_OnRspQryEWarrantOffset);
 		m_pSpi->p_OnRspQryEWarrantOffset = (Callback_OnRspQryEWarrantOffset)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryEWarrantOffset).ToPointer();
 
+		m_pSpi->d_RspQryInvestorProductGroupMargin = gcnew Internal_RspQryInvestorProductGroupMargin(this, &CTPTraderAdapter::cbk_OnRspQryInvestorProductGroupMargin);
+		m_pSpi->p_OnRspQryInvestorProductGroupMargin = (Callback_OnRspQryInvestorProductGroupMargin)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryInvestorProductGroupMargin).ToPointer();
 
-		m_pSpi->d_RspQryOptionInstrTradeCost= gcnew Internal_RspQryOptionInstrTradeCost(this, &CTPTraderAdapter::cbk_OnRspQryOptionInstrTradeCost);
+		m_pSpi->d_RspQryExchangeMarginRate = gcnew Internal_RspQryExchangeMarginRate(this, &CTPTraderAdapter::cbk_OnRspQryExchangeMarginRate);
+		m_pSpi->p_OnRspQryExchangeMarginRate = (Callback_OnRspQryExchangeMarginRate)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryExchangeMarginRate).ToPointer();
+
+		m_pSpi->d_RspQryExchangeMarginRateAdjust = gcnew Internal_RspQryExchangeMarginRateAdjust(this, &CTPTraderAdapter::cbk_OnRspQryExchangeMarginRateAdjust);
+		m_pSpi->p_OnRspQryExchangeMarginRateAdjust = (Callback_OnRspQryExchangeMarginRateAdjust)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryExchangeMarginRateAdjust).ToPointer();
+
+		m_pSpi->d_RspQryExchangeRate = gcnew Internal_RspQryExchangeRate(this, &CTPTraderAdapter::cbk_OnRspQryExchangeRate);
+		m_pSpi->p_OnRspQryExchangeRate = (Callback_OnRspQryExchangeRate)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryExchangeRate).ToPointer();
+
+		m_pSpi->d_RspQrySecAgentACIDMap = gcnew Internal_RspQrySecAgentACIDMap(this, &CTPTraderAdapter::cbk_OnRspQrySecAgentACIDMap);
+		m_pSpi->p_OnRspQrySecAgentACIDMap = (Callback_OnRspQrySecAgentACIDMap)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQrySecAgentACIDMap).ToPointer();
+
+		m_pSpi->d_RspQryOptionInstrTradeCost = gcnew Internal_RspQryOptionInstrTradeCost(this, &CTPTraderAdapter::cbk_OnRspQryOptionInstrTradeCost);
 		m_pSpi->p_OnRspQryOptionInstrTradeCost = (Callback_OnRspQryOptionInstrTradeCost)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryOptionInstrTradeCost).ToPointer();
 
 		m_pSpi->d_RspQryOptionInstrCommRate = gcnew Internal_RspQryOptionInstrCommRate(this, &CTPTraderAdapter::cbk_OnRspQryOptionInstrCommRate);
@@ -803,6 +958,11 @@ namespace CTP
 		m_pSpi->d_RspQryExecOrder = gcnew Internal_RspQryExecOrder(this, &CTPTraderAdapter::cbk_OnRspQryExecOrder);
 		m_pSpi->p_OnRspQryExecOrder = (Callback_OnRspQryExecOrder)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryExecOrder).ToPointer();
 
+		m_pSpi->d_RspQryForQuote = gcnew Internal_RspQryForQuote(this, &CTPTraderAdapter::cbk_OnRspQryForQuote);
+		m_pSpi->p_OnRspQryForQuote = (Callback_OnRspQryForQuote)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryForQuote).ToPointer();
+
+		m_pSpi->d_RspQryQuote = gcnew Internal_RspQryQuote(this, &CTPTraderAdapter::cbk_OnRspQryQuote);
+		m_pSpi->p_OnRspQryQuote = (Callback_OnRspQryQuote)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryQuote).ToPointer();
 
 		m_pSpi->d_RspQryTransferSerial = gcnew Internal_RspQryTransferSerial(this, &CTPTraderAdapter::cbk_OnRspQryTransferSerial);
 		m_pSpi->p_OnRspQryTransferSerial = (Callback_OnRspQryTransferSerial)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryTransferSerial).ToPointer();
@@ -834,7 +994,6 @@ namespace CTP
 		m_pSpi->d_RtnErrorConditionalOrder = gcnew Internal_RtnErrorConditionalOrder(this, &CTPTraderAdapter::cbk_OnRtnErrorConditionalOrder);
 		m_pSpi->p_OnRtnErrorConditionalOrder = (Callback_OnRtnErrorConditionalOrder)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RtnErrorConditionalOrder).ToPointer();
 
-
 		m_pSpi->d_RtnExecOrder = gcnew Internal_RtnExecOrder(this, &CTPTraderAdapter::cbk_OnRtnExecOrder);
 		m_pSpi->p_OnRtnExecOrder = (Callback_OnRtnExecOrder)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RtnExecOrder).ToPointer();
 
@@ -844,6 +1003,20 @@ namespace CTP
 		m_pSpi->d_ErrRtnExecOrderAction = gcnew Internal_ErrRtnExecOrderAction(this, &CTPTraderAdapter::cbk_OnErrRtnExecOrderAction);
 		m_pSpi->p_OnErrRtnExecOrderAction = (Callback_OnErrRtnExecOrderAction)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_ErrRtnExecOrderAction).ToPointer();
 
+		m_pSpi->d_ErrRtnForQuoteInsert = gcnew Internal_ErrRtnForQuoteInsert(this, &CTPTraderAdapter::cbk_OnErrRtnForQuoteInsert);
+		m_pSpi->p_OnErrRtnForQuoteInsert = (Callback_OnErrRtnForQuoteInsert)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_ErrRtnForQuoteInsert).ToPointer();
+
+		m_pSpi->d_RtnQuote = gcnew Internal_RtnQuote(this, &CTPTraderAdapter::cbk_OnRtnQuote);
+		m_pSpi->p_OnRtnQuote = (Callback_OnRtnQuote)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RtnQuote).ToPointer();
+
+		m_pSpi->d_ErrRtnQuoteInsert = gcnew Internal_ErrRtnQuoteInsert(this, &CTPTraderAdapter::cbk_OnErrRtnQuoteInsert);
+		m_pSpi->p_OnErrRtnQuoteInsert = (Callback_OnErrRtnQuoteInsert)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_ErrRtnQuoteInsert).ToPointer();
+
+		m_pSpi->d_ErrRtnQuoteAction = gcnew Internal_ErrRtnQuoteAction(this, &CTPTraderAdapter::cbk_OnErrRtnQuoteAction);
+		m_pSpi->p_OnErrRtnQuoteAction = (Callback_OnErrRtnQuoteAction)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_ErrRtnQuoteAction).ToPointer();
+
+		m_pSpi->d_RtnForQuoteRsp = gcnew Internal_RtnForQuoteRsp(this, &CTPTraderAdapter::cbk_OnRtnForQuoteRsp);
+		m_pSpi->p_OnRtnForQuoteRsp = (Callback_OnRtnForQuoteRsp)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RtnForQuoteRsp).ToPointer();
 
 		m_pSpi->d_RspQryContractBank = gcnew Internal_RspQryContractBank(this, &CTPTraderAdapter::cbk_OnRspQryContractBank);
 		m_pSpi->p_OnRspQryContractBank = (Callback_OnRspQryContractBank)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspQryContractBank).ToPointer();

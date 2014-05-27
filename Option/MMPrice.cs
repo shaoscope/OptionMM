@@ -37,7 +37,7 @@ namespace OptionMM
             return dRet;
         }
 
-        public static double GetBidPriceThisMonth(ref double AskPrice)
+        public static double GetBidPriceThisMonth(double AskPrice)
         {
             double dRet = 0;
             if (AskPrice < 0.6)
@@ -112,7 +112,7 @@ namespace OptionMM
             return dRet;
         }
 
-        public static double GetBidPriceNextMonth(ref double AskPrice)
+        public static double GetBidPriceNextMonth(double AskPrice)
         {
             double dRet = 0;
             if (AskPrice < 1.1)

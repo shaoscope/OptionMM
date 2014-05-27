@@ -76,11 +76,21 @@ namespace Native
 		virtual void OnRspRemoveParkedOrderAction(CThostFtdcRemoveParkedOrderActionField *pRemoveParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 
-		///删除预埋撤单响应
+		///执行宣告录入请求响应
 		virtual void OnRspExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-		///删除预埋撤单响应
+		///执行宣告操作请求响应
 		virtual void OnRspExecOrderAction(CThostFtdcInputExecOrderActionField *pInputExecOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+
+		///询价录入请求响应
+		virtual void OnRspForQuoteInsert(CThostFtdcInputForQuoteField *pInputForQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///报价录入请求响应
+		virtual void OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///报价操作请求响应
+		virtual void OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 
 		///请求查询报单响应
@@ -109,6 +119,9 @@ namespace Native
 
 		///请求查询交易所响应
 		virtual void OnRspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///请求查询产品响应
+		virtual void OnRspQryProduct(CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 		///请求查询合约响应
 		virtual void OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -141,6 +154,22 @@ namespace Native
 		virtual void OnRspQryEWarrantOffset(CThostFtdcEWarrantOffsetField *pEWarrantOffset, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 
+		///请求查询投资者品种/跨品种保证金响应
+		virtual void OnRspQryInvestorProductGroupMargin(CThostFtdcInvestorProductGroupMarginField *pInvestorProductGroupMargin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///请求查询交易所保证金率响应
+		virtual void OnRspQryExchangeMarginRate(CThostFtdcExchangeMarginRateField *pExchangeMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///请求查询交易所调整保证金率响应
+		virtual void OnRspQryExchangeMarginRateAdjust(CThostFtdcExchangeMarginRateAdjustField *pExchangeMarginRateAdjust, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///请求查询汇率响应
+		virtual void OnRspQryExchangeRate(CThostFtdcExchangeRateField *pExchangeRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///请求查询二级代理操作员银期权限响应
+		virtual void OnRspQrySecAgentACIDMap(CThostFtdcSecAgentACIDMapField *pSecAgentACIDMap, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+
 		///请求查询期权交易成本响应
 		virtual void OnRspQryOptionInstrTradeCost(CThostFtdcOptionInstrTradeCostField *pOptionInstrTradeCost, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
@@ -149,6 +178,13 @@ namespace Native
 
 		///请求查询执行宣告响应
 		virtual void OnRspQryExecOrder(CThostFtdcExecOrderField *pExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+
+		///请求查询询价响应
+		virtual void OnRspQryForQuote(CThostFtdcForQuoteField *pForQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///请求查询报价响应
+		virtual void OnRspQryQuote(CThostFtdcQuoteField *pQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 
 		///请求查询转帐流水响应
@@ -190,6 +226,22 @@ namespace Native
 
 		///执行宣告操作错误回报
 		virtual void OnErrRtnExecOrderAction(CThostFtdcExecOrderActionField *pExecOrderAction, CThostFtdcRspInfoField *pRspInfo);
+
+
+		///询价录入错误回报
+		virtual void OnErrRtnForQuoteInsert(CThostFtdcInputForQuoteField *pInputForQuote, CThostFtdcRspInfoField *pRspInfo);
+
+		///报价通知
+		virtual void OnRtnQuote(CThostFtdcQuoteField *pQuote);
+
+		///报价录入错误回报
+		virtual void OnErrRtnQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo);
+
+		///报价操作错误回报
+		virtual void OnErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, CThostFtdcRspInfoField *pRspInfo);
+
+		///询价通知
+		virtual void OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp);
 
 
 		///请求查询签约银行响应
@@ -295,10 +347,11 @@ namespace Native
 		Callback_OnRspSettlementInfoConfirm p_OnRspSettlementInfoConfirm;
 		Callback_OnRspRemoveParkedOrder p_OnRspRemoveParkedOrder;
 		Callback_OnRspRemoveParkedOrderAction p_OnRspRemoveParkedOrderAction;
-
 		Callback_OnRspExecOrderInsert p_OnRspExecOrderInsert;
 		Callback_OnRspExecOrderAction p_OnRspExecOrderAction;
-
+		Callback_OnRspForQuoteInsert p_OnRspForQuoteInsert;
+		Callback_OnRspQuoteInsert p_OnRspQuoteInsert;
+		Callback_OnRspQuoteAction p_OnRspQuoteAction;
 		Callback_OnRspQryOrder p_OnRspQryOrder;
 		Callback_OnRspQryTrade p_OnRspQryTrade;
 		Callback_OnRspQryInvestorPosition p_OnRspQryInvestorPosition;
@@ -308,6 +361,7 @@ namespace Native
 		Callback_OnRspQryInstrumentMarginRate p_OnRspQryInstrumentMarginRate;
 		Callback_OnRspQryInstrumentCommissionRate p_OnRspQryInstrumentCommissionRate;
 		Callback_OnRspQryExchange p_OnRspQryExchange;
+		Callback_OnRspQryProduct p_OnRspQryProduct;
 		Callback_OnRspQryInstrument p_OnRspQryInstrument;
 		Callback_OnRspQryDepthMarketData p_OnRspQryDepthMarketData;
 		Callback_OnRspQrySettlementInfo p_OnRspQrySettlementInfo;
@@ -318,11 +372,16 @@ namespace Native
 		Callback_OnRspQryInvestorPositionCombineDetail p_OnRspQryInvestorPositionCombineDetail;
 		Callback_OnRspQryCFMMCTradingAccountKey p_OnRspQryCFMMCTradingAccountKey;
 		Callback_OnRspQryEWarrantOffset p_OnRspQryEWarrantOffset;
-
+		Callback_OnRspQryInvestorProductGroupMargin p_OnRspQryInvestorProductGroupMargin;
+		Callback_OnRspQryExchangeMarginRate p_OnRspQryExchangeMarginRate;
+		Callback_OnRspQryExchangeMarginRateAdjust p_OnRspQryExchangeMarginRateAdjust;
+		Callback_OnRspQryExchangeRate p_OnRspQryExchangeRate;
+		Callback_OnRspQrySecAgentACIDMap p_OnRspQrySecAgentACIDMap;
 		Callback_OnRspQryOptionInstrTradeCost p_OnRspQryOptionInstrTradeCost;
 		Callback_OnRspQryOptionInstrCommRate p_OnRspQryOptionInstrCommRate;
 		Callback_OnRspQryExecOrder p_OnRspQryExecOrder;
-		
+		Callback_OnRspQryForQuote p_OnRspQryForQuote;
+		Callback_OnRspQryQuote p_OnRspQryQuote;
 		Callback_OnRspQryTransferSerial p_OnRspQryTransferSerial;
 		Callback_OnRspQryAccountregister p_OnRspQryAccountregister;
 		Callback_OnRspError p_OnRspError;
@@ -333,11 +392,14 @@ namespace Native
 		Callback_OnRtnInstrumentStatus p_OnRtnInstrumentStatus;
 		Callback_OnRtnTradingNotice p_OnRtnTradingNotice;
 		Callback_OnRtnErrorConditionalOrder p_OnRtnErrorConditionalOrder;
-
 		Callback_OnRtnExecOrder p_OnRtnExecOrder;
 		Callback_OnErrRtnExecOrderInsert p_OnErrRtnExecOrderInsert;
 		Callback_OnErrRtnExecOrderAction p_OnErrRtnExecOrderAction;
-
+		Callback_OnErrRtnForQuoteInsert p_OnErrRtnForQuoteInsert;
+		Callback_OnRtnQuote p_OnRtnQuote;
+		Callback_OnErrRtnQuoteInsert p_OnErrRtnQuoteInsert;
+		Callback_OnErrRtnQuoteAction p_OnErrRtnQuoteAction;
+		Callback_OnRtnForQuoteRsp p_OnRtnForQuoteRsp;
 		Callback_OnRspQryContractBank p_OnRspQryContractBank;
 		Callback_OnRspQryParkedOrder p_OnRspQryParkedOrder;
 		Callback_OnRspQryParkedOrderAction p_OnRspQryParkedOrderAction;
@@ -371,11 +433,9 @@ namespace Native
 		gcroot<Internal_FrontConnected^> d_FrontConnected;
 		gcroot<Internal_FrontDisconnected^> d_FrontDisconnected;
 		gcroot<Internal_HeartBeatWarning^> d_HeartBeatWarning;
+		gcroot<Internal_RspAuthenticate^> d_RspAuthenticate;
 		gcroot<Internal_RspUserLogin^> d_RspUserLogin;
 		gcroot<Internal_RspUserLogout^> d_RspUserLogout;
-		gcroot<Internal_RspError^> d_RspError;
-
-		gcroot<Internal_RspAuthenticate^> d_RspAuthenticate;
 		gcroot<Internal_RspUserPasswordUpdate^> d_RspUserPasswordUpdate;
 		gcroot<Internal_RspTradingAccountPasswordUpdate^> d_RspTradingAccountPasswordUpdate;
 		gcroot<Internal_RspOrderInsert^> d_RspOrderInsert;
@@ -386,6 +446,11 @@ namespace Native
 		gcroot<Internal_RspSettlementInfoConfirm^> d_RspSettlementInfoConfirm;
 		gcroot<Internal_RspRemoveParkedOrder^> d_RspRemoveParkedOrder;
 		gcroot<Internal_RspRemoveParkedOrderAction^> d_RspRemoveParkedOrderAction;
+		gcroot<Internal_RspExecOrderInsert^> d_RspExecOrderInsert;
+		gcroot<Internal_RspExecOrderAction^> d_RspExecOrderAction;
+		gcroot<Internal_RspForQuoteInsert^> d_RspForQuoteInsert;
+		gcroot<Internal_RspQuoteInsert^> d_RspQuoteInsert;
+		gcroot<Internal_RspQuoteAction^> d_RspQuoteAction;
 		gcroot<Internal_RspQryOrder^> d_RspQryOrder;
 		gcroot<Internal_RspQryTrade^> d_RspQryTrade;
 		gcroot<Internal_RspQryInvestorPosition^> d_RspQryInvestorPosition;
@@ -395,6 +460,7 @@ namespace Native
 		gcroot<Internal_RspQryInstrumentMarginRate^> d_RspQryInstrumentMarginRate;
 		gcroot<Internal_RspQryInstrumentCommissionRate^> d_RspQryInstrumentCommissionRate;
 		gcroot<Internal_RspQryExchange^> d_RspQryExchange;
+		gcroot<Internal_RspQryProduct^> d_RspQryProduct;
 		gcroot<Internal_RspQryInstrument^> d_RspQryInstrument;
 		gcroot<Internal_RspQryDepthMarketData^> d_RspQryDepthMarketData;
 		gcroot<Internal_RspQrySettlementInfo^> d_RspQrySettlementInfo;
@@ -405,8 +471,19 @@ namespace Native
 		gcroot<Internal_RspQryInvestorPositionCombineDetail^> d_RspQryInvestorPositionCombineDetail;
 		gcroot<Internal_RspQryCFMMCTradingAccountKey^> d_RspQryCFMMCTradingAccountKey;
 		gcroot<Internal_RspQryEWarrantOffset^> d_RspQryEWarrantOffset;
+		gcroot<Internal_RspQryInvestorProductGroupMargin^> d_RspQryInvestorProductGroupMargin;
+		gcroot<Internal_RspQryExchangeMarginRate^> d_RspQryExchangeMarginRate;
+		gcroot<Internal_RspQryExchangeMarginRateAdjust^> d_RspQryExchangeMarginRateAdjust;
+		gcroot<Internal_RspQryExchangeRate^> d_RspQryExchangeRate;
+		gcroot<Internal_RspQrySecAgentACIDMap^> d_RspQrySecAgentACIDMap;
+		gcroot<Internal_RspQryOptionInstrTradeCost^> d_RspQryOptionInstrTradeCost;
+		gcroot<Internal_RspQryOptionInstrCommRate^> d_RspQryOptionInstrCommRate;
+		gcroot<Internal_RspQryExecOrder^> d_RspQryExecOrder;
+		gcroot<Internal_RspQryForQuote^> d_RspQryForQuote;
+		gcroot<Internal_RspQryQuote^> d_RspQryQuote;
 		gcroot<Internal_RspQryTransferSerial^> d_RspQryTransferSerial;
 		gcroot<Internal_RspQryAccountregister^> d_RspQryAccountregister;
+		gcroot<Internal_RspError^> d_RspError;
 		gcroot<Internal_RtnOrder^> d_RtnOrder;
 		gcroot<Internal_RtnTrade^> d_RtnTrade;
 		gcroot<Internal_ErrRtnOrderInsert^> d_ErrRtnOrderInsert;
@@ -414,6 +491,14 @@ namespace Native
 		gcroot<Internal_RtnInstrumentStatus^> d_RtnInstrumentStatus;
 		gcroot<Internal_RtnTradingNotice^> d_RtnTradingNotice;
 		gcroot<Internal_RtnErrorConditionalOrder^> d_RtnErrorConditionalOrder;
+		gcroot<Internal_RtnExecOrder^> d_RtnExecOrder;
+		gcroot<Internal_ErrRtnExecOrderInsert^> d_ErrRtnExecOrderInsert;
+		gcroot<Internal_ErrRtnExecOrderAction^> d_ErrRtnExecOrderAction;
+		gcroot<Internal_ErrRtnForQuoteInsert^> d_ErrRtnForQuoteInsert;
+		gcroot<Internal_RtnQuote^> d_RtnQuote;
+		gcroot<Internal_ErrRtnQuoteInsert^> d_ErrRtnQuoteInsert;
+		gcroot<Internal_ErrRtnQuoteAction^> d_ErrRtnQuoteAction;
+		gcroot<Internal_RtnForQuoteRsp^> d_RtnForQuoteRsp;
 		gcroot<Internal_RspQryContractBank^> d_RspQryContractBank;
 		gcroot<Internal_RspQryParkedOrder^> d_RspQryParkedOrder;
 		gcroot<Internal_RspQryParkedOrderAction^> d_RspQryParkedOrderAction;

@@ -29,6 +29,17 @@ CTPMDAdapter::CTPMDAdapter(String^ pszFlowPath, bool bIsUsingUdp)
 	m_pApi->RegisterSpi(m_pSpi);
 }
 
+CTPMDAdapter::CTPMDAdapter(String^ pszFlowPath, bool bIsUsingUdp, bool bIsMulticast)
+{
+	CAutoStrPtr asp(pszFlowPath);
+	m_pApi = CThostFtdcMdApi::CreateFtdcMdApi(asp.m_pChar, bIsUsingUdp, bIsMulticast);
+	m_pSpi = new CMdSpi(this);
+#ifdef __CTP_MA__
+	RegisterCallbacks();
+#endif	
+	m_pApi->RegisterSpi(m_pSpi);
+}
+
 CTPMDAdapter::~CTPMDAdapter(void)
 {
 	Release();
@@ -56,6 +67,13 @@ void CTPMDAdapter::RegisterNameServer(String^  pszNsAddress)
 {
 	CAutoStrPtr asp = CAutoStrPtr(pszNsAddress);
 	m_pApi->RegisterNameServer(asp.m_pChar);
+}
+
+void CTPMDAdapter::RegisterFensUserInfo(ThostFtdcFensUserInfoField^ pFensUserInfo)
+{
+	CThostFtdcFensUserInfoField native;
+	MNConv<ThostFtdcFensUserInfoField^, CThostFtdcFensUserInfoField>::M2N(pFensUserInfo, &native);
+	m_pApi->RegisterFensUserInfo(&native);
 }
 
 void CTPMDAdapter::Init(void)
@@ -139,6 +157,58 @@ int CTPMDAdapter::UnSubscribeMarketData(array<String^>^ ppInstrumentID)
 	return result;
 }
 
+int CTPMDAdapter::SubscribeForQuoteRsp(array<String^>^ ppInstrumentID)
+{
+	if(ppInstrumentID == nullptr || ppInstrumentID->Length <= 0)
+		return -1;
+
+	int count = ppInstrumentID->Length;
+	char** pp = new char*[count];
+	CAutoStrPtr** asp = new CAutoStrPtr*[count];
+	for(int i=0; i<count; i++)
+	{
+		CAutoStrPtr* ptr = new CAutoStrPtr(ppInstrumentID[i]);
+		asp[i] = ptr;
+		pp[i] = ptr->m_pChar;
+	}
+
+	int result = m_pApi->SubscribeForQuoteRsp(pp, count);
+
+	// 释放所有分配的字符串内存
+	for(int i=0; i<count; i++)
+		delete asp[i];
+	delete asp;
+	delete pp;
+
+	return result;
+}
+
+int CTPMDAdapter::UnSubscribeForQuoteRsp(array<String^>^ ppInstrumentID)
+{
+	if(ppInstrumentID == nullptr || ppInstrumentID->Length <= 0)
+		return -1;
+
+	int count = ppInstrumentID->Length;
+	char** pp = new char*[count];
+	CAutoStrPtr** asp = new CAutoStrPtr*[count];
+	for(int i=0; i<count; i++)
+	{
+		CAutoStrPtr* ptr = new CAutoStrPtr(ppInstrumentID[i]);
+		asp[i] = ptr;
+		pp[i] = ptr->m_pChar;
+	}
+
+	int result = m_pApi->UnSubscribeForQuoteRsp(pp, count);
+
+	// 释放所分配的字符串内存
+	for(int i=0; i<count; i++)
+		delete asp[i];
+	delete asp;
+	delete pp;
+
+	return result;
+}
+
 #ifdef __CTP_MA__
 
 // 将所有回调函数地址传递给SPI，并保存对delegate的引用
@@ -168,8 +238,17 @@ void CTPMDAdapter::RegisterCallbacks()
 	m_pSpi->d_RspUnSubMarketData = gcnew Internal_RspUnSubMarketData(this, &CTPMDAdapter::cbk_OnRspUnSubMarketData);
 	m_pSpi->p_OnRspUnSubMarketData = (Callback_OnRspUnSubMarketData)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspUnSubMarketData).ToPointer();
 
+	m_pSpi->d_RspSubForQuoteRsp = gcnew Internal_RspSubForQuoteRsp(this, &CTPMDAdapter::cbk_OnRspSubForQuoteRsp);
+	m_pSpi->p_OnRspSubForQuoteRsp = (Callback_OnRspSubForQuoteRsp)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspSubForQuoteRsp).ToPointer();
+
+	m_pSpi->d_RspUnSubForQuoteRsp = gcnew Internal_RspUnSubForQuoteRsp(this, &CTPMDAdapter::cbk_OnRspUnSubForQuoteRsp);
+	m_pSpi->p_OnRspUnSubForQuoteRsp = (Callback_OnRspUnSubForQuoteRsp)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RspUnSubForQuoteRsp).ToPointer();
+
 	m_pSpi->d_RtnDepthMarketData = gcnew Internal_RtnDepthMarketData(this, &CTPMDAdapter::cbk_OnRtnDepthMarketData);
 	m_pSpi->p_OnRtnDepthMarketData = (Callback_OnRtnDepthMarketData)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RtnDepthMarketData).ToPointer();
+
+	m_pSpi->d_RtnForQuoteRsp = gcnew Internal_RtnForQuoteRsp(this, &CTPMDAdapter::cbk_OnRtnForQuoteRsp);
+	m_pSpi->p_OnRtnForQuoteRsp = (Callback_OnRtnForQuoteRsp)Marshal::GetFunctionPointerForDelegate(m_pSpi->d_RtnForQuoteRsp).ToPointer();
 }
 
 // ------------------------------------ Callbacks ------------------------------------
@@ -197,9 +276,25 @@ void CTPMDAdapter::cbk_OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSp
 void CTPMDAdapter::cbk_OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
 	this->OnRspUnSubMarketData(MNConv<ThostFtdcSpecificInstrumentField^, CThostFtdcSpecificInstrumentField>::N2M(pSpecificInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
 }
+void CTPMDAdapter::cbk_OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+	this->OnRspSubForQuoteRsp(MNConv<ThostFtdcSpecificInstrumentField^, CThostFtdcSpecificInstrumentField>::N2M(pSpecificInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
+}
+void CTPMDAdapter::cbk_OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+	this->OnRspUnSubForQuoteRsp(MNConv<ThostFtdcSpecificInstrumentField^, CThostFtdcSpecificInstrumentField>::N2M(pSpecificInstrument), RspInfoField(pRspInfo), nRequestID, bIsLast);
+}
 void CTPMDAdapter::cbk_OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData){
 	ThostFtdcDepthMarketDataField^ field = safe_cast<ThostFtdcDepthMarketDataField^>(Marshal::PtrToStructure(IntPtr(pDepthMarketData), ThostFtdcDepthMarketDataField::typeid));
 	this->OnRtnDepthMarketData(field);
+}
+void CTPMDAdapter::cbk_OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp){
+	ThostFtdcForQuoteRspField^ field = safe_cast<ThostFtdcForQuoteRspField^>(Marshal::PtrToStructure(IntPtr(pForQuoteRsp), ThostFtdcForQuoteRspField::typeid));
+	this->OnRtnForQuoteRsp(field);
+}
+void CTPMDAdapter::cbk_OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData){
+	this->OnRtnDepthMarketData(MNConv<ThostFtdcDepthMarketDataField^, CThostFtdcDepthMarketDataField>::N2M(pDepthMarketData));
+}
+void CTPMDAdapter::cbk_OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp){
+	this->OnRtnForQuoteRsp(MNConv<ThostFtdcForQuoteRspField^, CThostFtdcForQuoteRspField>::N2M(pForQuoteRsp));
 }
 #endif
 

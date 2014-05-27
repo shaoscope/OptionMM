@@ -39,6 +39,7 @@ namespace OptionMM
             this.loginStatusLabel.Text = "正在验证登陆信息...";
             md.Connect();
             td.Connect();
+            Thread.Sleep(2000);
             if (td.g_logined)
             {
                 //登陆成功

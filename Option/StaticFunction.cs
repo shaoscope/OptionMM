@@ -48,5 +48,28 @@ namespace OptionMM
                 return 0;
             }
         }
+
+        /// <summary>
+        /// 获取期权距到期交易天数
+        /// </summary>
+        /// <returns></returns>
+        public static int GetDaysToMaturity(string instrumentID)
+        {
+
+            int daysToMaturity = 0;
+            if (instrumentID.Contains("1406"))
+            {
+                daysToMaturity = GlobalValues.DaysToMaturity[0];
+            }
+            else if (instrumentID.Contains("1407"))
+            {
+                daysToMaturity = GlobalValues.DaysToMaturity[1];
+            }
+            else if (instrumentID.Contains("1408"))
+            {
+                daysToMaturity = GlobalValues.DaysToMaturity[2];
+            }
+            return daysToMaturity;
+        }
     }
 }

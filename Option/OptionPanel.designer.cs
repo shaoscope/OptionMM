@@ -318,14 +318,16 @@ namespace OptionMM
             // 
             // cBidPrice
             // 
-            dataGridViewCellStyle16.Format = "f6";
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle16.Format = "f1";
             this.cBidPrice.DefaultCellStyle = dataGridViewCellStyle16;
             this.cBidPrice.HeaderText = "买入报价";
             this.cBidPrice.Name = "cBidPrice";
             // 
             // cAskPrice
             // 
-            dataGridViewCellStyle17.Format = "f6";
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle17.Format = "f1";
             this.cAskPrice.DefaultCellStyle = dataGridViewCellStyle17;
             this.cAskPrice.HeaderText = "卖出报价";
             this.cAskPrice.Name = "cAskPrice";

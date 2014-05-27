@@ -8,8 +8,15 @@ namespace OptionMM
 {
     class Position
     {
+        /// <summary>
+        /// 仓位多头信息
+        /// </summary>
         public ThostFtdcInvestorPositionField longPosition = new ThostFtdcInvestorPositionField();
+        /// <summary>
+        /// 仓位空头信息
+        /// </summary>
         public ThostFtdcInvestorPositionField shortPosition = new ThostFtdcInvestorPositionField();
+
         public ThostFtdcOrderField ShortOptionOrder = null;
         public ThostFtdcOrderField LongOptionOrder = null;
         public ThostFtdcOrderField CloseLongOptionOrder = null;

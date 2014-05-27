@@ -21,7 +21,6 @@ namespace CTP
         // 郑州品种年份为一位数
         //string[] ppInstrumentID = { "ag1301", "cu1301", "ru1201", "TA301", "SR301", "y1305", "IF1212" };	// 行情订阅列表
         int iRequestID = 0;
-        //Strategy stg = null;
 
         public MDAPI(string mdaddr, string brokerID, string InvesterID, string password)
         {
@@ -29,8 +28,6 @@ namespace CTP
             BrokerID = brokerID;
             UserID = InvesterID;
             Password = password;
-            //ppInstrumentID = InstrumentID;
-            //stg = new Strategy(mdaddr, tdaddr, brokerID, InvesterID, password, ppInstrumentID);
             api = new CTPMDAdapter();
             AddEvent();
         }
@@ -84,9 +81,6 @@ namespace CTP
             req.UserID = UserID;
             req.Password = Password;
             int iResult = api.ReqUserLogin(req, ++iRequestID);
-
-            //Console.WriteLine("--->>> 发送用户登录请求: " + ((iResult == 0) ? "成功" : "失败"));
-            //GUIRefresh.UpdateListBox2("--->>> 发送行情用户登录请求: " + ((iResult == 0) ? "成功" : "失败"));
             return iResult;
         }
 
@@ -113,13 +107,6 @@ namespace CTP
         {
             if (bIsLast && !IsErrorRspInfo(pRspInfo))
             {
-                //Console.WriteLine("行情登陆成功");
-                //GUIRefresh.UpdateListBox2("行情登陆成功");
-                ///获取当前交易日
-                //Console.WriteLine("--->>> 获取当前交易日 = " + api.GetTradingDay());
-                //GUIRefresh.UpdateListBox2("--->>> 获取行情当前交易日 = " + api.GetTradingDay());
-                // 请求订阅行情
-                //SubscribeMarketData();
                 bLogin = true;
             }
         }
@@ -141,14 +128,12 @@ namespace CTP
 
         void OnHeartBeatWarning(int nTimeLapse)
         {
-            //Console.WriteLine("--->>> nTimerLapse = " + nTimeLapse);
-            //GUIRefresh.UpdateListBox2("--->>> nTimerLapse = " + nTimeLapse);
+
         }
 
         void OnFrontDisconnected(int nReason)
         {
-            //Console.WriteLine("--->>> Reason = {0}", nReason);
-            //GUIRefresh.UpdateListBox2(string.Format("--->>> Reason = {0}", nReason));
+
         }
 
         void OnFrontConnected()
@@ -162,8 +147,7 @@ namespace CTP
             bool bResult = ((pRspInfo != null) && (pRspInfo.ErrorID != 0));
             if (bResult)
             {
-                //Console.WriteLine("--->>> ErrorID={0}, ErrorMsg={1}", pRspInfo.ErrorID, pRspInfo.ErrorMsg);
-                //GUIRefresh.UpdateListBox2(string.Format("--->>> ErrorID={0}, ErrorMsg={1}", pRspInfo.ErrorID, pRspInfo.ErrorMsg));
+
             }
             return bResult;
         }
@@ -181,7 +165,6 @@ namespace CTP
         {
             if (pDepthMarketData != null)
             {
-                //DepthMarketData(pDepthMarketData);
                 PushTick(pDepthMarketData);
             }
         }
@@ -199,13 +182,6 @@ namespace CTP
             }
             return dRet;
         }
-
-        /*public event DepthMarketDataHandle OnDepthMarketData;
-        public void DepthMarketData(ThostFtdcDepthMarketDataField md)
-        {
-            if (OnDepthMarketData != null)
-                OnDepthMarketData(md);
-        }*/
 
     }
 }

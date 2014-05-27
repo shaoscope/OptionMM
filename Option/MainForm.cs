@@ -19,7 +19,19 @@ namespace OptionMM
         public MainForm()
         {
             InitializeComponent();
-            this.WindowState = FormWindowState.Maximized;
+            instance = this;
+        }
+
+
+        //唯一实例
+        private static MainForm instance;
+
+        /// <summary>
+        /// 获取唯一实例
+        /// </summary>
+        public static MainForm Instance
+        {
+            get { return MainForm.instance; }
         }
 
         private Dictionary<string, string[]> configValues = new Dictionary<string, string[]>();
@@ -68,9 +80,6 @@ namespace OptionMM
                 this.optionPanel.AddStrategy(strategy);
             }
 
-            //仓位对冲
-            //this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 5 * 60 * 1000, 5 * 60 * 1000);
-
             this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 60 * 1000, 3 * 60 * 1000);
 
         }
@@ -86,7 +95,6 @@ namespace OptionMM
         }
 
 
-        int UnderlyingCount = 0;
         private void InitFromXML(string strFile)
         {
             
@@ -140,19 +148,10 @@ namespace OptionMM
                             else if (xmlRder.Name == "标的物")
                             {
                                 Property[5] = xmlRder.Value;
-                                InstrumentManager.CreatInstrument(xmlRder.Value);
-                                //ContractManager.CreatContract(InstrumentManager.GetInstrument(xmlRder.Value));
                             }
                         }
                         configValues.Add(strID, Property);
                     }
-                }
-                //每个标的物只生成一个CONTRACT
-                Dictionary<string, Instrument> instrumentTemp = InstrumentManager.GetAllInstrument();
-                UnderlyingCount = instrumentTemp.Count;
-                foreach (Instrument inst in instrumentTemp.Values)
-                {
-                    ContractManager.CreatContract(inst);
                 }
             }
             catch
@@ -165,8 +164,16 @@ namespace OptionMM
             }
         }
 
+        /// <summary>
+        /// 策略是否已经全开的标记位
+        /// </summary>
         private bool areAllRunning = false;
 
+        /// <summary>
+        /// 点击全部启动/全部停止按钮的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void startAllButton_Click(object sender, EventArgs e)
         {
             if (!areAllRunning)
@@ -189,6 +196,17 @@ namespace OptionMM
                 areAllRunning = false;
                 this.startAllButton.Text = "全部启动";
             }
+        }
+
+        /// <summary>
+        /// 点击风险管理按钮的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void riskManagementButton_Click(object sender, EventArgs e)
+        {
+            RiskManagementForm riskManagementForm = new RiskManagementForm();
+            riskManagementForm.ShowDialog();
         }
     }
 }

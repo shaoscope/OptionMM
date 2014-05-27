@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="CTP.cpp" />
+    <ClCompile Include="CTPMDAdapter.cpp" />
+    <ClCompile Include="CTPTraderAdapter.cpp" />
+    <ClCompile Include="MdSpi.cpp" />
+    <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="TraderSpi.cpp" />
+    <ClCompile Include="Util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Callbacks.h" />
+    <ClInclude Include="CTP.h" />
+    <ClInclude Include="CTPMDAdapter.h" />
+    <ClInclude Include="CTPTraderAdapter.h" />
+    <ClInclude Include="Delegates.h" />
+    <ClInclude Include="MdSpi.h" />
+    <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="Struct.h" />
+    <ClInclude Include="TraderSpi.h" />
+    <ClInclude Include="Util.h" />
+  </ItemGroup>
+</Project>

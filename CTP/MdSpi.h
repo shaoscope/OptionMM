@@ -52,8 +52,17 @@ namespace Native
 		///取消订阅行情应答
 		virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
+		///订阅询价应答
+		virtual void OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		///取消订阅询价应答
+		virtual void OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
 		///深度行情通知
 		virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
+
+		///询价通知
+		virtual void OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp);
 	
 #ifdef __CTP_MA__
 	public:
@@ -66,7 +75,10 @@ namespace Native
 		Callback_OnRspError p_OnRspError;
 		Callback_OnRspSubMarketData p_OnRspSubMarketData;
 		Callback_OnRspUnSubMarketData p_OnRspUnSubMarketData;
+		Callback_OnRspSubForQuoteRsp p_OnRspSubForQuoteRsp;
+		Callback_OnRspUnSubForQuoteRsp p_OnRspUnSubForQuoteRsp;
 		Callback_OnRtnDepthMarketData p_OnRtnDepthMarketData;
+		Callback_OnRtnForQuoteRsp p_OnRtnForQuoteRsp;
 
 		// 回调函数对应的delegate，必须保持一份对该deleage的引用，否则GC会自动回收该deleage并导致上面的回调函数失效
 		gcroot<Internal_FrontConnected^> d_FrontConnected;
@@ -75,10 +87,12 @@ namespace Native
 		gcroot<Internal_RspUserLogin^> d_RspUserLogin;
 		gcroot<Internal_RspUserLogout^> d_RspUserLogout;
 		gcroot<Internal_RspError^> d_RspError;
-
 		gcroot<Internal_RspSubMarketData^> d_RspSubMarketData;
 		gcroot<Internal_RspUnSubMarketData^> d_RspUnSubMarketData;
+		gcroot<Internal_RspSubForQuoteRsp^> d_RspSubForQuoteRsp;
+		gcroot<Internal_RspUnSubForQuoteRsp^> d_RspUnSubForQuoteRsp;
 		gcroot<Internal_RtnDepthMarketData^> d_RtnDepthMarketData;
+		gcroot<Internal_RtnForQuoteRsp^> d_RtnForQuoteRsp;
 #else
 	private:
 		gcroot<CTPMDAdapter^> m_pAdapter;

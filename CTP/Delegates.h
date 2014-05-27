@@ -7,20 +7,23 @@
 
 namespace CTP
 {
-	// common deleagats
+	// common deleagats 
 	public delegate void FrontConnected();
 	public delegate void FrontDisconnected(int nReason);
 	public delegate void HeartBeatWarning(int nTimeLapse);
 	public delegate void RspUserLogin(ThostFtdcRspUserLoginField^ pRspUserLogin, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspUserLogout(ThostFtdcUserLogoutField^ pUserLogout, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspError(ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RtnForQuoteRsp(ThostFtdcForQuoteRspField^ pForQuoteRsp);
 
 	// marketdata 
 	public delegate void RspSubMarketData(ThostFtdcSpecificInstrumentField^ pSpecificInstrument, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspUnSubMarketData(ThostFtdcSpecificInstrumentField^ pSpecificInstrument, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspSubForQuoteRsp(ThostFtdcSpecificInstrumentField^ pSpecificInstrument, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspUnSubForQuoteRsp(ThostFtdcSpecificInstrumentField^ pSpecificInstrument, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RtnDepthMarketData(ThostFtdcDepthMarketDataField^ pDepthMarketData);
 
-	// trader
+	// trader 
 	public delegate void RspAuthenticate(ThostFtdcRspAuthenticateField^ pRspAuthenticateField, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspUserPasswordUpdate(ThostFtdcUserPasswordUpdateField^ pUserPasswordUpdate, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspTradingAccountPasswordUpdate(ThostFtdcTradingAccountPasswordUpdateField^ pTradingAccountPasswordUpdate, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
@@ -32,10 +35,11 @@ namespace CTP
 	public delegate void RspSettlementInfoConfirm(ThostFtdcSettlementInfoConfirmField^ pSettlementInfoConfirm, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspRemoveParkedOrder(ThostFtdcRemoveParkedOrderField^ pRemoveParkedOrder, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspRemoveParkedOrderAction(ThostFtdcRemoveParkedOrderActionField^ pRemoveParkedOrderAction, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
-
 	public delegate void RspExecOrderInsert(ThostFtdcInputExecOrderField^ pInputExecOrder, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspExecOrderAction(ThostFtdcInputExecOrderActionField^ pInputExecOrderAction, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
-
+	public delegate void RspForQuoteInsert(ThostFtdcInputForQuoteField^ pInputForQuote, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQuoteInsert(ThostFtdcInputQuoteField^ pInputQuote, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQuoteAction(ThostFtdcInputQuoteActionField^ pInputQuoteAction, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryOrder(ThostFtdcOrderField^ pOrder, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryTrade(ThostFtdcTradeField^ pTrade, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryInvestorPosition(ThostFtdcInvestorPositionField^ pInvestorPosition, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
@@ -45,6 +49,7 @@ namespace CTP
 	public delegate void RspQryInstrumentMarginRate(ThostFtdcInstrumentMarginRateField^ pInstrumentMarginRate, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryInstrumentCommissionRate(ThostFtdcInstrumentCommissionRateField^ pInstrumentCommissionRate, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryExchange(ThostFtdcExchangeField^ pExchange, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQryProduct(ThostFtdcProductField^ pProduct, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryInstrument(ThostFtdcInstrumentField^ pInstrument, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryDepthMarketData(ThostFtdcDepthMarketDataField^ pDepthMarketData, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQrySettlementInfo(ThostFtdcSettlementInfoField^ pSettlementInfo, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
@@ -55,11 +60,16 @@ namespace CTP
 	public delegate void RspQryInvestorPositionCombineDetail(ThostFtdcInvestorPositionCombineDetailField^ pInvestorPositionCombineDetail, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryCFMMCTradingAccountKey(ThostFtdcCFMMCTradingAccountKeyField^ pCFMMCTradingAccountKey, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryEWarrantOffset(ThostFtdcEWarrantOffsetField^ pEWarrantOffset, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
-	
+	public delegate void RspQryInvestorProductGroupMargin(ThostFtdcInvestorProductGroupMarginField^ pInvestorProductGroupMargin, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQryExchangeMarginRate(ThostFtdcExchangeMarginRateField^ pExchangeMarginRate, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQryExchangeMarginRateAdjust(ThostFtdcExchangeMarginRateAdjustField^ pExchangeMarginRateAdjust, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQryExchangeRate(ThostFtdcExchangeRateField^ pExchangeRate, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQrySecAgentACIDMap(ThostFtdcSecAgentACIDMapField^ pSecAgentACIDMap, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryOptionInstrTradeCost(ThostFtdcOptionInstrTradeCostField^ pOptionInstrTradeCost, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryOptionInstrCommRate(ThostFtdcOptionInstrCommRateField^ pOptionInstrCommRate, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryExecOrder(ThostFtdcExecOrderField^ pExecOrder, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
-
+	public delegate void RspQryForQuote(ThostFtdcForQuoteField^ pForQuote, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
+	public delegate void RspQryQuote(ThostFtdcQuoteField^ pQuote, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryTransferSerial(ThostFtdcTransferSerialField^ pTransferSerial, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryAccountregister(ThostFtdcAccountregisterField^ pAccountregister, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RtnOrder(ThostFtdcOrderField^ pOrder);
@@ -69,11 +79,13 @@ namespace CTP
 	public delegate void RtnInstrumentStatus(ThostFtdcInstrumentStatusField^ pInstrumentStatus);
 	public delegate void RtnTradingNotice(ThostFtdcTradingNoticeInfoField^ pTradingNoticeInfo);
 	public delegate void RtnErrorConditionalOrder(ThostFtdcErrorConditionalOrderField^ pErrorConditionalOrder);
-
 	public delegate void RtnExecOrder(ThostFtdcExecOrderField^ pExecOrder);
 	public delegate void ErrRtnExecOrderInsert(ThostFtdcInputExecOrderField^ pInputExecOrder, ThostFtdcRspInfoField^ pRspInfo);
 	public delegate void ErrRtnExecOrderAction(ThostFtdcExecOrderActionField^ pExecOrderAction, ThostFtdcRspInfoField^ pRspInfo);
-
+	public delegate void ErrRtnForQuoteInsert(ThostFtdcInputForQuoteField^ pInputForQuote, ThostFtdcRspInfoField^ pRspInfo);
+	public delegate void RtnQuote(ThostFtdcQuoteField^ pQuote);
+	public delegate void ErrRtnQuoteInsert(ThostFtdcInputQuoteField^ pInputQuote, ThostFtdcRspInfoField^ pRspInfo);
+	public delegate void ErrRtnQuoteAction(ThostFtdcQuoteActionField^ pQuoteAction, ThostFtdcRspInfoField^ pRspInfo);
 	public delegate void RspQryContractBank(ThostFtdcContractBankField^ pContractBank, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryParkedOrder(ThostFtdcParkedOrderField^ pParkedOrder, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
 	public delegate void RspQryParkedOrderAction(ThostFtdcParkedOrderActionField^ pParkedOrderAction, ThostFtdcRspInfoField^ pRspInfo, int nRequestID, bool bIsLast);
@@ -108,17 +120,23 @@ namespace CTP
 
 namespace Native
 {
+	// common deleagats 
 	delegate void Internal_FrontConnected();
 	delegate void Internal_FrontDisconnected(int nReason);
 	delegate void Internal_HeartBeatWarning(int nTimeLapse);
 	delegate void Internal_RspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp);
 
+	// marketdata 
 	delegate void Internal_RspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
 
+	// trader 
 	delegate void Internal_RspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspTradingAccountPasswordUpdate(CThostFtdcTradingAccountPasswordUpdateField *pTradingAccountPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -130,10 +148,11 @@ namespace Native
 	delegate void Internal_RspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspRemoveParkedOrder(CThostFtdcRemoveParkedOrderField *pRemoveParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspRemoveParkedOrderAction(CThostFtdcRemoveParkedOrderActionField *pRemoveParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	
-	delegate void Internal_RspExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, int nRequestID);
-	delegate void Internal_RspExecOrderAction(CThostFtdcInputExecOrderActionField *pInputExecOrderAction, int nRequestID);
-
+	delegate void Internal_RspExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspExecOrderAction(CThostFtdcInputExecOrderActionField *pInputExecOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspForQuoteInsert(CThostFtdcInputForQuoteField *pInputForQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -143,6 +162,7 @@ namespace Native
 	delegate void Internal_RspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryProduct(CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -153,11 +173,16 @@ namespace Native
 	delegate void Internal_RspQryInvestorPositionCombineDetail(CThostFtdcInvestorPositionCombineDetailField *pInvestorPositionCombineDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryCFMMCTradingAccountKey(CThostFtdcCFMMCTradingAccountKeyField *pCFMMCTradingAccountKey, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryEWarrantOffset(CThostFtdcEWarrantOffsetField *pEWarrantOffset, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	
-	delegate void Internal_RspQryOptionInstrTradeCost(CThostFtdcQryOptionInstrTradeCostField *pQryOptionInstrTradeCost, int nRequestID);
-	delegate void Internal_RspQryOptionInstrCommRate(CThostFtdcQryOptionInstrCommRateField *pQryOptionInstrCommRate, int nRequestID);
-	delegate void Internal_RspQryExecOrder(CThostFtdcQryExecOrderField *pQryExecOrder, int nRequestID);
-	
+	delegate void Internal_RspQryInvestorProductGroupMargin(CThostFtdcInvestorProductGroupMarginField *pInvestorProductGroupMargin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryExchangeMarginRate(CThostFtdcExchangeMarginRateField *pExchangeMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryExchangeMarginRateAdjust(CThostFtdcExchangeMarginRateAdjustField *pExchangeMarginRateAdjust, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryExchangeRate(CThostFtdcExchangeRateField *pExchangeRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQrySecAgentACIDMap(CThostFtdcSecAgentACIDMapField *pSecAgentACIDMap, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryOptionInstrTradeCost(CThostFtdcOptionInstrTradeCostField *pOptionInstrTradeCost, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryExecOrder(CThostFtdcExecOrderField *pExecOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryForQuote(CThostFtdcForQuoteField *pForQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	delegate void Internal_RspQryQuote(CThostFtdcQuoteField *pQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryTransferSerial(CThostFtdcTransferSerialField *pTransferSerial, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryAccountregister(CThostFtdcAccountregisterField *pAccountregister, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RtnOrder(CThostFtdcOrderField *pOrder);
@@ -167,6 +192,13 @@ namespace Native
 	delegate void Internal_RtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus);
 	delegate void Internal_RtnTradingNotice(CThostFtdcTradingNoticeInfoField *pTradingNoticeInfo);
 	delegate void Internal_RtnErrorConditionalOrder(CThostFtdcErrorConditionalOrderField *pErrorConditionalOrder);
+	delegate void Internal_RtnExecOrder(CThostFtdcExecOrderField *pExecOrder);
+	delegate void Internal_ErrRtnExecOrderInsert(CThostFtdcInputExecOrderField *pInputExecOrder, CThostFtdcRspInfoField *pRspInfo);
+	delegate void Internal_ErrRtnExecOrderAction(CThostFtdcExecOrderActionField *pExecOrderAction, CThostFtdcRspInfoField *pRspInfo);
+	delegate void Internal_ErrRtnForQuoteInsert(CThostFtdcInputForQuoteField *pInputForQuote, CThostFtdcRspInfoField *pRspInfo);
+	delegate void Internal_RtnQuote(CThostFtdcQuoteField *pQuote);
+	delegate void Internal_ErrRtnQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo);
+	delegate void Internal_ErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, CThostFtdcRspInfoField *pRspInfo);
 	delegate void Internal_RspQryContractBank(CThostFtdcContractBankField *pContractBank, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryParkedOrder(CThostFtdcParkedOrderField *pParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	delegate void Internal_RspQryParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);

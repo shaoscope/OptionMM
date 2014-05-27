@@ -31,6 +31,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.optionPanel = new OptionMM.OptionPanel();
             this.menuBarPanel = new System.Windows.Forms.Panel();
+            this.riskManagementButton = new System.Windows.Forms.Button();
             this.startAllButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuBarPanel.SuspendLayout();
@@ -63,6 +64,7 @@
             // menuBarPanel
             // 
             this.menuBarPanel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.menuBarPanel.Controls.Add(this.riskManagementButton);
             this.menuBarPanel.Controls.Add(this.startAllButton);
             this.menuBarPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.menuBarPanel.Location = new System.Drawing.Point(0, 0);
@@ -71,13 +73,27 @@
             this.menuBarPanel.Size = new System.Drawing.Size(1161, 29);
             this.menuBarPanel.TabIndex = 1;
             // 
+            // riskManagementButton
+            // 
+            this.riskManagementButton.Dock = System.Windows.Forms.DockStyle.Right;
+            this.riskManagementButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.riskManagementButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.riskManagementButton.Location = new System.Drawing.Point(1086, 0);
+            this.riskManagementButton.Name = "riskManagementButton";
+            this.riskManagementButton.Size = new System.Drawing.Size(75, 29);
+            this.riskManagementButton.TabIndex = 1;
+            this.riskManagementButton.Text = "风险管理";
+            this.riskManagementButton.UseVisualStyleBackColor = true;
+            this.riskManagementButton.Click += new System.EventHandler(this.riskManagementButton_Click);
+            // 
             // startAllButton
             // 
+            this.startAllButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.startAllButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.startAllButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.startAllButton.Location = new System.Drawing.Point(3, 3);
+            this.startAllButton.Location = new System.Drawing.Point(0, 0);
             this.startAllButton.Name = "startAllButton";
-            this.startAllButton.Size = new System.Drawing.Size(75, 23);
+            this.startAllButton.Size = new System.Drawing.Size(75, 29);
             this.startAllButton.TabIndex = 0;
             this.startAllButton.Text = "全部启动";
             this.startAllButton.UseVisualStyleBackColor = true;
@@ -91,6 +107,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "MainForm";
             this.Text = "MainForm";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.menuBarPanel.ResumeLayout(false);
@@ -101,9 +118,10 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private OptionPanel optionPanel;
+        public OptionPanel optionPanel;
         private System.Windows.Forms.Panel menuBarPanel;
         private System.Windows.Forms.Button startAllButton;
+        private System.Windows.Forms.Button riskManagementButton;
 
 
     }

@@ -24,10 +24,6 @@ namespace OptionMM
             set { this.futureHedgeVolume = value; }
         }
 
-
-        private ThostFtdcOrderField IF1406PreviousOrder = null;
-        private ThostFtdcOrderField IF1407PreviousOrder = null;
-
         //期权持仓列表
         private List<ThostFtdcInvestorPositionField> positionDictionary = new List<ThostFtdcInvestorPositionField>();
 
@@ -45,31 +41,10 @@ namespace OptionMM
                 Strategy strategy = (Strategy)dataRow.Tag;
                 futureHedgeVolume["IF1406"] += -strategy.Option.Delta * strategy.Option.longPosition.Position / 3;
                 futureHedgeVolume["IF1406"] += strategy.Option.Delta * strategy.Option.shortPosition.Position / 3;
-                //foreach(ThostFtdcInvestorPositionField optionPosition in positionList)
-                //{
-                //    if(strategy.Option.InstrumentID == optionPosition.InstrumentID)
-                //    {
-                //        if (optionPosition.PosiDirection == EnumPosiDirectionType.Long && strategy.Option.OptionType == OptionTypeEnum.call)
-                //        {
-                //            futureHedgeVolume[strategy.Future.InstrumentID] += -strategy.Option.Delta * optionPosition.Position / 3;
-                //        }
-                //        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Short && strategy.Option.OptionType == OptionTypeEnum.call)
-                //        {
-                //            futureHedgeVolume[strategy.Future.InstrumentID] += strategy.Option.Delta * optionPosition.Position / 3;
-                //        }
-                //        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Long && strategy.Option.OptionType == OptionTypeEnum.put)
-                //        {
-                //            futureHedgeVolume[strategy.Future.InstrumentID] += -strategy.Option.Delta * optionPosition.Position / 3;
-                //        }
-                //        else if (optionPosition.PosiDirection == EnumPosiDirectionType.Short && strategy.Option.OptionType == OptionTypeEnum.put)
-                //        {
-                //            futureHedgeVolume[strategy.Future.InstrumentID] += strategy.Option.Delta * optionPosition.Position / 3;
-                //        }
-                //    }
-                //}
+                
             }
             //输出期货对冲的数量
-            Console.WriteLine(System.DateTime.Now.ToShortTimeString() + ":" + "IF1406 " + futureHedgeVolume["IF1406"]);
+            Console.WriteLine(System.DateTime.Now.ToShortTimeString() + " ==================================================== " + "IF1406 " + futureHedgeVolume["IF1406"]);
         }
 
         /// <summary>
