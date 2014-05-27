@@ -75,6 +75,11 @@ namespace OptionMM
         private bool isRunning = false;
 
         /// <summary>
+        /// 是否有询价单标记位
+        /// </summary>
+        private bool hasForQuote = false;
+
+        /// <summary>
         /// 获取或者设置策略是否在运行的标记位
         /// </summary>
         public bool IsRunning
@@ -92,6 +97,7 @@ namespace OptionMM
             isRunning = true;
             MDManager.MD.SubscribeMarketData(new string[] { this.option.InstrumentID, this.future.InstrumentID });
             MDManager.MD.OnTick += MD_OnTick;
+            MDManager.MD.OnForQuote += MD_OnForQuote;
             TDManager.TD.OnCanceled += TD_OnCanceled;
             TDManager.TD.OnTraded += TD_OnTraded;
             TDManager.TD.OnTrading += TD_OnTrading;
@@ -195,6 +201,14 @@ namespace OptionMM
             }
         }
 
+        private void MD_OnForQuote(ThostFtdcForQuoteRspField pForQuoteRsp)
+        {
+            if (this.option.InstrumentID == pForQuoteRsp.InstrumentID)
+            {
+                hasForQuote = true;
+            }
+        }
+
         /// <summary>
         /// 有行情到来时的处理逻辑
         /// </summary>
@@ -222,8 +236,9 @@ namespace OptionMM
                 updateDateTime = updateDateTime.AddHours(double.Parse(updateDateTimeString[0]));
                 updateDateTime = updateDateTime.AddMinutes(double.Parse(updateDateTimeString[1]));
                 updateDateTime = updateDateTime.AddSeconds(double.Parse(updateDateTimeString[2]));
-                if (this.lastUpdateDateTime == new DateTime() || (updateDateTime - lastUpdateDateTime).Seconds >= this.ReplaceOrderDuration)
+                if (this.lastUpdateDateTime == new DateTime() || (updateDateTime - lastUpdateDateTime).Seconds >= this.ReplaceOrderDuration || hasForQuote)
                 {
+                    hasForQuote = false;
                     this.lastUpdateDateTime = updateDateTime;
                     this.option.LastMarket = md;
                     //计算出的做市价格

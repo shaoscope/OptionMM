@@ -8,6 +8,7 @@ namespace CTP
 {
    // public delegate void DepthMarketDataHandle(ThostFtdcDepthMarketDataField md);
     public delegate void TickHandle(ThostFtdcDepthMarketDataField md);
+    public delegate void ForQuoteHandle(ThostFtdcForQuoteRspField ForQuoteRsp);
     public class MDAPI
     {   
         public bool bLogin = false;
@@ -43,6 +44,7 @@ namespace CTP
             api.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
             api.OnRspUserLogout += new RspUserLogout(OnRspUserLogout);
             api.OnRtnDepthMarketData += new RtnDepthMarketData(OnRtnDepthMarketData);
+            api.OnRtnForQuoteRsp += new RtnForQuoteRsp(OnRtnForQuoteRsp);
         }
 
         public void Connect()
@@ -88,6 +90,7 @@ namespace CTP
         {
             int iRet;
             iRet = api.SubscribeMarketData(ppInstrumentID);
+            SubscribeForQuoteRsp(ppInstrumentID);
             return iRet;
         }
 
@@ -95,6 +98,21 @@ namespace CTP
         {
             int iRet;
             iRet = api.UnSubscribeMarketData(ppInstrumentID);
+            UnSubscribeForQuoteRsp(ppInstrumentID);
+            return iRet;
+        }
+
+        private int SubscribeForQuoteRsp(string[] ppInstrumentID)
+        {
+            int iRet;
+            iRet = api.SubscribeForQuoteRsp(ppInstrumentID);
+            return iRet;
+        }
+
+        private int UnSubscribeForQuoteRsp(string[] ppInstrumentID)
+        {
+            int iRet;
+            iRet = api.UnSubscribeForQuoteRsp(ppInstrumentID);
             return iRet;
         }
 
@@ -166,6 +184,22 @@ namespace CTP
             if (pDepthMarketData != null)
             {
                 PushTick(pDepthMarketData);
+            }
+        }
+
+        public event ForQuoteHandle OnForQuote;
+        public void PushForQuote(ThostFtdcForQuoteRspField pForQuoteRsp)
+        {
+            if (OnForQuote != null)
+            {
+                OnForQuote(pForQuoteRsp);
+            }
+        }
+        void OnRtnForQuoteRsp(ThostFtdcForQuoteRspField pForQuoteRsp)
+        {
+            if (pForQuoteRsp != null)
+            {
+                PushForQuote(pForQuoteRsp);
             }
         }
 
