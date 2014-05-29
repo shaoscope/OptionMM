@@ -76,11 +76,12 @@ namespace OptionMM
                         strategy.Option.shortPosition = position;
                     }
                 }
+                strategy.Configuration();
                 //插入策略
                 this.optionPanel.AddStrategy(strategy);
             }
 
-            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 60 * 1000, 3 * 60 * 1000);
+            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 60 * 1000);
 
         }
 
@@ -91,7 +92,17 @@ namespace OptionMM
         private void positionHedgeCallBack(object state)
         {            
             PositionHedge positionHedge = new PositionHedge(PositionList, this.optionPanel.dataTable);
+            this.BeginInvoke(new Action<PositionHedge>(this.RefreshHedgeVolumeLabel), positionHedge);
             //positionHedge.DoHedge();
+        }
+
+        /// <summary>
+        /// 更新面板对冲手数
+        /// </summary>
+        /// <param name="positionHedge"></param>
+        private void RefreshHedgeVolumeLabel(PositionHedge positionHedge)
+        {
+            this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)positionHedge.FutureHedgeVolume["IF1406"];
         }
 
 
@@ -208,5 +219,6 @@ namespace OptionMM
             RiskManagementForm riskManagementForm = new RiskManagementForm();
             riskManagementForm.ShowDialog();
         }
+
     }
 }

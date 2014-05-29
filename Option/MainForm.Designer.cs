@@ -31,8 +31,10 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.optionPanel = new OptionMM.OptionPanel();
             this.menuBarPanel = new System.Windows.Forms.Panel();
+            this.hedgeIFVolumeLabel = new System.Windows.Forms.Label();
             this.riskManagementButton = new System.Windows.Forms.Button();
             this.startAllButton = new System.Windows.Forms.Button();
+            this.forQuoteInfoLabel = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuBarPanel.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +66,8 @@
             // menuBarPanel
             // 
             this.menuBarPanel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.menuBarPanel.Controls.Add(this.forQuoteInfoLabel);
+            this.menuBarPanel.Controls.Add(this.hedgeIFVolumeLabel);
             this.menuBarPanel.Controls.Add(this.riskManagementButton);
             this.menuBarPanel.Controls.Add(this.startAllButton);
             this.menuBarPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -72,6 +76,19 @@
             this.menuBarPanel.Name = "menuBarPanel";
             this.menuBarPanel.Size = new System.Drawing.Size(1161, 29);
             this.menuBarPanel.TabIndex = 1;
+            // 
+            // hedgeIFVolumeLabel
+            // 
+            this.hedgeIFVolumeLabel.AutoSize = true;
+            this.hedgeIFVolumeLabel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.hedgeIFVolumeLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.hedgeIFVolumeLabel.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.hedgeIFVolumeLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.hedgeIFVolumeLabel.Location = new System.Drawing.Point(83, 8);
+            this.hedgeIFVolumeLabel.Name = "hedgeIFVolumeLabel";
+            this.hedgeIFVolumeLabel.Size = new System.Drawing.Size(138, 18);
+            this.hedgeIFVolumeLabel.TabIndex = 2;
+            this.hedgeIFVolumeLabel.Text = "对冲IF1406(手)：";
             // 
             // riskManagementButton
             // 
@@ -99,6 +116,20 @@
             this.startAllButton.UseVisualStyleBackColor = true;
             this.startAllButton.Click += new System.EventHandler(this.startAllButton_Click);
             // 
+            // forQuoteInfoLabel
+            // 
+            this.forQuoteInfoLabel.AutoSize = true;
+            this.forQuoteInfoLabel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.forQuoteInfoLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.forQuoteInfoLabel.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.forQuoteInfoLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.forQuoteInfoLabel.Location = new System.Drawing.Point(288, 8);
+            this.forQuoteInfoLabel.Name = "forQuoteInfoLabel";
+            this.forQuoteInfoLabel.Size = new System.Drawing.Size(74, 18);
+            this.forQuoteInfoLabel.TabIndex = 3;
+            this.forQuoteInfoLabel.Text = "询价单：";
+            this.forQuoteInfoLabel.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -111,6 +142,7 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.menuBarPanel.ResumeLayout(false);
+            this.menuBarPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -122,6 +154,8 @@
         private System.Windows.Forms.Panel menuBarPanel;
         private System.Windows.Forms.Button startAllButton;
         private System.Windows.Forms.Button riskManagementButton;
+        private System.Windows.Forms.Label hedgeIFVolumeLabel;
+        public System.Windows.Forms.Label forQuoteInfoLabel;
 
 
     }

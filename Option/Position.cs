@@ -17,6 +17,11 @@ namespace OptionMM
         /// </summary>
         public ThostFtdcInvestorPositionField shortPosition = new ThostFtdcInvestorPositionField();
 
+        /// <summary>
+        /// 上一次返回回来的成交单
+        /// </summary>
+        public ThostFtdcOrderField previousOrder = null;
+
         public ThostFtdcOrderField ShortOptionOrder = null;
         public ThostFtdcOrderField LongOptionOrder = null;
         public ThostFtdcOrderField CloseLongOptionOrder = null;

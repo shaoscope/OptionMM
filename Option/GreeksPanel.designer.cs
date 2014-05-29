@@ -162,6 +162,9 @@ namespace OptionMM
             this.cTheta.DefaultCellStyle = dataGridViewCellStyle6;
             this.cTheta.HeaderText = "Theta";
             this.cTheta.Name = "cTheta";
+            this.cTheta.ReadOnly = true;
+            this.cTheta.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.cTheta.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // cRho
             // 

@@ -195,6 +195,9 @@ namespace OptionMM
             this.cRealPrice.DefaultCellStyle = dataGridViewCellStyle6;
             this.cRealPrice.HeaderText = "实际价格";
             this.cRealPrice.Name = "cRealPrice";
+            this.cRealPrice.ReadOnly = true;
+            this.cRealPrice.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.cRealPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // cOptionPositionThreshold
             // 
@@ -323,6 +326,9 @@ namespace OptionMM
             this.cBidPrice.DefaultCellStyle = dataGridViewCellStyle16;
             this.cBidPrice.HeaderText = "买入报价";
             this.cBidPrice.Name = "cBidPrice";
+            this.cBidPrice.ReadOnly = true;
+            this.cBidPrice.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.cBidPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // cAskPrice
             // 
@@ -331,6 +337,9 @@ namespace OptionMM
             this.cAskPrice.DefaultCellStyle = dataGridViewCellStyle17;
             this.cAskPrice.HeaderText = "卖出报价";
             this.cAskPrice.Name = "cAskPrice";
+            this.cAskPrice.ReadOnly = true;
+            this.cAskPrice.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.cAskPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // cRunningStatus
             // 

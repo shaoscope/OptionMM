@@ -9,10 +9,10 @@ namespace OptionMM
     {
 
         /// <summary>
-        /// 计算波动率
+        /// 计算历史波动率
         /// </summary>
         /// <returns></returns>
-        public static double CalculateVolatility(List<double> barsList)
+        public static double CalculateHistoricalVolatility(List<double> barsList)
         {
             List<double> logReturnList = new List<double>();
             List<double> sigmaSquareList = new List<double>();
@@ -47,6 +47,41 @@ namespace OptionMM
             {
                 return 0;
             }
+        }
+
+        /// <summary>
+        /// 计算隐含波动率
+        /// </summary>
+        /// <param name="underlyingPrice"></param>
+        /// <param name="strikePrice"></param>
+        /// <param name="daysToMaturity"></param>
+        /// <param name="interestRate"></param>
+        /// <param name="marketPrice"></param>
+        /// <param name="optionType"></param>
+        /// <returns></returns>
+        public static double CalculateImpliedVolatility(double underlyingPrice, double strikePrice, int daysToMaturity, double interestRate, double marketPrice, OptionTypeEnum optionType)
+        {
+            double lower = 0;
+            double upper = 100;
+            double impliedPrice = 0;
+            double impliedVolatility = 0;
+            while (Math.Abs(marketPrice - impliedPrice) < 0.05)
+            {
+                impliedVolatility = (lower + upper) / 2;
+                OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(optionType,
+                    underlyingPrice, strikePrice, interestRate, impliedVolatility, daysToMaturity);
+                OptionValue optionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
+                impliedPrice = optionValue.Price;
+                if(impliedPrice >= marketPrice)
+                {
+                    upper = impliedVolatility;
+                }
+                else
+                {
+                    lower = impliedVolatility;
+                }
+            }
+            return impliedVolatility;
         }
 
         /// <summary>

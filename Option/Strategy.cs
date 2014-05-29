@@ -49,6 +49,39 @@ namespace OptionMM
             future = new Future();
         }
 
+        /// <summary>
+        /// 配置策略
+        /// </summary>
+        public void Configuration()
+        {
+            MDManager.MD.SubscribeMarketData(new string[] { this.option.InstrumentID, this.future.InstrumentID });
+            MDManager.MD.OnTick += MD_OnTick;
+            MDManager.MD.OnForQuote += MD_OnForQuote;
+            TDManager.TD.OnCanceled += TD_OnCanceled;
+            TDManager.TD.OnTraded += TD_OnTraded;
+            TDManager.TD.OnTrading += TD_OnTrading;
+            //TDManager.TD.OnCancelAction += TD_OnCancelAction;
+            ////刷新面板定时器
+            //this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
+        }
+
+        private void TD_OnCancelAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo)
+        {
+            if (pRspInfo.ErrorID == 26 || pRspInfo.ErrorID == 25 || pRspInfo.ErrorID == 24)
+            {
+                //不处理
+            }
+            else
+            {
+                int cancelOrderResult = -1;
+                do
+                {
+                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.LongOptionOrder);
+                }
+                while (cancelOrderResult != 0);
+            }
+        }
+
         //所属面板控件
         private OptionPanel optionPanel;
 
@@ -61,13 +94,10 @@ namespace OptionMM
             this.optionPanel = optionPanel;
         }
 
-        //刷新面板定时器
-        private System.Threading.Timer panelRefreshTimer;
-
         /// <summary>
         /// 撤单再下单的时间间隔(秒)
         /// </summary>
-        private int ReplaceOrderDuration = 10;
+        private int ReplaceOrderDuration = 11;
 
         /// <summary>
         /// 策略是否运行标记位
@@ -95,25 +125,6 @@ namespace OptionMM
         {
             //启动策略
             isRunning = true;
-            MDManager.MD.SubscribeMarketData(new string[] { this.option.InstrumentID, this.future.InstrumentID });
-            MDManager.MD.OnTick += MD_OnTick;
-            MDManager.MD.OnForQuote += MD_OnForQuote;
-            TDManager.TD.OnCanceled += TD_OnCanceled;
-            TDManager.TD.OnTraded += TD_OnTraded;
-            TDManager.TD.OnTrading += TD_OnTrading;
-            //刷新面板定时器
-            this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
-            //定期重新下单定时器
-            //this.replaceOrderTimer = new System.Threading.Timer(this.replaceOrderCallBack, null, 0, (long)ReplaceOrderDuration * 1000);
-        }
-        
-        /// <summary>
-        /// 定时重新下单回调
-        /// </summary>
-        /// <param name="state"></param>
-        private void replaceOrderCallBack(object state)
-        {
-            
         }
 
         /// <summary>
@@ -121,61 +132,87 @@ namespace OptionMM
         /// </summary>
         /// <param name="pOrder"></param>
         void TD_OnTrading(ThostFtdcOrderField pOrder)
-        {
+        {            
             if(pOrder.InstrumentID == this.option.InstrumentID)
             {
-                if (this.option.PlaceLongOptionOrderRef == pOrder.OrderRef)
+                if(this.option.previousOrder == null)
                 {
-                    if(this.option.LongOptionOrder == null)
+                    if(pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
                     {
-                        this.option.LongOptionOrder = pOrder;
-                        this.Option.longPosition.Position += pOrder.VolumeTraded;
+                        this.option.longPosition.Position += pOrder.VolumeTraded;
+                    }
+                    else if(pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                    {
+                        this.option.shortPosition.Position -= pOrder.VolumeTraded;
+                    }
+                    else if(pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                    {
+                        this.option.shortPosition.Position += pOrder.VolumeTraded;
+                    }
+                    else if(pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                    {
+                        this.option.longPosition.Position -= pOrder.VolumeTraded;
+                    }
+                    this.option.previousOrder = pOrder;
+                }
+                else
+                {
+                    if(pOrder.OrderRef == this.option.previousOrder.OrderRef)
+                    {
+                        if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                        {
+                            this.option.longPosition.Position += pOrder.VolumeTraded - this.option.previousOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            this.option.shortPosition.Position -= pOrder.VolumeTraded - this.option.previousOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                        {
+                            this.option.shortPosition.Position += pOrder.VolumeTraded - this.option.previousOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            this.option.longPosition.Position -= pOrder.VolumeTraded - this.option.previousOrder.VolumeTraded;
+                        }
+                        this.option.previousOrder = pOrder;
                     }
                     else
                     {
-                        this.Option.longPosition.Position += pOrder.VolumeTraded - this.option.LongOptionOrder.VolumeTraded;
-                        this.option.LongOptionOrder = pOrder;
+                        if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                        {
+                            this.option.longPosition.Position += pOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            this.option.shortPosition.Position -= pOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                        {
+                            this.option.shortPosition.Position += pOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            this.option.longPosition.Position -= pOrder.VolumeTraded;
+                        }
+                        this.option.previousOrder = pOrder;
                     }
+                }
+                if (this.option.PlaceLongOptionOrderRef == pOrder.OrderRef)
+                {
+                    this.option.LongOptionOrder = pOrder;                    
                 }
                 else if (this.option.PlaceShortOptionOrderRef == pOrder.OrderRef)
                 {
-
-                    if (this.option.ShortOptionOrder == null)
-                    {
-                        this.option.ShortOptionOrder = pOrder;
-                        this.Option.shortPosition.Position += pOrder.VolumeTraded;
-                    }
-                    else
-                    {
-                        this.Option.shortPosition.Position += pOrder.VolumeTraded - this.option.ShortOptionOrder.VolumeTraded;
-                        this.option.ShortOptionOrder = pOrder;
-                    }
+                    this.option.ShortOptionOrder = pOrder;
                 }
-                else if(this.option.CloseLongOptionOrderRef == pOrder.OrderRef)
+                else if (this.option.CloseLongOptionOrderRef == pOrder.OrderRef)
                 {
-                    if (this.option.CloseLongOptionOrder == null)
-                    {
-                        this.option.CloseLongOptionOrder = pOrder;
-                        this.Option.longPosition.Position -= pOrder.VolumeTraded;
-                    }
-                    else
-                    {
-                        this.Option.longPosition.Position -= pOrder.VolumeTraded - this.option.CloseLongOptionOrder.VolumeTraded;
-                        this.option.CloseLongOptionOrder = pOrder;
-                    }
+                    this.option.CloseLongOptionOrder = pOrder;
                 }
-                else if(this.option.CloseShortOptionOrderRef == pOrder.OrderRef)
+                else if (this.option.CloseShortOptionOrderRef == pOrder.OrderRef)
                 {
-                    if (this.option.CloseShortOptionOrder == null)
-                    {
-                        this.option.CloseShortOptionOrder = pOrder;
-                        this.Option.shortPosition.Position -= pOrder.VolumeTraded;
-                    }
-                    else
-                    {
-                        this.Option.shortPosition.Position -= pOrder.VolumeTraded - this.option.CloseShortOptionOrder.VolumeTraded;
-                        this.option.CloseShortOptionOrder = pOrder;
-                    }
+                    this.option.CloseShortOptionOrder = pOrder;
                 }
             }
             else if(pOrder.InstrumentID == this.future.InstrumentID)
@@ -189,11 +226,30 @@ namespace OptionMM
             
         }
 
+        /// <summary>
+        /// 撤单成功的处理
+        /// </summary>
+        /// <param name="pOrder"></param>
         void TD_OnCanceled(ThostFtdcOrderField pOrder)
         {
             if(pOrder.InstrumentID == this.option.InstrumentID)
             {
-
+                if (this.option.PlaceLongOptionOrderRef == pOrder.OrderRef)
+                {
+                    this.option.PlaceLongOptionOrderRef = null;
+                }
+                else if (this.option.PlaceShortOptionOrderRef == pOrder.OrderRef)
+                {
+                    this.option.PlaceShortOptionOrderRef = null;
+                }
+                else if (this.option.CloseLongOptionOrderRef == pOrder.OrderRef)
+                {
+                    this.option.CloseLongOptionOrderRef = null;
+                }
+                else if (this.option.CloseShortOptionOrderRef == pOrder.OrderRef)
+                {
+                    this.option.CloseShortOptionOrderRef = null;
+                }
             }
             else if(pOrder.InstrumentID == this.future.InstrumentID)
             {
@@ -206,6 +262,7 @@ namespace OptionMM
             if (this.option.InstrumentID == pForQuoteRsp.InstrumentID)
             {
                 hasForQuote = true;
+                //MainForm.Instance.forQuoteInfoLabel.Text = "询价单：" + pForQuoteRsp.InstrumentID + "-" + pForQuoteRsp.ForQuoteTime;
             }
         }
 
@@ -236,51 +293,59 @@ namespace OptionMM
                 updateDateTime = updateDateTime.AddHours(double.Parse(updateDateTimeString[0]));
                 updateDateTime = updateDateTime.AddMinutes(double.Parse(updateDateTimeString[1]));
                 updateDateTime = updateDateTime.AddSeconds(double.Parse(updateDateTimeString[2]));
-                if (this.lastUpdateDateTime == new DateTime() || (updateDateTime - lastUpdateDateTime).Seconds >= this.ReplaceOrderDuration || hasForQuote)
+                if ((updateDateTime - lastUpdateDateTime).TotalSeconds > this.ReplaceOrderDuration)
+                {
+                    this.lastUpdateDateTime = updateDateTime;
+                    this.option.LastMarket = md;
+                    if (isRunning)
+                    {
+                        //计算出的做市价格
+                        double MMBid = 0;
+                        double MMAsk = 0;
+                        string status = "";
+                        if (this.option.TheoreticalPrice - this.option.LastMarket.LastPrice >= this.optionPositionThreshold)
+                        {
+                            MMBid = Math.Round(this.option.LastMarket.BidPrice1 - 0.3, 2);
+                            MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
+                            //争取买入开单
+                            status = "LongOpen";
+                        }
+                        else if (this.option.LastMarket.LastPrice - this.option.TheoreticalPrice > this.optionPositionThreshold)
+                        {
+                            MMAsk = Math.Round(this.option.LastMarket.AskPrice1 + 0.3, 2);
+                            MMBid = MMPrice.GetBidPriceThisMonth(MMAsk);
+                            //争取卖出开单
+                            status = "ShortOpen";
+                        }
+                        else if (this.option.TheoreticalPrice >= this.option.LastMarket.LastPrice)
+                        {
+                            MMBid = Math.Round(this.option.TheoreticalPrice - this.optionPositionThreshold);
+                            MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
+                            //简单挂单
+                            status = "SampleQuote";
+                        }
+                        else if (this.option.TheoreticalPrice < this.option.LastMarket.LastPrice)
+                        {
+                            MMAsk = Math.Round(this.option.TheoreticalPrice + this.optionPositionThreshold);
+                            MMBid = MMPrice.GetBidPriceThisMonth(MMAsk);
+                            //简单挂单
+                            status = "SampleQuote";
+                        }
+                        status = "SampleQuote";
+                        this.option.MMQuotation.AskPrice = MMAsk;
+                        this.option.MMQuotation.BidPrice = MMBid;
+                        //策略逻辑 先撤单再下单
+                        this.CancelOrder();
+                        this.PlaceOrder(status);
+                    }
+                }
+                if(hasForQuote)
                 {
                     hasForQuote = false;
                     this.lastUpdateDateTime = updateDateTime;
-                    this.option.LastMarket = md;
-                    //计算出的做市价格
-                    double MMBid = 0;
-                    double MMAsk = 0;
-                    string status = "";
-                    if (this.option.TheoreticalPrice - this.option.LastMarket.LastPrice >= this.optionPositionThreshold)
-                    {
-                        MMBid = Math.Round(this.option.LastMarket.BidPrice1 - 0.3, 2);
-                        MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
-                        //争取买入开单
-                        status = "LongOpen";
-                    }
-                    else if (this.option.LastMarket.LastPrice - this.option.TheoreticalPrice > this.optionPositionThreshold)
-                    {
-                        MMAsk = Math.Round(this.option.LastMarket.AskPrice1 + 0.3, 2);
-                        MMBid = MMPrice.GetBidPriceThisMonth(MMAsk);
-                        //争取卖出开单
-                        status = "ShortOpen";
-                    }
-                    else if (this.option.TheoreticalPrice >= this.option.LastMarket.LastPrice)
-                    {
-                        MMBid = Math.Round(this.option.TheoreticalPrice - this.optionPositionThreshold);
-                        MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
-                        //简单挂单
-                        status = "SampleQuote";
-                    }
-                    else if (this.option.TheoreticalPrice < this.option.LastMarket.LastPrice)
-                    {
-                        MMAsk = Math.Round(this.option.TheoreticalPrice + this.optionPositionThreshold);
-                        MMBid = MMPrice.GetBidPriceThisMonth(MMAsk);
-                        //简单挂单
-                        status = "SampleQuote";
-                    }
-                    status = "SampleQuote";
-                    this.option.MMQuotation.AskPrice = MMAsk;
-                    this.option.MMQuotation.BidPrice = MMBid;
-                    //策略逻辑 先撤单再下单
-                    this.CancelOrder();
-                    this.PlaceOrder(status);
                 }
             }
+            this.panelRefreshCallback(null);
         }
 
         /// <summary>
@@ -288,22 +353,42 @@ namespace OptionMM
         /// </summary>
         private void CancelOrder()
         {
-            if (this.option.PlaceLongOptionOrderRef != null)
-            {
-                TDManager.TD.CancelOrder(this.option.LongOptionOrder);
-            }
-            if(this.option.PlaceShortOptionOrderRef != null)
-            {
-                TDManager.TD.CancelOrder(this.option.ShortOptionOrder);
-            }
-            if(this.option.CloseLongOptionOrderRef != null)
-            {
-                TDManager.TD.CancelOrder(this.option.CloseLongOptionOrder);
-            }
-            if(this.option.CloseShortOptionOrderRef!=null)
-            {
-                TDManager.TD.CancelOrder(this.option.CloseShortOptionOrder);
-            }
+            //if (this.option.PlaceLongOptionOrderRef != null)
+            //{
+            //    int cancelOrderResult = -1;
+            //    do
+            //    {
+            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.LongOptionOrder);
+            //    }
+            //    while (cancelOrderResult != 0);                
+            //}
+            //if(this.option.PlaceShortOptionOrderRef != null)
+            //{
+            //    int cancelOrderResult = -1;
+            //    do
+            //    {
+            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.ShortOptionOrder);
+            //    }
+            //    while (cancelOrderResult != 0);
+            //}
+            //if(this.option.CloseLongOptionOrderRef != null)
+            //{
+            //    int cancelOrderResult = -1;
+            //    do
+            //    {
+            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseLongOptionOrder);
+            //    }
+            //    while (cancelOrderResult != 0);
+            //}
+            //if(this.option.CloseShortOptionOrderRef!=null)
+            //{
+            //    int cancelOrderResult = -1;
+            //    do
+            //    {
+            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseShortOptionOrder);
+            //    }
+            //    while (cancelOrderResult != 0);
+            //}
         }
 
         /// <summary>
@@ -412,8 +497,34 @@ namespace OptionMM
                             askPrice = this.option.LastMarket.LastPrice + 12.5;
                         }
                     }
-                    this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
-                    this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askPrice);
+                    //平仓优先
+                    if(this.option.shortPosition.Position >= 10)
+                    {
+                        this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidPrice);
+                        if (this.option.longPosition.Position >= 10)
+                        {
+                            this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askPrice);
+                        }
+                        else
+                        {
+                            this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askPrice);
+                        }
+                    }
+                    else if(this.option.longPosition.Position >= 10)
+                    {
+                        this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askPrice);
+                        if(this.option.shortPosition.Position >= 10)
+                        {
+                            this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidPrice);
+                        }
+                        else
+                        {
+                            this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
+                        }
+                    }
+                    //直接开仓
+                    //this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
+                    //this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askPrice);
                     break;
             }
             #region 平仓策略
@@ -520,8 +631,8 @@ namespace OptionMM
         public void Stop()
         {
             this.isRunning = false;
-            this.RefreshDataRow();
-            this.panelRefreshTimer.Dispose();
+            //this.RefreshDataRow();
+            this.panelRefreshCallback(null);
             //MDManager.MD.UnSubMD(new string[] { this.future.InstrumentID, this.option.InstrumentID });
             MDManager.MD.OnTick -= MD_OnTick;
             TDManager.TD.OnCanceled -= TD_OnCanceled;

@@ -9,6 +9,7 @@ using System.Reflection;
 namespace CTP
 {
     public delegate void OrderHandle(ThostFtdcOrderField pOrder);
+    public delegate void CancelActionHandle(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo);
 
     public delegate void PositionHandle(ThostFtdcInvestorPositionField position);
     
@@ -331,7 +332,6 @@ namespace CTP
                 req.InstrumentID = pOrder.InstrumentID;
                 ///报单引用
                 req.OrderRef = pOrder.OrderRef;
-
                 ///用户代码
                 //	TThostFtdcUserIDType	UserID;
                 ///报单价格条件: 限价
@@ -340,7 +340,6 @@ namespace CTP
                 req.Direction = pOrder.Direction;
                 ///组合开平标志: 开仓
                 req.CombOffsetFlag_0 = pOrder.CombOffsetFlag_0;
-
                 ///组合投机套保标志
                 req.CombHedgeFlag_0 = pOrder.CombHedgeFlag_0;
                 ///价格
@@ -434,7 +433,6 @@ namespace CTP
             req.InstrumentID = instrumentID;
             ///报单引用
             req.OrderRef = ORDER_REF.ToString();
-
             ///用户代码
             //	TThostFtdcUserIDType	UserID;
             ///报单价格条件: 限价
@@ -486,7 +484,7 @@ namespace CTP
             IsErrorRspInfo(pRspInfo);
         }
 
-        public void ReqOrderAction(string InstrumentID, string OrderRef)
+        public int ReqOrderAction(string InstrumentID, string OrderRef)
         {
             ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
             ///经纪公司代码
@@ -517,11 +515,17 @@ namespace CTP
             //	TThostFtdcUserIDType	UserID;
             ///合约代码
             req.InstrumentID = InstrumentID;
-
             int iResult = api.ReqOrderAction(req, ++iRequestID);
+            return iResult;
         }
 
-        public void ReqOrderAction(ThostFtdcOrderField pOrder)
+        /// <summary>
+        /// 撤单指令
+        /// </summary>
+        /// <param name="InstrumentID"></param>
+        /// <param name="OrderRef"></param>
+        /// <returns>0--下撤单指令成功</returns>
+        public int ReqOrderAction(ThostFtdcOrderField pOrder)
         {
             ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
             ///经纪公司代码
@@ -552,22 +556,39 @@ namespace CTP
             //	TThostFtdcUserIDType	UserID;
             ///合约代码
             req.InstrumentID = pOrder.InstrumentID;
-
             int iResult = api.ReqOrderAction(req, ++iRequestID);
+            return iResult;
         }
 
-        void OnRspOrderAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        public event CancelActionHandle OnCancelAction;
+        public void CancelAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo)
+        {
+            if (OnCancelAction != null)
+            {
+                OnCancelAction(pInputOrderAction, pRspInfo);
+            }
+        }
+
+        /// <summary>
+        /// 撤单失败
+        /// </summary>
+        /// <param name="pInputOrderAction"></param>
+        /// <param name="pRspInfo"></param>
+        /// <param name="nRequestID"></param>
+        /// <param name="bIsLast"></param>
+        public void OnRspOrderAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             if (IsErrorRspInfo(pRspInfo))
             {
             }
             if (bIsLast && IsErrorRspInfo(pRspInfo))
             {
-                //撤单失败
-                if (pRspInfo.ErrorID == 26 || pRspInfo.ErrorID == 25 || pRspInfo.ErrorID == 24)
-                {
-
-                }
+                CancelAction(pInputOrderAction, pRspInfo);
+                ////撤单失败
+                //if (pRspInfo.ErrorID == 26 || pRspInfo.ErrorID == 25 || pRspInfo.ErrorID == 24)
+                //{
+                    
+                //}
             }
         }
 
@@ -628,7 +649,7 @@ namespace CTP
         public bool IsErrorRspInfo(ThostFtdcRspInfoField pRspInfo)
         {
             // 如果ErrorID != 0, 说明收到了错误的响应
-            bool bResult = ((pRspInfo == null) || (pRspInfo.ErrorID != 0));
+            bool bResult = ((pRspInfo != null) && (pRspInfo.ErrorID != 0));
             if (bResult)
             {
 
@@ -638,7 +659,8 @@ namespace CTP
 
         public bool IsMyOrder(ThostFtdcOrderField pOrder)
         {
-            return ((pOrder.FrontID == FRONT_ID) && (pOrder.SessionID == SESSION_ID));
+            //return ((pOrder.FrontID == FRONT_ID) && (pOrder.SessionID == SESSION_ID));
+            return true;
         }
 
         public bool IsMyTrade(ThostFtdcOrderField pOrder, ThostFtdcTradeField pTrade)
@@ -655,9 +677,10 @@ namespace CTP
 
         public bool IsTradingOrder(ThostFtdcOrderField pOrder)
         {
-            return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
-                    (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
-                    (pOrder.OrderStatus != EnumOrderStatusType.AllTraded));
+            //return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
+            //        (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
+            //        (pOrder.OrderStatus != EnumOrderStatusType.AllTraded));
+            return pOrder.OrderStatus != EnumOrderStatusType.Canceled;
         }
 
         public bool IsErrorOrder(ThostFtdcOrderField pOrder)
@@ -722,12 +745,22 @@ namespace CTP
         /// 取消报单
         /// </summary>
         /// <param name="order"></param>
-        public void CancelOrder(ThostFtdcOrderField order)  
+        /// <returns>-1--无效报单，0--下撤单指令成功，1--下撤单指令失败</returns>
+        public int CancelOrder(ThostFtdcOrderField order)  
         {
-            if (order != null)
+            if (order == null)
             {
-                ReqOrderAction(order);
+                return -1;
             }
+            else
+            {
+                return ReqOrderAction(order);
+            }
+        }
+
+        public int CancelOrder(string InstrumentID, string OrderRef)
+        {
+            return ReqOrderAction(InstrumentID, OrderRef);
         }
     }
 }
