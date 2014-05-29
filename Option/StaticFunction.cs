@@ -65,7 +65,7 @@ namespace OptionMM
             double upper = 100;
             double impliedPrice = 0;
             double impliedVolatility = 0;
-            while (Math.Abs(marketPrice - impliedPrice) < 0.05)
+            while (Math.Abs(marketPrice - impliedPrice) > 0.05)
             {
                 impliedVolatility = (lower + upper) / 2;
                 OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(optionType,

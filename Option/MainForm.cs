@@ -81,7 +81,7 @@ namespace OptionMM
                 this.optionPanel.AddStrategy(strategy);
             }
 
-            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 60 * 1000);
+            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 10 * 1000);
 
         }
 

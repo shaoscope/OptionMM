@@ -519,44 +519,88 @@ namespace CTP
             return iResult;
         }
 
-        /// <summary>
-        /// 撤单指令
-        /// </summary>
-        /// <param name="InstrumentID"></param>
-        /// <param name="OrderRef"></param>
-        /// <returns>0--下撤单指令成功</returns>
+        public int ReqOrderAction(ThostFtdcInputOrderActionField pInputOrderAction)
+        {
+            ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
+            ///操作标志
+            req.ActionFlag = CTP.EnumActionFlagType.Delete;
+            ///经纪公司代码
+            req.BrokerID = pInputOrderAction.BrokerID;
+            ///交易所代码
+            //	TThostFtdcExchangeIDType	ExchangeID;
+            req.ExchangeID = pInputOrderAction.ExchangeID;
+            ///前置编号
+            req.FrontID = pInputOrderAction.FrontID;
+            ///合约代码
+            req.InstrumentID = pInputOrderAction.InstrumentID;
+            ///投资者代码
+            req.InvestorID = pInputOrderAction.InvestorID;
+            ///报单操作引用
+            //req.OrderActionRef = pInputOrderAction.OrderActionRef;
+            ///报单引用
+            req.OrderRef = pInputOrderAction.OrderRef;
+            ///报单编号
+            //	TThostFtdcOrderSysIDType	OrderSysID;
+            req.OrderSysID = pInputOrderAction.OrderSysID;
+            ///请求编号
+            //	TThostFtdcRequestIDType	RequestID;
+            //req.RequestID = pInputOrderAction.RequestID;
+            ///会话编号
+            req.SessionID = pInputOrderAction.SessionID;
+            ///用户代码
+            //	TThostFtdcUserIDType	UserID;
+            req.UserID = pInputOrderAction.UserID;
+
+            ///价格
+            //	TThostFtdcPriceType	LimitPrice;
+            ///数量变化
+            //	TThostFtdcVolumeType	VolumeChange;            
+
+            int iResult = api.ReqOrderAction(req, ++iRequestID);
+            return iResult;
+            //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
+            //GUIRefresh.UpdateListBox2("--->>> 报单录入请求: " + ((iResult == 0) ? "成功" : "失败"));
+        }
+
         public int ReqOrderAction(ThostFtdcOrderField pOrder)
         {
             ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
-            ///经纪公司代码
-            req.BrokerID = pOrder.BrokerID;
-            ///投资者代码
-            req.InvestorID = pOrder.InvestorID;
-            ///报单操作引用
-            //	TThostFtdcOrderActionRefType	OrderActionRef;
-            ///报单引用
-            req.OrderRef = pOrder.OrderRef;
-            ///请求编号
-            //	TThostFtdcRequestIDType	RequestID;
-            ///前置编号
-            req.FrontID = FRONT_ID;
-            ///会话编号
-            req.SessionID = SESSION_ID;
-            ///交易所代码
-            //	TThostFtdcExchangeIDType	ExchangeID;
-            ///报单编号
-            //	TThostFtdcOrderSysIDType	OrderSysID;
             ///操作标志
             req.ActionFlag = CTP.EnumActionFlagType.Delete;
+            ///经纪公司代码
+            req.BrokerID = pOrder.BrokerID;
+            ///交易所代码
+            //	TThostFtdcExchangeIDType	ExchangeID;
+            req.ExchangeID = pOrder.ExchangeID;
+            ///前置编号
+            req.FrontID = pOrder.FrontID;
+            ///投资者代码
+            req.InvestorID = pOrder.InvestorID;
+            ///合约代码
+            req.InstrumentID = pOrder.InstrumentID;
+            ///报单引用
+            req.OrderRef = pOrder.OrderRef;
+            ///报单编号
+            //	TThostFtdcOrderSysIDType	OrderSysID;
+            req.OrderSysID = pOrder.OrderSysID;
+            //请求编号
+            //	TThostFtdcRequestIDType	RequestID;
+            //req.RequestID = pOrder.RequestID;
+            ///会话编号
+            req.SessionID = pOrder.SessionID;
+            ///用户代码
+            //	TThostFtdcUserIDType	UserID;
+            req.UserID = pOrder.UserID;
+
+
             ///价格
             //	TThostFtdcPriceType	LimitPrice;
             ///数量变化
             //	TThostFtdcVolumeType	VolumeChange;
-            ///用户代码
-            //	TThostFtdcUserIDType	UserID;
-            ///合约代码
-            req.InstrumentID = pOrder.InstrumentID;
+
             int iResult = api.ReqOrderAction(req, ++iRequestID);
+            //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
+            //GUIRefresh.UpdateListBox2("--->>> 撤单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             return iResult;
         }
 
@@ -750,7 +794,7 @@ namespace CTP
         {
             if (order == null)
             {
-                return -1;
+                return 0;
             }
             else
             {
@@ -758,9 +802,9 @@ namespace CTP
             }
         }
 
-        public int CancelOrder(string InstrumentID, string OrderRef)
+        public int CancelOrder(ThostFtdcInputOrderActionField pInputOrderAction)
         {
-            return ReqOrderAction(InstrumentID, OrderRef);
+            return ReqOrderAction(pInputOrderAction);
         }
     }
 }

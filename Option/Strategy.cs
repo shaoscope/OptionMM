@@ -60,7 +60,7 @@ namespace OptionMM
             TDManager.TD.OnCanceled += TD_OnCanceled;
             TDManager.TD.OnTraded += TD_OnTraded;
             TDManager.TD.OnTrading += TD_OnTrading;
-            //TDManager.TD.OnCancelAction += TD_OnCancelAction;
+            TDManager.TD.OnCancelAction += TD_OnCancelAction;
             ////刷新面板定时器
             //this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
         }
@@ -76,7 +76,7 @@ namespace OptionMM
                 int cancelOrderResult = -1;
                 do
                 {
-                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.LongOptionOrder);
+                    cancelOrderResult = TDManager.TD.CancelOrder(pInputOrderAction);
                 }
                 while (cancelOrderResult != 0);
             }
@@ -262,8 +262,17 @@ namespace OptionMM
             if (this.option.InstrumentID == pForQuoteRsp.InstrumentID)
             {
                 hasForQuote = true;
-                //MainForm.Instance.forQuoteInfoLabel.Text = "询价单：" + pForQuoteRsp.InstrumentID + "-" + pForQuoteRsp.ForQuoteTime;
+                this.optionPanel.BeginInvoke(new Action<ThostFtdcForQuoteRspField>(this.UpdateForQupteLabel), pForQuoteRsp);
             }
+        }
+
+        /// <summary>
+        /// 更新询价单标签
+        /// </summary>
+        /// <param name="pForQuoteRsp"></param>
+        private void UpdateForQupteLabel(ThostFtdcForQuoteRspField pForQuoteRsp)
+        {
+            MainForm.Instance.forQuoteInfoLabel.Text = "询价单：" + pForQuoteRsp.InstrumentID + "-" + pForQuoteRsp.ForQuoteTime;
         }
 
         /// <summary>
@@ -288,6 +297,13 @@ namespace OptionMM
             }
             else if (this.option.InstrumentID == md.InstrumentID)
             {
+                //计算隐含波动率
+                if (this.future.LastMarket != null)
+                {
+                    double impliedVolatility = StaticFunction.CalculateImpliedVolatility(this.future.LastMarket.LastPrice, this.option.StrikePrice,
+                        StaticFunction.GetDaysToMaturity(this.option.InstrumentID), GlobalValues.InterestRate, md.LastPrice, this.option.OptionType);
+
+                }
                 string[] updateDateTimeString = md.UpdateTime.Split(':');
                 DateTime updateDateTime = new DateTime();
                 updateDateTime = updateDateTime.AddHours(double.Parse(updateDateTimeString[0]));
@@ -297,12 +313,15 @@ namespace OptionMM
                 {
                     this.lastUpdateDateTime = updateDateTime;
                     this.option.LastMarket = md;
+                    //撤单
+                    this.CancelOrder();
                     if (isRunning)
                     {
+                        string status = "";
+                        #region 计算做市商报价
                         //计算出的做市价格
                         double MMBid = 0;
                         double MMAsk = 0;
-                        string status = "";
                         if (this.option.TheoreticalPrice - this.option.LastMarket.LastPrice >= this.optionPositionThreshold)
                         {
                             MMBid = Math.Round(this.option.LastMarket.BidPrice1 - 0.3, 2);
@@ -331,18 +350,19 @@ namespace OptionMM
                             //简单挂单
                             status = "SampleQuote";
                         }
-                        status = "SampleQuote";
                         this.option.MMQuotation.AskPrice = MMAsk;
                         this.option.MMQuotation.BidPrice = MMBid;
-                        //策略逻辑 先撤单再下单
-                        this.CancelOrder();
+                        #endregion
+                        status = "SampleQuote";
                         this.PlaceOrder(status);
                     }
-                }
-                if(hasForQuote)
-                {
-                    hasForQuote = false;
-                    this.lastUpdateDateTime = updateDateTime;
+                    else if(hasForQuote)
+                    {
+                        hasForQuote = false;
+                        string status = "";
+                        status = "SampleQuote";
+                        this.PlaceOrder(status);
+                    }
                 }
             }
             this.panelRefreshCallback(null);
@@ -353,42 +373,42 @@ namespace OptionMM
         /// </summary>
         private void CancelOrder()
         {
-            //if (this.option.PlaceLongOptionOrderRef != null)
-            //{
-            //    int cancelOrderResult = -1;
-            //    do
-            //    {
-            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.LongOptionOrder);
-            //    }
-            //    while (cancelOrderResult != 0);                
-            //}
-            //if(this.option.PlaceShortOptionOrderRef != null)
-            //{
-            //    int cancelOrderResult = -1;
-            //    do
-            //    {
-            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.ShortOptionOrder);
-            //    }
-            //    while (cancelOrderResult != 0);
-            //}
-            //if(this.option.CloseLongOptionOrderRef != null)
-            //{
-            //    int cancelOrderResult = -1;
-            //    do
-            //    {
-            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseLongOptionOrder);
-            //    }
-            //    while (cancelOrderResult != 0);
-            //}
-            //if(this.option.CloseShortOptionOrderRef!=null)
-            //{
-            //    int cancelOrderResult = -1;
-            //    do
-            //    {
-            //        cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseShortOptionOrder);
-            //    }
-            //    while (cancelOrderResult != 0);
-            //}
+            if (this.option.PlaceLongOptionOrderRef != null)
+            {
+                int cancelOrderResult = -1;
+                do
+                {
+                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.LongOptionOrder);
+                }
+                while (cancelOrderResult != 0);
+            }
+            if (this.option.PlaceShortOptionOrderRef != null)
+            {
+                int cancelOrderResult = -1;
+                do
+                {
+                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.ShortOptionOrder);
+                }
+                while (cancelOrderResult != 0);
+            }
+            if (this.option.CloseLongOptionOrderRef != null)
+            {
+                int cancelOrderResult = -1;
+                do
+                {
+                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseLongOptionOrder);
+                }
+                while (cancelOrderResult != 0);
+            }
+            if (this.option.CloseShortOptionOrderRef != null)
+            {
+                int cancelOrderResult = -1;
+                do
+                {
+                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseShortOptionOrder);
+                }
+                while (cancelOrderResult != 0);
+            }
         }
 
         /// <summary>
@@ -522,9 +542,13 @@ namespace OptionMM
                             this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
                         }
                     }
+                    else
+                    {
+                        this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
+                        this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askPrice);
+                    }
                     //直接开仓
-                    //this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
-                    //this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askPrice);
+
                     break;
             }
             #region 平仓策略

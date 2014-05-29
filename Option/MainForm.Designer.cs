@@ -31,10 +31,10 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.optionPanel = new OptionMM.OptionPanel();
             this.menuBarPanel = new System.Windows.Forms.Panel();
+            this.forQuoteInfoLabel = new System.Windows.Forms.Label();
             this.hedgeIFVolumeLabel = new System.Windows.Forms.Label();
             this.riskManagementButton = new System.Windows.Forms.Button();
             this.startAllButton = new System.Windows.Forms.Button();
-            this.forQuoteInfoLabel = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuBarPanel.SuspendLayout();
             this.SuspendLayout();
@@ -77,6 +77,19 @@
             this.menuBarPanel.Size = new System.Drawing.Size(1161, 29);
             this.menuBarPanel.TabIndex = 1;
             // 
+            // forQuoteInfoLabel
+            // 
+            this.forQuoteInfoLabel.AutoSize = true;
+            this.forQuoteInfoLabel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.forQuoteInfoLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.forQuoteInfoLabel.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.forQuoteInfoLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.forQuoteInfoLabel.Location = new System.Drawing.Point(288, 8);
+            this.forQuoteInfoLabel.Name = "forQuoteInfoLabel";
+            this.forQuoteInfoLabel.Size = new System.Drawing.Size(74, 18);
+            this.forQuoteInfoLabel.TabIndex = 3;
+            this.forQuoteInfoLabel.Text = "询价单：";
+            // 
             // hedgeIFVolumeLabel
             // 
             this.hedgeIFVolumeLabel.AutoSize = true;
@@ -115,20 +128,6 @@
             this.startAllButton.Text = "全部启动";
             this.startAllButton.UseVisualStyleBackColor = true;
             this.startAllButton.Click += new System.EventHandler(this.startAllButton_Click);
-            // 
-            // forQuoteInfoLabel
-            // 
-            this.forQuoteInfoLabel.AutoSize = true;
-            this.forQuoteInfoLabel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.forQuoteInfoLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.forQuoteInfoLabel.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.forQuoteInfoLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.forQuoteInfoLabel.Location = new System.Drawing.Point(288, 8);
-            this.forQuoteInfoLabel.Name = "forQuoteInfoLabel";
-            this.forQuoteInfoLabel.Size = new System.Drawing.Size(74, 18);
-            this.forQuoteInfoLabel.TabIndex = 3;
-            this.forQuoteInfoLabel.Text = "询价单：";
-            this.forQuoteInfoLabel.Visible = false;
             // 
             // MainForm
             // 

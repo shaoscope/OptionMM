@@ -43,8 +43,6 @@ namespace OptionMM
                 futureHedgeVolume["IF1406"] += strategy.Option.Delta * strategy.Option.shortPosition.Position / 3;
                 
             }
-            //输出期货对冲的数量
-            Console.WriteLine(System.DateTime.Now.ToShortTimeString() + " ==================================================== " + "IF1406 " + futureHedgeVolume["IF1406"]);
         }
 
         /// <summary>
