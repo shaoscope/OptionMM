@@ -39,8 +39,8 @@ namespace OptionMM
             foreach(DataGridViewRow dataRow in dataTable.Rows)
             {
                 Strategy strategy = (Strategy)dataRow.Tag;
-                futureHedgeVolume["IF1406"] += -strategy.Option.Delta * strategy.Option.longPosition.Position / 3;
-                futureHedgeVolume["IF1406"] += strategy.Option.Delta * strategy.Option.shortPosition.Position / 3;
+                futureHedgeVolume["IF1406"] += -strategy.Option.OptionValue.Delta * strategy.Option.longPosition.Position / 3;
+                futureHedgeVolume["IF1406"] += strategy.Option.OptionValue.Delta * strategy.Option.shortPosition.Position / 3;
                 
             }
         }

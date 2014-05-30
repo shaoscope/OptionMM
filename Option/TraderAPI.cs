@@ -157,8 +157,7 @@ namespace CTP
             }
             catch (Exception e)
             {
-                //Console.WriteLine(e.Message);
-                //GUIRefresh.UpdateMessageBox(e.Message);
+                Console.WriteLine(e.Message);
             }
             finally
             {

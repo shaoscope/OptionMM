@@ -58,21 +58,17 @@ namespace OptionMM
             strategy.SetPanel(this);
             strategy.CreateCells(this.dataTable);
             DataGridViewCellCollection cells = strategy.Cells;
-            cells[0].Value = strategy.Option.InstrumentID;               //合约名 cOptionID
-            cells[1].Value = strategy.Option.ImpridVolatility;                     //隐含波动率 cImpridVolatility
-            cells[2].Value = strategy.Option.Delta;      //Delta cDelta
-            cells[3].Value = strategy.Option.TheoreticalPrice;      //理论价格 cTheroricalPrice
-            cells[4].Value = strategy.Option.LastMarket != null ? strategy.Option.LastMarket.LastPrice : 0;     //实际价格 cRealPrice
-            cells[5].Value = strategy.optionPositionThreshold;        //开仓阈值 cOptionPositionThreshold
-            cells[6].Value = strategy.minOptionOpenLots;     //最少开仓数 cMiniumOptionOpenPosition
-            cells[7].Value = strategy.Option.longPosition != null ? strategy.Option.longPosition.Position : 0;        //期权多头仓位数 cOptionLongPositionNum
-            cells[8].Value = strategy.Option.shortPosition != null ? strategy.Option.shortPosition.Position : 0;     //期权空头仓位数 cOptionShortPositionNum
-            //cells[9].Value = hedgeRecord.UnderlyingPrice;     //股指多头仓位数 cIndexLongPositionNum
-            //cells[10].Value = hedgeRecord.OptionProfit;        //股指空头仓位数 cIndexShortPositionNum
-            //cells[11].Value = hedgeRecord.CloseProfit;        //持仓盈亏 cPositionProfit
-            //cells[12].Value = hedgeRecord.PositionProfit;     //期权限仓数 cOptionMaximumPositionNum
-            //cells[13].Value = hedgeRecord.Commission;             //股指限仓数 cIndexMaximumPositionNum
-            cells[16].Value = "停止";
+            cells[0].Value = strategy.Option.InstrumentID;
+            cells[1].Value = strategy.Option.MMQuotation.BidQuote;
+            cells[2].Value = strategy.Option.LastMarket != null ? strategy.Option.LastMarket.BidPrice1 : 0;
+            cells[3].Value = strategy.Option.LastMarket != null ? strategy.Option.LastMarket.LastPrice : 0;
+            cells[4].Value = strategy.Option.LastMarket != null ? strategy.Option.LastMarket.AskPrice1 : 0;
+            cells[5].Value = strategy.Option.MMQuotation.AskQuote;
+            cells[6].Value = strategy.Option.longPosition != null ? strategy.Option.longPosition.Position : 0;
+            cells[7].Value = strategy.Option.shortPosition != null ? strategy.Option.shortPosition.Position : 0;
+            cells[8].Value = strategy.Option.ImpliedVolatility;
+            cells[9].Value = strategy.Option.OptionValue.Delta;
+            cells[10].Value = "停止";
             this.dataTable.Rows.Add(strategy);
         }
 

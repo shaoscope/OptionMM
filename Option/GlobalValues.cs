@@ -17,13 +17,13 @@ namespace OptionMM
         public static readonly int TradingDaysPerYear = 252;
 
         //无风险利率
-        public static readonly double InterestRate = 0.05;
+        public static readonly double InterestRate = 0.04;
         
         //股指波动率
-        public static readonly double Volatility = 0.26;
+        public static readonly double Volatility = 0.28;
 
         //到期天数
-        public static readonly int[] DaysToMaturity = { 16, 36, 56 };
+        public static readonly int[] DaysToMaturity = { 15, 35, 55 };
 
         //test
         //test

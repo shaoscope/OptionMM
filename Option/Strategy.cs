@@ -36,12 +36,6 @@ namespace OptionMM
 
         private DateTime lastUpdateDateTime = new DateTime();
 
-        public double optionPositionThreshold;  //开仓阈值
-
-        public double minOptionOpenLots;    //最小开仓数
-
-        public double maxOptionOpenLots;    //最大开仓数
-
         public Strategy()
         {
             this.Tag = this;
@@ -286,23 +280,18 @@ namespace OptionMM
                 this.future.LastMarket = md;
                 //计算期权理论价格
                 OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
-                    this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility, StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
-                OptionValue optionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
-                this.option.TheoreticalPrice = optionValue.Price;
-                this.option.Delta = optionValue.Delta;
-                this.option.Gamma = optionValue.Gamma;
-                this.option.Vega = optionValue.Vega;
-                this.option.Theta = optionValue.Theta;
-                this.option.Rho = optionValue.Rho;
+                    this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility, 
+                    StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
+                this.option.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
             }
             else if (this.option.InstrumentID == md.InstrumentID)
             {
+                this.option.LastMarket = md;
                 //计算隐含波动率
                 if (this.future.LastMarket != null)
                 {
-                    double impliedVolatility = StaticFunction.CalculateImpliedVolatility(this.future.LastMarket.LastPrice, this.option.StrikePrice,
+                    this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.future.LastMarket.LastPrice, this.option.StrikePrice,
                         StaticFunction.GetDaysToMaturity(this.option.InstrumentID), GlobalValues.InterestRate, md.LastPrice, this.option.OptionType);
-
                 }
                 string[] updateDateTimeString = md.UpdateTime.Split(':');
                 DateTime updateDateTime = new DateTime();
@@ -312,60 +301,111 @@ namespace OptionMM
                 if ((updateDateTime - lastUpdateDateTime).TotalSeconds > this.ReplaceOrderDuration)
                 {
                     this.lastUpdateDateTime = updateDateTime;
-                    this.option.LastMarket = md;
                     //撤单
                     this.CancelOrder();
+                    //计算报价
+                    double []quote = this.CalculateQuote();
                     if (isRunning)
                     {
-                        string status = "";
-                        #region 计算做市商报价
-                        //计算出的做市价格
-                        double MMBid = 0;
-                        double MMAsk = 0;
-                        if (this.option.TheoreticalPrice - this.option.LastMarket.LastPrice >= this.optionPositionThreshold)
-                        {
-                            MMBid = Math.Round(this.option.LastMarket.BidPrice1 - 0.3, 2);
-                            MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
-                            //争取买入开单
-                            status = "LongOpen";
-                        }
-                        else if (this.option.LastMarket.LastPrice - this.option.TheoreticalPrice > this.optionPositionThreshold)
-                        {
-                            MMAsk = Math.Round(this.option.LastMarket.AskPrice1 + 0.3, 2);
-                            MMBid = MMPrice.GetBidPriceThisMonth(MMAsk);
-                            //争取卖出开单
-                            status = "ShortOpen";
-                        }
-                        else if (this.option.TheoreticalPrice >= this.option.LastMarket.LastPrice)
-                        {
-                            MMBid = Math.Round(this.option.TheoreticalPrice - this.optionPositionThreshold);
-                            MMAsk = MMPrice.GetAskPriceThisMonth(MMBid);
-                            //简单挂单
-                            status = "SampleQuote";
-                        }
-                        else if (this.option.TheoreticalPrice < this.option.LastMarket.LastPrice)
-                        {
-                            MMAsk = Math.Round(this.option.TheoreticalPrice + this.optionPositionThreshold);
-                            MMBid = MMPrice.GetBidPriceThisMonth(MMAsk);
-                            //简单挂单
-                            status = "SampleQuote";
-                        }
-                        this.option.MMQuotation.AskPrice = MMAsk;
-                        this.option.MMQuotation.BidPrice = MMBid;
-                        #endregion
-                        status = "SampleQuote";
-                        this.PlaceOrder(status);
+                        this.PlaceOrder(quote);
                     }
                     else if(hasForQuote)
                     {
                         hasForQuote = false;
-                        string status = "";
-                        status = "SampleQuote";
-                        this.PlaceOrder(status);
+                        this.PlaceOrder(quote);
                     }
                 }
             }
             this.panelRefreshCallback(null);
+        }
+
+        /// <summary>
+        /// 计算报价
+        /// </summary>
+        /// <returns></returns>
+        private double[] CalculateQuote()
+        {
+            double[] quote = new double[] { 0, 0 };
+            #region 计算报单价格--最大区间计算法
+            double bidQuote = 0;
+            double askQuote = 0;
+            if (this.option.InstrumentID.Contains("1406"))
+            {
+                if (this.option.LastMarket.LastPrice < 10)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 0.3;
+                    askQuote = this.option.LastMarket.LastPrice + 0.2;
+                }
+                else if (this.option.LastMarket.LastPrice < 20)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 0.5;
+                    askQuote = this.option.LastMarket.LastPrice + 0.5;
+                }
+                else if (this.option.LastMarket.LastPrice < 50)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 1.3;
+                    askQuote = this.option.LastMarket.LastPrice + 1.2;
+                }
+                else if (this.option.LastMarket.LastPrice < 100)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 2.5;
+                    askQuote = this.option.LastMarket.LastPrice + 2.5;
+                }
+                else if (this.option.LastMarket.LastPrice < 250)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 4;
+                    askQuote = this.option.LastMarket.LastPrice + 4;
+                }
+                else
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 7.5;
+                    askQuote = this.option.LastMarket.LastPrice + 7.5;
+                }
+            }
+            else
+            {
+                if (this.option.LastMarket.LastPrice < 10)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 0.5;
+                    askQuote = this.option.LastMarket.LastPrice + 0.5;
+                }
+                else if (this.option.LastMarket.LastPrice < 20)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 1;
+                    askQuote = this.option.LastMarket.LastPrice + 1;
+                }
+                else if (this.option.LastMarket.LastPrice < 50)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 2;
+                    askQuote = this.option.LastMarket.LastPrice + 2;
+                }
+                else if (this.option.LastMarket.LastPrice < 100)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 4;
+                    askQuote = this.option.LastMarket.LastPrice + 4;
+                }
+                else if (this.option.LastMarket.LastPrice < 250)
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 7.5;
+                    askQuote = this.option.LastMarket.LastPrice + 7.5;
+                }
+                else
+                {
+                    bidQuote = this.option.LastMarket.LastPrice - 12.5;
+                    askQuote = this.option.LastMarket.LastPrice + 12.5;
+                }
+            }
+            #endregion
+
+            #region 计算报单价格--隐含波动率计算法
+
+            #endregion
+
+            this.option.MMQuotation.BidQuote = bidQuote;
+            this.option.MMQuotation.AskQuote = askQuote;
+            quote[0] = bidQuote;
+            quote[1] = askQuote;
+            return quote;
         }
 
         /// <summary>
@@ -414,198 +454,44 @@ namespace OptionMM
         /// <summary>
         /// 下单逻辑
         /// </summary>
-        private void PlaceOrder(string status)
+        private void PlaceOrder(double []quote)
         {
             //清空报单信息
             this.option.clearOrderInfo();
-            //报单手数
-            //this.option.MMQuotation.AskLots = 10;
-            //this.option.MMQuotation.BidLots = 10;
             int placeOrderVolume = 10;
-            switch(status)
+            double bidQuote = quote[0];
+            double askQuote = quote[1];
+            #region 下单--平仓优先
+            //平仓优先
+            if (this.option.shortPosition.Position >= 10)
             {
-                case "LongOpen":
-                    if (this.option.shortPosition.Position >= placeOrderVolume)
-                    {
-                        //有空单，平空单
-
-                    }
-                    else
-                    {
-                        //开多单
-
-                    }
-                    break;
-                case "ShortOpen":
-                    if (this.option.longPosition.Position >= placeOrderVolume)
-                    {
-                        //有多单，平多单
-
-                    }
-                    else
-                    {
-                        //开空单
-
-                    }
-                    break;
-                case "SampleQuote":
-                    double bidPrice = 0;
-                    double askPrice = 0;
-                    if (this.option.InstrumentID.Contains("1406"))
-                    {
-                        if (this.option.LastMarket.LastPrice < 10)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 0.3;
-                            askPrice = this.option.LastMarket.LastPrice + 0.2;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 20)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 0.5;
-                            askPrice = this.option.LastMarket.LastPrice + 0.5;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 50)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 1.3;
-                            askPrice = this.option.LastMarket.LastPrice + 1.2;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 100)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 2.5;
-                            askPrice = this.option.LastMarket.LastPrice + 2.5;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 250)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 4;
-                            askPrice = this.option.LastMarket.LastPrice + 4;
-                        }
-                        else
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 7.5;
-                            askPrice = this.option.LastMarket.LastPrice + 7.5;
-                        }
-                    }
-                    else
-                    {
-                        if (this.option.LastMarket.LastPrice < 10)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 0.5;
-                            askPrice = this.option.LastMarket.LastPrice + 0.5;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 20)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 1;
-                            askPrice = this.option.LastMarket.LastPrice + 1;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 50)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 2;
-                            askPrice = this.option.LastMarket.LastPrice + 2;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 100)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 4;
-                            askPrice = this.option.LastMarket.LastPrice + 4;
-                        }
-                        else if (this.option.LastMarket.LastPrice < 250)
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 7.5;
-                            askPrice = this.option.LastMarket.LastPrice + 7.5;
-                        }
-                        else
-                        {
-                            bidPrice = this.option.LastMarket.LastPrice - 12.5;
-                            askPrice = this.option.LastMarket.LastPrice + 12.5;
-                        }
-                    }
-                    //平仓优先
-                    if(this.option.shortPosition.Position >= 10)
-                    {
-                        this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidPrice);
-                        if (this.option.longPosition.Position >= 10)
-                        {
-                            this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askPrice);
-                        }
-                        else
-                        {
-                            this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askPrice);
-                        }
-                    }
-                    else if(this.option.longPosition.Position >= 10)
-                    {
-                        this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askPrice);
-                        if(this.option.shortPosition.Position >= 10)
-                        {
-                            this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidPrice);
-                        }
-                        else
-                        {
-                            this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
-                        }
-                    }
-                    else
-                    {
-                        this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidPrice);
-                        this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askPrice);
-                    }
-                    //直接开仓
-
-                    break;
+                this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidQuote);
+                if (this.option.longPosition.Position >= 10)
+                {
+                    this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askQuote);
+                }
+                else
+                {
+                    this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
+                }
             }
-            #region 平仓策略
-            //if (this.option.longPosition.Position >= this.option.shortPosition.Position && this.option.longPosition.Position >= placeOrderVolume)
-            //{
-            //    //平多仓
-            //    double askPrice = this.option.LastMarket.AskPrice1 + 0.1;
-            //    double bidPrice = MMPrice.GetBidPriceThisMonth(askPrice);
-            //    this.option.CloseLongOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, askPrice);
-            //    this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, bidPrice);
-            //}
-            //else if (this.option.shortPosition.Position >= this.option.longPosition.Position && this.option.shortPosition.Position >= placeOrderVolume)
-            //{
-            //    //平空仓
-            //    double bidPrice = this.option.LastMarket.BidPrice1 - 0.1;
-            //    double askPrice = MMPrice.GetAskPriceThisMonth(bidPrice);
-            //    this.option.CloseShortOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, bidPrice);
-            //    this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, askPrice);
-            //}
-            //else
-            //{
-            //    //按照回归开仓
-            //    this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.BidPrice);
-            //    this.option.CloseShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.AskPrice);
-            //}
-            #endregion
-            #region 挂单策略
-            //if (this.option.shortPosition.Position >= this.option.longPosition.Position)
-            //{
-            //    if (this.option.shortPosition.Position >= placeOrderVolume)
-            //    {
-            //        //平空单
-            //        this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.AskPrice);
-            //        this.option.CloseLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.BidPrice);
-            //    }
-            //    else
-            //    {
-            //        //开多单
-            //        this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.BidPrice);
-            //        this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.AskPrice);
-            //    }
-            //}
-            //else
-            //{
-            //    if (this.option.longPosition.Position >= this.option.MMQuotation.AskLots)
-            //    {
-            //        //平多单
-            //        this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.BidPrice);
-            //        this.option.CloseShortOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.AskPrice);
-            //    }
-            //    else
-            //    {
-            //        //开空单
-            //        this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.AskPrice);
-            //        this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, this.option.MMQuotation.BidPrice);
-            //    }
-            //}
+            else if (this.option.longPosition.Position >= 10)
+            {
+                this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askQuote);
+                if (this.option.shortPosition.Position >= 10)
+                {
+                    this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidQuote);
+                }
+                else
+                {
+                    this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+                }
+            }
+            else
+            {
+                this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+                this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
+            }
             #endregion
         }
 
@@ -639,13 +525,15 @@ namespace OptionMM
         /// </summary>
         public void RefreshDataRow()
         {
-            this.Cells["cDelta"].Value = this.option.Delta;
-            this.Cells["cTheroricalPrice"].Value = this.option.TheoreticalPrice;
-            this.Cells["cRealPrice"].Value = this.option.LastMarket == null ? 0 : this.option.LastMarket.LastPrice;
-            this.Cells["cAskPrice"].Value = this.option.LastMarket == null ? 0 : this.option.LastMarket.AskPrice1;
+            this.Cells["cBidQuote"].Value = this.option.MMQuotation.BidQuote;
             this.Cells["cBidPrice"].Value = this.option.LastMarket == null ? 0 : this.option.LastMarket.BidPrice1;
-            this.Cells["cOptionLongPositionNum"].Value = this.option.longPosition.Position;
-            this.Cells["cOptionShortPositionNum"].Value = this.option.shortPosition.Position;
+            this.Cells["cMarketPrice"].Value = this.option.LastMarket == null ? 0 : this.option.LastMarket.LastPrice;
+            this.Cells["cAskPrice"].Value = this.option.LastMarket == null ? 0 : this.option.LastMarket.AskPrice1;
+            this.Cells["cAskQuote"].Value = this.option.MMQuotation.AskQuote;
+            this.Cells["cLongVolume"].Value = this.option.longPosition.Position;
+            this.Cells["cShortVolume"].Value = this.option.shortPosition.Position;
+            this.Cells["cImpliedVolatility"].Value = this.option.ImpliedVolatility;
+            this.Cells["cDelta"].Value = this.option.OptionValue.Delta;
             this.Cells["cRunningStatus"].Value = this.isRunning == true ? "正在运行" : "停止";
         }
 
@@ -655,13 +543,17 @@ namespace OptionMM
         public void Stop()
         {
             this.isRunning = false;
-            //this.RefreshDataRow();
             this.panelRefreshCallback(null);
-            //MDManager.MD.UnSubMD(new string[] { this.future.InstrumentID, this.option.InstrumentID });
-            MDManager.MD.OnTick -= MD_OnTick;
-            TDManager.TD.OnCanceled -= TD_OnCanceled;
-            TDManager.TD.OnTraded -= TD_OnTraded;
-            TDManager.TD.OnTrading -= TD_OnTrading;
+            //MDManager.MD.OnTick -= MD_OnTick;
+            //TDManager.TD.OnCanceled -= TD_OnCanceled;
+            //TDManager.TD.OnTraded -= TD_OnTraded;
+            //TDManager.TD.OnTrading -= TD_OnTrading;
         }
-    }
+
+
+        public override string ToString()
+        {
+            return this.option.InstrumentID + "," + this.option.LastMarket.LastPrice + "," + this.option.ImpliedVolatility + "," + this.option.OptionValue.Delta;
+        }
+    }//class
 }

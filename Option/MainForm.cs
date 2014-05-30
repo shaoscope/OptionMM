@@ -47,6 +47,8 @@ namespace OptionMM
         //仓位对冲定时器
         private System.Threading.Timer positionHedgeTimer;
 
+        private System.Threading.Timer recordVolatilityTimer; 
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             //加载面板
@@ -58,12 +60,7 @@ namespace OptionMM
                 string[] strTemp = instrumentID.Split('-');
                 strategy.Option.StrikePrice = double.Parse(strTemp[2]);
                 strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
-                strategy.Option.ImpridVolatility = Double.Parse(configValues[instrumentID][0]);
-                strategy.optionPositionThreshold = Double.Parse(configValues[instrumentID][1]);
-                strategy.minOptionOpenLots = Double.Parse(configValues[instrumentID][2]);
-                //option.maxOptionOpenLots = Double.Parse(configValues[instrumentID][3]);   //开仓点数
-                strategy.maxOptionOpenLots = Double.Parse(configValues[instrumentID][4]);
-                strategy.Future.InstrumentID = configValues[instrumentID][5];
+                strategy.Future.InstrumentID = configValues[instrumentID][0];
                 //加入仓位信息
                 foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
                 {
@@ -82,7 +79,23 @@ namespace OptionMM
             }
 
             this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 10 * 1000);
+            this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
+        }
 
+        /// <summary>
+        /// 记录波动率回调
+        /// </summary>
+        /// <param name="state"></param>
+        private void recordVolatilityCallBack(object state)
+        {
+            StreamWriter fileWriter = new StreamWriter("VolatilityRecord//" + System.DateTime.Now.Month + "-" + System.DateTime.Now.Day + "-" + System.DateTime.Now.Hour + "-" + System.DateTime.Now.Minute + ".csv");
+            foreach (DataGridViewRow dataRow in MainForm.instance.optionPanel.dataTable.Rows)
+            {
+                Strategy strategy = (Strategy)dataRow.Tag;
+                fileWriter.WriteLine(strategy.ToString());
+            }
+            fileWriter.Flush();
+            fileWriter.Close();
         }
 
         /// <summary>
@@ -128,7 +141,7 @@ namespace OptionMM
                     if ((xmlRder.Name == "Option") && (xmlRder.HasAttributes))
                     {
                         string strID = null;
-                        string[] Property = new string[6];
+                        string[] Property = new string[1];
                         for (int i = 0; i < xmlRder.AttributeCount; i++)
                         {
                             xmlRder.MoveToAttribute(i);
@@ -136,29 +149,9 @@ namespace OptionMM
                             {
                                 strID = xmlRder.Value;
                             }
-                            else if (xmlRder.Name == "隐含波动率")
-                            {
-                                Property[0] = xmlRder.Value;
-                            }
-                            else if (xmlRder.Name == "开仓阈值")
-                            {
-                                Property[1] = xmlRder.Value;
-                            }
-                            else if (xmlRder.Name == "最少挂单数")
-                            {
-                                Property[2] = xmlRder.Value;
-                            }
-                            else if (xmlRder.Name == "平仓点数")
-                            {
-                                Property[3] = xmlRder.Value;
-                            }
-                            else if (xmlRder.Name == "最大开仓数")
-                            {
-                                Property[4] = xmlRder.Value;
-                            }
                             else if (xmlRder.Name == "标的物")
                             {
-                                Property[5] = xmlRder.Value;
+                                Property[0] = xmlRder.Value;
                             }
                         }
                         configValues.Add(strID, Property);
@@ -220,5 +213,6 @@ namespace OptionMM
             riskManagementForm.ShowDialog();
         }
 
-    }
-}
+
+    }//class
+}//namespace

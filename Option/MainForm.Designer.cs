@@ -29,22 +29,24 @@
         private void InitializeComponent()
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.optionPanel = new OptionMM.OptionPanel();
             this.menuBarPanel = new System.Windows.Forms.Panel();
             this.forQuoteInfoLabel = new System.Windows.Forms.Label();
             this.hedgeIFVolumeLabel = new System.Windows.Forms.Label();
             this.riskManagementButton = new System.Windows.Forms.Button();
             this.startAllButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.optionPanel = new OptionMM.OptionPanel();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuBarPanel.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.optionPanel, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.menuBarPanel, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -53,15 +55,6 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1161, 665);
             this.tableLayoutPanel1.TabIndex = 0;
-            // 
-            // optionPanel
-            // 
-            this.optionPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.optionPanel.Location = new System.Drawing.Point(0, 30);
-            this.optionPanel.Margin = new System.Windows.Forms.Padding(0);
-            this.optionPanel.Name = "optionPanel";
-            this.optionPanel.Size = new System.Drawing.Size(1161, 635);
-            this.optionPanel.TabIndex = 0;
             // 
             // menuBarPanel
             // 
@@ -129,6 +122,31 @@
             this.startAllButton.UseVisualStyleBackColor = true;
             this.startAllButton.Click += new System.EventHandler(this.startAllButton_Click);
             // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 950F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Controls.Add(this.optionPanel, 0, 0);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 30);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 1;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1161, 635);
+            this.tableLayoutPanel2.TabIndex = 2;
+            // 
+            // optionPanel
+            // 
+            this.optionPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.optionPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.optionPanel.Location = new System.Drawing.Point(0, 0);
+            this.optionPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.optionPanel.Name = "optionPanel";
+            this.optionPanel.Size = new System.Drawing.Size(950, 635);
+            this.optionPanel.TabIndex = 0;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -142,6 +160,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.menuBarPanel.ResumeLayout(false);
             this.menuBarPanel.PerformLayout();
+            this.tableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -149,12 +168,13 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        public OptionPanel optionPanel;
         private System.Windows.Forms.Panel menuBarPanel;
         private System.Windows.Forms.Button startAllButton;
         private System.Windows.Forms.Button riskManagementButton;
         private System.Windows.Forms.Label hedgeIFVolumeLabel;
         public System.Windows.Forms.Label forQuoteInfoLabel;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        public OptionPanel optionPanel;
 
 
     }

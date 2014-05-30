@@ -8,20 +8,23 @@ namespace OptionMM
     class MMQuotation
     {
 
-        private double askPrice;
+        private double askQuote;
 
-        public double AskPrice
+        public double AskQuote
         {
-            get { return this.askPrice; }
-            set { this.askPrice = value; }
+            get { return this.askQuote; }
+            set { this.askQuote = value; }
         }
 
-        private double bidPrice;
+        /// <summary>
+        /// 买入报价
+        /// </summary>
+        private double bidQuote;
 
-        public double BidPrice
+        public double BidQuote
         {
-            get { return this.bidPrice; }
-            set { this.bidPrice = value; }
+            get { return this.bidQuote; }
+            set { this.bidQuote = value; }
         }
 
         private int askLots;

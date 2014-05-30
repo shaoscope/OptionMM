@@ -43,16 +43,16 @@ namespace OptionMM
                     Strategy strategy = (Strategy)dataRow.Tag;
                     if(strategy.Option.InstrumentID.StartsWith(instrumentID))
                     {
-                        greeks.Delta += strategy.Option.Delta * strategy.Option.longPosition.Position;
-                        greeks.Delta += -strategy.Option.Delta * strategy.Option.shortPosition.Position;
-                        greeks.Gamma += strategy.Option.Gamma * strategy.Option.longPosition.Position;
-                        greeks.Gamma += -strategy.Option.Gamma * strategy.Option.shortPosition.Position;
-                        greeks.Vega += strategy.Option.Vega * strategy.Option.longPosition.Position;
-                        greeks.Vega += -strategy.Option.Vega * strategy.Option.shortPosition.Position;
-                        greeks.Theta += strategy.Option.Theta * strategy.Option.longPosition.Position;
-                        greeks.Theta += -strategy.Option.Theta * strategy.Option.shortPosition.Position;
-                        greeks.Rho += strategy.Option.Rho * strategy.Option.longPosition.Position;
-                        greeks.Rho += -strategy.Option.Rho * strategy.Option.shortPosition.Position;
+                        greeks.Delta += strategy.Option.OptionValue.Delta * strategy.Option.longPosition.Position;
+                        greeks.Delta += -strategy.Option.OptionValue.Delta * strategy.Option.shortPosition.Position;
+                        greeks.Gamma += strategy.Option.OptionValue.Gamma * strategy.Option.longPosition.Position;
+                        greeks.Gamma += -strategy.Option.OptionValue.Gamma * strategy.Option.shortPosition.Position;
+                        greeks.Vega += strategy.Option.OptionValue.Vega * strategy.Option.longPosition.Position;
+                        greeks.Vega += -strategy.Option.OptionValue.Vega * strategy.Option.shortPosition.Position;
+                        greeks.Theta += strategy.Option.OptionValue.Theta * strategy.Option.longPosition.Position;
+                        greeks.Theta += -strategy.Option.OptionValue.Theta * strategy.Option.shortPosition.Position;
+                        greeks.Rho += strategy.Option.OptionValue.Rho * strategy.Option.longPosition.Position;
+                        greeks.Rho += -strategy.Option.OptionValue.Rho * strategy.Option.shortPosition.Position;
                     }
                 }
                 this.greeksPanel.AddGreeks(greeks);
