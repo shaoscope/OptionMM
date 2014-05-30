@@ -10,45 +10,21 @@ namespace CTP
 {
     public delegate void OrderHandle(ThostFtdcOrderField pOrder);
     public delegate void CancelActionHandle(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo);
-
     public delegate void PositionHandle(ThostFtdcInvestorPositionField position);
-    
-    public class OrderInstert
+
+    public struct OrderSignal
     {
-        public ThostFtdcInputOrderField _req = null;
-        public OrderInstertState _state = OrderInstertState.Insterted;
-        public Type _type = null;
-
-        public OrderInstert(ThostFtdcInputOrderField req, Type type)
-        {
-            _req = req;
-            _type = type;
-        }
-    }
-
-    public enum OrderInstertState : byte
-    {
-        Insterted = 0,
-        Canceling = 1,
-        Canceled = 2,
-        //PartTraded = 3,
-        //Traded = 4
-    }
-
-    public class OrderReturn
-    {
-        public ThostFtdcOrderField _pOrder = null;
-        public Type _type = null;
-
-        public OrderReturn(ThostFtdcOrderField pOrder, Type type)
-        {
-            _pOrder = pOrder;
-            _type = type;
-        }
+        public string OrderRef;
+        public int FrontID;
+        public int SessionID;
+        //public string ExchangeID;
+        //public string OrderSysID;
     }
 
     public class TraderAPI
     {
+        private System.Threading.Timer OrderTimer;
+
         public event OrderHandle OnTrading;
         public void Trading(ThostFtdcOrderField pOrder)
         {
@@ -80,7 +56,7 @@ namespace CTP
 
         public void ReqPosition(ThostFtdcInvestorPositionField position)
         {
-            if(onReqPosition != null)
+            if (onReqPosition != null)
             {
                 onReqPosition(position);
             }
@@ -104,12 +80,21 @@ namespace CTP
         public int SESSION_ID;	//会话编号
         public int ORDER_REF;	//报单引用（当前）
 
-        public List<OrderInstert> orderInstert = new List<OrderInstert>();
-        public List<OrderReturn> orderList = new List<OrderReturn>();
-        public List<OrderReturn> orderTraded = new List<OrderReturn>();
-        public List<OrderReturn> orderCanceled = new List<OrderReturn>();
-        public List<ThostFtdcTradeField> tradeList = new List<ThostFtdcTradeField>();
-        public ThostFtdcTradingAccountField accountInfo = null;
+        /// <summary>
+        /// 系统启动前今天的报单情况
+        /// </summary>
+        public Dictionary<OrderSignal, ThostFtdcOrderField> TodayTradingOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
+        public Dictionary<OrderSignal, ThostFtdcOrderField> TodayFinishedOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
+
+        /// <summary>
+        /// 系统启动后今天的报单情况
+        /// </summary>
+        public Dictionary<OrderSignal, ThostFtdcInputOrderField> InputOrderMap = new Dictionary<OrderSignal, ThostFtdcInputOrderField>();
+        public Dictionary<OrderSignal, ThostFtdcOrderField> TradingOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
+        public Dictionary<OrderSignal, ThostFtdcOrderField> FinishedOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
+        public Dictionary<OrderSignal, ThostFtdcInputOrderActionField> ActionOrderMap = new Dictionary<OrderSignal, ThostFtdcInputOrderActionField>();
+
+
         public List<ThostFtdcInvestorPositionField> positionList = new List<ThostFtdcInvestorPositionField>();
 
         public TraderAPI(string addr, string brokerID, string InvesterID, string password)
@@ -149,6 +134,7 @@ namespace CTP
             {
                 api.RegisterFront(FRONT_ADDR);
                 api.Init();
+                this.OrderTimer = new System.Threading.Timer(this.OrderManagerCallBack, null, 1000, 1000);
                 //ReqQryOrder();
                 //Thread.Sleep(1000);
                 //ReqQryTrade();
@@ -163,6 +149,56 @@ namespace CTP
             finally
             {
                 //Release();
+            }
+        }
+
+        List<OrderSignal> InputList = new List<OrderSignal>();
+        List<OrderSignal> ActionList = new List<OrderSignal>();
+        object InputLock = new object();
+        object ActionLock = new object();
+        /// <summary>
+        /// 订单管理器
+        /// </summary>
+        /// <param name="state"></param>
+        private void OrderManagerCallBack(object state)
+        {
+            lock (this)
+            {
+                //检查报单
+                foreach (OrderSignal os in InputList)
+                {
+                    if (this.InputOrderMap.ContainsKey(os))
+                    {
+                        //检查了两遍，重发
+                        this.ReReqOrderInsert(InputOrderMap[os]);
+                    }
+                }
+                InputList = new List<OrderSignal>();
+                lock (InputLock)
+                {
+                    foreach (OrderSignal os in InputOrderMap.Keys)
+                    {
+                        InputList.Add(os);
+                    }
+                }
+
+                //检查撤单
+                foreach (OrderSignal os in ActionList)
+                {
+                    if (this.ActionOrderMap.ContainsKey(os))
+                    {
+                        //检查了两遍，重发
+                        this.ReqOrderAction(ActionOrderMap[os]);
+                    }
+                }
+                ActionList = new List<OrderSignal>();
+                lock (ActionLock)
+                {
+                    foreach (OrderSignal os in ActionOrderMap.Keys)
+                    {
+                        ActionList.Add(os);
+                    }
+                }
             }
         }
 
@@ -222,7 +258,7 @@ namespace CTP
             {
                 ///请求查询合约
                 //ReqQryInstrument();
-                
+
                 g_logined = true;
             }
             if (bIsLast)
@@ -244,7 +280,7 @@ namespace CTP
                 //请求查询资金
                 //ReqQryTradingAccount();
             }
-            if(bIsLast)
+            if (bIsLast)
                 bCanReq = true;
         }
 
@@ -268,7 +304,6 @@ namespace CTP
             {
                 //请求查询投资者持仓
                 //ReqQryInvestorPosition();
-                accountInfo = pTradingAccount;
             }
             if (bIsLast)
             {
@@ -296,12 +331,12 @@ namespace CTP
         {
             positionList.Add(pInvestorPosition);
             if (bIsLast)
-            { 
+            {
                 bCanReq = true;
             }
         }
 
-        void ReqQryOrder()
+        public void ReqQryOrder()
         {
             //Thread.Sleep(1000);
             while (!bCanReq)
@@ -368,22 +403,23 @@ namespace CTP
                 //	TThostFtdcRequestIDType	RequestID;
                 ///用户强评标志: 否
                 req.UserForceClose = pOrder.UserForceClose;
-                OrderInstert order = new OrderInstert(req, StragetyType);
-                orderInstert.Add(order);
+                OrderSignal Signal = new OrderSignal();
+                Signal.OrderRef = req.OrderRef;
+                Signal.FrontID = pOrder.FrontID;
+                Signal.SessionID = pOrder.SessionID;
+                //Signal.ExchangeID = pOrder.ExchangeID;
+                //Signal.OrderSysID = pOrder.OrderSysID;
                 if (pOrder.OrderStatus == EnumOrderStatusType.Canceled)
                 {
-                    OrderReturn orderRtn = new OrderReturn(pOrder, StragetyType);
-                    orderCanceled.Add(orderRtn);
+                    TodayFinishedOrderMap.Add(Signal, pOrder);
                 }
                 else if (pOrder.OrderStatus == EnumOrderStatusType.AllTraded)
                 {
-                    OrderReturn orderRtn = new OrderReturn(pOrder, StragetyType);
-                    orderTraded.Add(orderRtn);
+                    TodayFinishedOrderMap.Add(Signal, pOrder);
                 }
                 else
                 {
-                    OrderReturn orderRtn = new OrderReturn(pOrder, StragetyType);
-                    orderList.Add(orderRtn);
+                    TodayTradingOrderMap.Add(Signal, pOrder);
                 }
             }
             if (bIsLast)
@@ -413,12 +449,22 @@ namespace CTP
         {
             if (!IsErrorRspInfo(pRspInfo) && pTrade != null)
             {
-                tradeList.Add(pTrade);
             }
             if (bIsLast)
             {
                 bCanReq = true;
             }
+        }
+
+        /// <summary>
+        /// 重发
+        /// </summary>
+        /// <param name="req"></param>
+        private void ReReqOrderInsert(ThostFtdcInputOrderField req)
+        {
+            api.ReqOrderInsert(req, ++iRequestID);
+            //DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + req.OrderRef);
         }
 
         private string ReqOrderInsert(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
@@ -473,8 +519,19 @@ namespace CTP
             int iResult = api.ReqOrderInsert(req, ++iRequestID);
             StackTrace trace = new StackTrace();
             Type StragetyType = trace.GetFrame(2).GetMethod().ReflectedType;
-            OrderInstert order = new OrderInstert(req, StragetyType);
-            orderInstert.Add(order);
+            OrderSignal Signal = new OrderSignal();
+            Signal.FrontID = FRONT_ID;
+            Signal.OrderRef = req.OrderRef;
+            Signal.SessionID = SESSION_ID;
+            if (!InputOrderMap.ContainsKey(Signal))
+            {
+                lock (InputLock)
+                {
+                    InputOrderMap.Add(Signal, req);
+                }
+            }
+            //DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + ORDER_REF.ToString());
             return req.OrderRef;
         }
 
@@ -484,79 +541,43 @@ namespace CTP
             IsErrorRspInfo(pRspInfo);
         }
 
-        public int ReqOrderAction(string InstrumentID, string OrderRef)
+        object TradingLock = new object();
+        public void ReqOrderActionAll()
         {
-            ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
-            ///经纪公司代码
-            req.BrokerID = this.BROKER_ID;
-            ///投资者代码
-            req.InvestorID = this.INVESTOR_ID;
-            ///报单操作引用
-            //	TThostFtdcOrderActionRefType	OrderActionRef;
-            ///报单引用
-            req.OrderRef = OrderRef;
-            ///请求编号
-            //	TThostFtdcRequestIDType	RequestID;
-            ///前置编号
-            req.FrontID = FRONT_ID;
-            ///会话编号
-            req.SessionID = SESSION_ID;
-            ///交易所代码
-            //	TThostFtdcExchangeIDType	ExchangeID;
-            ///报单编号
-            //	TThostFtdcOrderSysIDType	OrderSysID;
-            ///操作标志
-            req.ActionFlag = CTP.EnumActionFlagType.Delete;
-            ///价格
-            //	TThostFtdcPriceType	LimitPrice;
-            ///数量变化
-            //	TThostFtdcVolumeType	VolumeChange;
-            ///用户代码
-            //	TThostFtdcUserIDType	UserID;
-            ///合约代码
-            req.InstrumentID = InstrumentID;
-            int iResult = api.ReqOrderAction(req, ++iRequestID);
-            return iResult;
+            //foreach (OrderSignal signal in InputOrderMap.Keys)
+            //{
+            //    if (TradingOrderMap.ContainsKey(signal))
+            //    {
+            //        ReqOrderAction(TradingOrderMap[signal]);
+            //    }
+            //}
+            lock (TradingLock)
+            {
+                foreach (OrderSignal signal in TradingOrderMap.Keys)
+                {
+                    ReqOrderAction(TradingOrderMap[signal]);
+                }
+            }
         }
 
         public int ReqOrderAction(ThostFtdcInputOrderActionField pInputOrderAction)
         {
-            ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
-            ///操作标志
-            req.ActionFlag = CTP.EnumActionFlagType.Delete;
-            ///经纪公司代码
-            req.BrokerID = pInputOrderAction.BrokerID;
-            ///交易所代码
-            //	TThostFtdcExchangeIDType	ExchangeID;
-            req.ExchangeID = pInputOrderAction.ExchangeID;
-            ///前置编号
-            req.FrontID = pInputOrderAction.FrontID;
-            ///合约代码
-            req.InstrumentID = pInputOrderAction.InstrumentID;
-            ///投资者代码
-            req.InvestorID = pInputOrderAction.InvestorID;
-            ///报单操作引用
-            //req.OrderActionRef = pInputOrderAction.OrderActionRef;
-            ///报单引用
-            req.OrderRef = pInputOrderAction.OrderRef;
-            ///报单编号
-            //	TThostFtdcOrderSysIDType	OrderSysID;
-            req.OrderSysID = pInputOrderAction.OrderSysID;
-            ///请求编号
-            //	TThostFtdcRequestIDType	RequestID;
-            //req.RequestID = pInputOrderAction.RequestID;
-            ///会话编号
-            req.SessionID = pInputOrderAction.SessionID;
-            ///用户代码
-            //	TThostFtdcUserIDType	UserID;
-            req.UserID = pInputOrderAction.UserID;
+            int iResult = 0;
+            //ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
+            OrderSignal Signal = new OrderSignal();
+            Signal.FrontID = pInputOrderAction.FrontID;
+            Signal.OrderRef = pInputOrderAction.OrderRef;
+            Signal.SessionID = pInputOrderAction.SessionID;
+            //Signal.ExchangeID = pInputOrderAction.ExchangeID;
+            //Signal.OrderSysID = pInputOrderAction.OrderSysID;
+            iResult = api.ReqOrderAction(pInputOrderAction, ++iRequestID);
+            //DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + pInputOrderAction.OrderRef);
 
             ///价格
             //	TThostFtdcPriceType	LimitPrice;
             ///数量变化
             //	TThostFtdcVolumeType	VolumeChange;            
-
-            int iResult = api.ReqOrderAction(req, ++iRequestID);
             return iResult;
             //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             //GUIRefresh.UpdateListBox2("--->>> 报单录入请求: " + ((iResult == 0) ? "成功" : "失败"));
@@ -592,13 +613,27 @@ namespace CTP
             //	TThostFtdcUserIDType	UserID;
             req.UserID = pOrder.UserID;
 
-
             ///价格
             //	TThostFtdcPriceType	LimitPrice;
             ///数量变化
             //	TThostFtdcVolumeType	VolumeChange;
 
             int iResult = api.ReqOrderAction(req, ++iRequestID);
+            OrderSignal Signal = new OrderSignal();
+            Signal.FrontID = pOrder.FrontID;
+            Signal.OrderRef = pOrder.OrderRef;
+            Signal.SessionID = pOrder.SessionID;
+            //Signal.ExchangeID = pOrder.ExchangeID;
+            //Signal.OrderSysID = pOrder.OrderSysID;
+            if (!ActionOrderMap.ContainsKey(Signal))
+            {
+                lock (ActionLock)
+                {
+                    ActionOrderMap.Add(Signal, req);
+                }
+            }
+            //DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + req.OrderRef);
             //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             //GUIRefresh.UpdateListBox2("--->>> 撤单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             return iResult;
@@ -622,41 +657,132 @@ namespace CTP
         /// <param name="bIsLast"></param>
         public void OnRspOrderAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
+            //DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRspOrderAction" + "," + pInputOrderAction.OrderRef + "," + pRspInfo.ErrorMsg);
             if (IsErrorRspInfo(pRspInfo))
             {
             }
             if (bIsLast && IsErrorRspInfo(pRspInfo))
             {
                 CancelAction(pInputOrderAction, pRspInfo);
-                ////撤单失败
-                //if (pRspInfo.ErrorID == 26 || pRspInfo.ErrorID == 25 || pRspInfo.ErrorID == 24)
-                //{
-                    
-                //}
             }
         }
 
         ///报单通知
         void OnRtnOrder(ThostFtdcOrderField pOrder)
         {
-            if (IsMyOrder(pOrder))
+            //DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRtnOrder" + "," + pOrder.OrderRef + "," + pOrder.OrderStatus + "," + pOrder.StatusMsg);
+            CurrentOrder = pOrder;
+            if (IsTradingOrder(pOrder))
             {
-                CurrentOrder = pOrder;
-                if (IsTradingOrder(pOrder))
+                if (IsMyOrder(pOrder))
                 {
-                    Trading(pOrder);
+                    if (pOrder.ExchangeID != null && pOrder.ExchangeID != "" && pOrder.OrderSysID != null && pOrder.OrderSysID != "")
+                    {
+                        if (pOrder.OrderStatus != EnumOrderStatusType.Unknown)
+                        {
+                            OrderSignal Signal = new OrderSignal();
+                            Signal.FrontID = pOrder.FrontID;
+                            Signal.OrderRef = pOrder.OrderRef;
+                            Signal.SessionID = pOrder.SessionID;
+                            lock (TradingLock)
+                            {
+                                if (TradingOrderMap.ContainsKey(Signal))
+                                {
+                                    TradingOrderMap[Signal] = pOrder;
+                                }
+                                else
+                                {
+                                    TradingOrderMap.Add(Signal, pOrder);
+                                }
+                            }
+                            lock (InputLock)
+                            {
+                                InputOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                            }
+                        }
+                    }
                 }
-                else if (pOrder.OrderStatus == EnumOrderStatusType.Canceled)
-                {
-                    Canceled(pOrder);
-                }
-                else if (pOrder.OrderStatus == EnumOrderStatusType.AllTraded)
-                {
-                    Traded(pOrder);
-                }
-                else if (pOrder.OrderStatus == EnumOrderStatusType.PartTradedNotQueueing)
-                {
 
+                Trading(pOrder);
+            }
+            else if (pOrder.OrderStatus == EnumOrderStatusType.Canceled)
+            {
+                if (IsMyOrder(pOrder))
+                {
+                    OrderSignal Signal = new OrderSignal();
+                    Signal.FrontID = pOrder.FrontID;
+                    Signal.OrderRef = pOrder.OrderRef;
+                    Signal.SessionID = pOrder.SessionID;
+                    TradingOrderMap.Remove(Signal);
+                    if (FinishedOrderMap.ContainsKey(Signal))
+                    {
+                        FinishedOrderMap[Signal] = pOrder;
+                    }
+                    else
+                    {
+                        FinishedOrderMap.Add(Signal, pOrder);
+                    }
+                    lock (InputLock)
+                    {
+                        if (ActionOrderMap.ContainsKey(Signal) && InputOrderMap.ContainsKey(Signal))
+                        {
+                            InputOrderMap.Remove(Signal);
+                        }
+                    }
+                    lock (ActionLock)
+                    {
+                        if (ActionOrderMap.ContainsKey(Signal))
+                        {
+                            ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                        }
+                    }
+                }
+
+                Canceled(pOrder);
+            }
+            else if (pOrder.OrderStatus == EnumOrderStatusType.AllTraded)
+            {
+                if (IsMyOrder(pOrder))
+                {
+                    OrderSignal Signal = new OrderSignal();
+                    Signal.FrontID = pOrder.FrontID;
+                    Signal.OrderRef = pOrder.OrderRef;
+                    Signal.SessionID = pOrder.SessionID;
+                    lock (TradingLock)
+                    {
+                        TradingOrderMap.Remove(Signal);
+                    }
+                    FinishedOrderMap.Add(Signal, pOrder);
+                    lock (ActionLock)
+                    {
+                        if (ActionOrderMap.ContainsKey(Signal))
+                        {
+                            ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                        }
+                    }
+                }
+
+                Traded(pOrder);
+            }
+            else if (pOrder.OrderStatus == EnumOrderStatusType.PartTradedNotQueueing)
+            {
+                OrderSignal Signal = new OrderSignal();
+                Signal.FrontID = pOrder.FrontID;
+                Signal.OrderRef = pOrder.OrderRef;
+                Signal.SessionID = pOrder.SessionID;
+                lock (TradingLock)
+                {
+                    TradingOrderMap.Remove(Signal);
+                }
+                FinishedOrderMap.Add(Signal, pOrder);
+                lock (ActionLock)
+                {
+                    if (ActionOrderMap.ContainsKey(Signal))
+                    {
+                        ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                    }
                 }
             }
         }
@@ -671,7 +797,7 @@ namespace CTP
         {
             if (IsMyTrade(CurrentOrder, pTrade))
             {
-                tradeList.Add(pTrade);
+                //tradeList.Add(pTrade);
             }
         }
 
@@ -687,6 +813,8 @@ namespace CTP
 
         void OnRspError(ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
+            //DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRspError" + "," + pRspInfo.ErrorMsg);
             IsErrorRspInfo(pRspInfo);
         }
 
@@ -703,8 +831,7 @@ namespace CTP
 
         public bool IsMyOrder(ThostFtdcOrderField pOrder)
         {
-            //return ((pOrder.FrontID == FRONT_ID) && (pOrder.SessionID == SESSION_ID));
-            return true;
+            return ((pOrder.FrontID == FRONT_ID) && (pOrder.SessionID == SESSION_ID));
         }
 
         public bool IsMyTrade(ThostFtdcOrderField pOrder, ThostFtdcTradeField pTrade)
@@ -790,7 +917,7 @@ namespace CTP
         /// </summary>
         /// <param name="order"></param>
         /// <returns>-1--无效报单，0--下撤单指令成功，1--下撤单指令失败</returns>
-        public int CancelOrder(ThostFtdcOrderField order)  
+        public int CancelOrder(ThostFtdcOrderField order)
         {
             if (order == null)
             {
