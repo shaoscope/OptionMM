@@ -300,17 +300,18 @@ namespace OptionMM
                 updateDateTime = updateDateTime.AddSeconds(double.Parse(updateDateTimeString[2]));
                 if ((updateDateTime - lastUpdateDateTime).TotalSeconds > this.ReplaceOrderDuration)
                 {
-                    this.lastUpdateDateTime = updateDateTime;
                     //撤单
                     this.CancelOrder();
                     //计算报价
-                    double []quote = this.CalculateQuote();
+                    double[] quote = this.CalculateQuote();
                     if (isRunning)
                     {
+                        this.lastUpdateDateTime = updateDateTime;
                         this.PlaceOrder(quote);
                     }
                     else if(hasForQuote)
                     {
+                        this.lastUpdateDateTime = updateDateTime;
                         hasForQuote = false;
                         this.PlaceOrder(quote);
                     }

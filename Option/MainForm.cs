@@ -88,7 +88,7 @@ namespace OptionMM
         /// <param name="state"></param>
         private void recordVolatilityCallBack(object state)
         {
-            StreamWriter fileWriter = new StreamWriter("VolatilityRecord//" + System.DateTime.Now.Month + "-" + System.DateTime.Now.Day + "-" + System.DateTime.Now.Hour + "-" + System.DateTime.Now.Minute + ".csv");
+            StreamWriter fileWriter = new StreamWriter("C://Users//user//Desktop//VolatilityRecord//" + System.DateTime.Now.Month + "-" + System.DateTime.Now.Day + "-" + System.DateTime.Now.Hour + "-" + System.DateTime.Now.Minute + ".csv");
             foreach (DataGridViewRow dataRow in MainForm.instance.optionPanel.dataTable.Rows)
             {
                 Strategy strategy = (Strategy)dataRow.Tag;
@@ -186,6 +186,7 @@ namespace OptionMM
                 {
                     Strategy strategy = (Strategy)dataRow.Tag;
                     strategy.Start();
+                    Thread.Sleep(300);
                 }
                 areAllRunning = true;
                 this.startAllButton.Text = "全部停止";
@@ -196,6 +197,7 @@ namespace OptionMM
                 {
                     Strategy strategy = (Strategy)dataRow.Tag;
                     strategy.Stop();
+                    Thread.Sleep(300);
                 }
                 areAllRunning = false;
                 this.startAllButton.Text = "全部启动";
