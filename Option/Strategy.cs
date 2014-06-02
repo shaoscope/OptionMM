@@ -34,7 +34,24 @@ namespace OptionMM
             set { this.future = value; }
         }
 
+        /// <summary>
+        /// 上一次下单时间
+        /// </summary>
         private DateTime lastUpdateDateTime = new DateTime();
+
+        /// <summary>
+        /// 是否是做市合约
+        /// </summary>
+        private bool isMarketMakingContract = false;
+
+        /// <summary>
+        /// 获取或者设置本合约是否是做市合约
+        /// </summary>
+        public bool IsMarketMakingContract
+        {
+            get { return this.isMarketMakingContract; }
+            set { this.isMarketMakingContract = value; }
+        }
 
         public Strategy()
         {

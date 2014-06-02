@@ -61,6 +61,7 @@ namespace OptionMM
                 strategy.Option.StrikePrice = double.Parse(strTemp[2]);
                 strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
                 strategy.Future.InstrumentID = configValues[instrumentID][0];
+                strategy.IsMarketMakingContract = bool.Parse(configValues[instrumentID][1]);
                 //加入仓位信息
                 foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
                 {
@@ -141,7 +142,7 @@ namespace OptionMM
                     if ((xmlRder.Name == "Option") && (xmlRder.HasAttributes))
                     {
                         string strID = null;
-                        string[] Property = new string[1];
+                        string[] Property = new string[2];
                         for (int i = 0; i < xmlRder.AttributeCount; i++)
                         {
                             xmlRder.MoveToAttribute(i);
@@ -152,6 +153,10 @@ namespace OptionMM
                             else if (xmlRder.Name == "标的物")
                             {
                                 Property[0] = xmlRder.Value;
+                            }
+                            else if(xmlRder.Name == "做市合约")
+                            {
+                                Property[1] = xmlRder.Value;
                             }
                         }
                         configValues.Add(strID, Property);
