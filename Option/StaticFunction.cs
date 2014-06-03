@@ -62,19 +62,20 @@ namespace OptionMM
         public static double CalculateImpliedVolatility(double underlyingPrice, double strikePrice, int daysToMaturity, double interestRate, double marketPrice, OptionTypeEnum optionType)
         {
             double lower = 0;
-            double upper = 1;
+            double upper = 10;
             double impliedPrice = 0;
             double impliedVolatility = 0;
+            int a = 0;
             while (Math.Abs(marketPrice - impliedPrice) > 0.05)
             {
-                //if (optionType == OptionTypeEnum.put && strikePrice == 2400)
-                //{
-                //    int a = 0;
-                //}
                 impliedVolatility = (lower + upper) / 2;
                 OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(optionType,
                     underlyingPrice, strikePrice, interestRate, impliedVolatility, daysToMaturity);
                 OptionValue optionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
+                if (optionValue.Price == impliedPrice || ++a > 20)
+                {
+                    break;
+                }
                 impliedPrice = optionValue.Price;
                 if(impliedPrice >= marketPrice)
                 {

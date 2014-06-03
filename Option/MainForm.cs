@@ -74,16 +74,14 @@ namespace OptionMM
                         strategy.Option.shortPosition = position;
                     }
                 }
-                //Thread.Sleep(300);
                 strategy.Configuration();
                 //插入策略
-                if (strategy.IsMarketMakingContract)
-                {
-                    this.optionPanel.AddStrategy(strategy);
-                }
-                //this.optionPanel.AddStrategy(strategy);
+                //if (strategy.IsMarketMakingContract)
+                //{
+                //    this.optionPanel.AddStrategy(strategy);
+                //}
+                this.optionPanel.AddStrategy(strategy);
             }
-
             this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 10 * 1000);
             this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
         }
@@ -94,7 +92,9 @@ namespace OptionMM
         /// <param name="state"></param>
         private void recordVolatilityCallBack(object state)
         {
-            StreamWriter fileWriter = new StreamWriter("C://Users//user//Desktop//VolatilityRecord//" + System.DateTime.Now.Month + "-" + System.DateTime.Now.Day + "-" + System.DateTime.Now.Hour + "-" + System.DateTime.Now.Minute + ".csv");
+            StreamWriter fileWriter = new StreamWriter("C://Users//user//Desktop//VolatilityRecord//" + 
+                System.DateTime.Now.Month + "-" + System.DateTime.Now.Day + "-" + System.DateTime.Now.Hour + "-" + 
+                System.DateTime.Now.Minute + ".csv");
             foreach (DataGridViewRow dataRow in MainForm.instance.optionPanel.dataTable.Rows)
             {
                 Strategy strategy = (Strategy)dataRow.Tag;

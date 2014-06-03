@@ -67,7 +67,7 @@ namespace OptionMM
         /// </summary>
         public void Configuration()
         {
-            MDManager.MD.SubscribeMarketData(new string[] { this.option.InstrumentID, this.future.InstrumentID });
+            MDManager.MD.SubscribeMarketData(new string[] { this.future.InstrumentID, this.option.InstrumentID });
             MDManager.MD.OnTick += MD_OnTick;
             MDManager.MD.OnForQuote += MD_OnForQuote;
             TDManager.TD.OnCanceled += TD_OnCanceled;
@@ -315,7 +315,7 @@ namespace OptionMM
             {
                 this.option.LastMarket = md;
                 ////计算隐含波动率
-                if (this.future.LastMarket != null)
+                if (this.future.LastMarket != null && this.isMarketMakingContract)
                 {
                     this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.future.LastMarket.LastPrice, this.option.StrikePrice,
                         StaticFunction.GetDaysToMaturity(this.option.InstrumentID), GlobalValues.InterestRate, md.LastPrice, this.option.OptionType);
