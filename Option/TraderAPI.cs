@@ -143,7 +143,7 @@ namespace CTP
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+
             }
             finally
             {
@@ -462,8 +462,6 @@ namespace CTP
         private void ReReqOrderInsert(ThostFtdcInputOrderField req)
         {
             api.ReqOrderInsert(req, ++iRequestID);
-            //DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + req.OrderRef);
         }
 
         private string ReqOrderInsert(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
@@ -529,8 +527,6 @@ namespace CTP
                     InputOrderMap.Add(Signal, req);
                 }
             }
-            //DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + ORDER_REF.ToString());
             return req.OrderRef;
         }
 
@@ -570,8 +566,6 @@ namespace CTP
             //Signal.ExchangeID = pInputOrderAction.ExchangeID;
             //Signal.OrderSysID = pInputOrderAction.OrderSysID;
             iResult = api.ReqOrderAction(pInputOrderAction, ++iRequestID);
-            //DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + pInputOrderAction.OrderRef);
 
             ///价格
             //	TThostFtdcPriceType	LimitPrice;
@@ -624,15 +618,20 @@ namespace CTP
             Signal.SessionID = pOrder.SessionID;
             //Signal.ExchangeID = pOrder.ExchangeID;
             //Signal.OrderSysID = pOrder.OrderSysID;
-            if (!ActionOrderMap.ContainsKey(Signal))
+            lock (ActionLock)
             {
-                lock (ActionLock)
+                if (!ActionOrderMap.ContainsKey(Signal))
                 {
                     ActionOrderMap.Add(Signal, req);
                 }
             }
-            //DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + req.OrderRef);
+            lock (InputLock)
+            {
+                if (InputOrderMap.ContainsKey(Signal))
+                {
+                    InputOrderMap.Remove(Signal);
+                }
+            }
             //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             //GUIRefresh.UpdateListBox2("--->>> 撤单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             return iResult;
@@ -656,8 +655,6 @@ namespace CTP
         /// <param name="bIsLast"></param>
         public void OnRspOrderAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
-            //DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRspOrderAction" + "," + pInputOrderAction.OrderRef + "," + pRspInfo.ErrorMsg);
             if (IsErrorRspInfo(pRspInfo))
             {
             }
@@ -670,8 +667,6 @@ namespace CTP
         ///报单通知
         void OnRtnOrder(ThostFtdcOrderField pOrder)
         {
-            //DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRtnOrder" + "," + pOrder.OrderRef + "," + pOrder.OrderStatus + "," + pOrder.StatusMsg);
             CurrentOrder = pOrder;
             if (IsTradingOrder(pOrder))
             {
@@ -723,13 +718,6 @@ namespace CTP
                     {
                         FinishedOrderMap.Add(Signal, pOrder);
                     }
-                    lock (InputLock)
-                    {
-                        if (ActionOrderMap.ContainsKey(Signal) && InputOrderMap.ContainsKey(Signal))
-                        {
-                            InputOrderMap.Remove(Signal);
-                        }
-                    }
                     lock (ActionLock)
                     {
                         if (ActionOrderMap.ContainsKey(Signal))
@@ -753,12 +741,26 @@ namespace CTP
                     {
                         TradingOrderMap.Remove(Signal);
                     }
-                    FinishedOrderMap.Add(Signal, pOrder);
+                    if (FinishedOrderMap.ContainsKey(Signal))
+                    {
+                        FinishedOrderMap[Signal] = pOrder;
+                    }
+                    else
+                    {
+                        FinishedOrderMap.Add(Signal, pOrder);
+                    }
                     lock (ActionLock)
                     {
                         if (ActionOrderMap.ContainsKey(Signal))
                         {
                             ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                        }
+                    }
+                    lock (InputLock)
+                    {
+                        if (InputOrderMap.ContainsKey(Signal))
+                        {
+                            InputOrderMap.Remove(Signal);
                         }
                     }
                 }
@@ -812,8 +814,6 @@ namespace CTP
 
         void OnRspError(ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
-            //DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRspError" + "," + pRspInfo.ErrorMsg);
             IsErrorRspInfo(pRspInfo);
         }
 
