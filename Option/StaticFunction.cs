@@ -63,21 +63,14 @@ namespace OptionMM
         {
             double lower = 0;
             double upper = 10;
-            double impliedPrice = 0;
             double impliedVolatility = 0;
-            int a = 0;
-            while (Math.Abs(marketPrice - impliedPrice) > 0.05)
+            while (Math.Abs(upper - lower) > 0.0005)
             {
                 impliedVolatility = (lower + upper) / 2;
                 OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(optionType,
                     underlyingPrice, strikePrice, interestRate, impliedVolatility, daysToMaturity);
                 OptionValue optionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
-                if (optionValue.Price == impliedPrice || ++a > 20)
-                {
-                    break;
-                }
-                impliedPrice = optionValue.Price;
-                if(impliedPrice >= marketPrice)
+                if (optionValue.Price >= marketPrice)
                 {
                     upper = impliedVolatility;
                 }
