@@ -11,11 +11,8 @@
   <Option InstrumentID = "IO1406-C-2300" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="1"/>
   <Option InstrumentID = "IO1406-C-2350" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-C-2400" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1406-C-2450" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-C-2500" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1406-C-2550" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-C-2600" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1406-C-2650" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-C-2700" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
 
   <Option InstrumentID = "IO1406-P-1900" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
@@ -29,32 +26,29 @@
   <Option InstrumentID = "IO1406-P-2300" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="1"/>
   <Option InstrumentID = "IO1406-P-2350" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-P-2400" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1406-P-2450" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-P-2500" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1406-P-2550" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-P-2600" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1406-P-2650" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
   <Option InstrumentID = "IO1406-P-2700" 标的物 = "IF1406" 当月合约 = "1" 做市合约 ="0"/>
 
 
   <Option InstrumentID = "IO1407-C-1950" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1407-C-2000" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-C-2050" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-C-2100" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-C-2150" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-C-2200" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-C-2250" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-C-2300" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
+  <Option InstrumentID = "IO1407-C-2000" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-C-2050" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-C-2100" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-C-2150" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-C-2200" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-C-2250" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-C-2300" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
   <Option InstrumentID = "IO1407-C-2350" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
 
   <Option InstrumentID = "IO1407-P-1950" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
-  <Option InstrumentID = "IO1407-P-2000" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-P-2050" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-P-2100" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-P-2150" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-P-2200" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-P-2250" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1407-P-2300" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
+  <Option InstrumentID = "IO1407-P-2000" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-P-2050" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-P-2100" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-P-2150" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-P-2200" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-P-2250" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
+  <Option InstrumentID = "IO1407-P-2300" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
   <Option InstrumentID = "IO1407-P-2350" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
 
 
@@ -66,7 +60,6 @@
   <Option InstrumentID = "IO1408-C-2200" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
   <Option InstrumentID = "IO1408-C-2250" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
   <Option InstrumentID = "IO1408-C-2300" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1408-C-2350" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
 
   <Option InstrumentID = "IO1408-P-1950" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
   <Option InstrumentID = "IO1408-P-2000" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
@@ -76,5 +69,4 @@
   <Option InstrumentID = "IO1408-P-2200" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
   <Option InstrumentID = "IO1408-P-2250" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
   <Option InstrumentID = "IO1408-P-2300" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="1"/>
-  <Option InstrumentID = "IO1408-P-2350" 标的物 = "IF1406" 当月合约 = "0" 做市合约 ="0"/>
 </root>

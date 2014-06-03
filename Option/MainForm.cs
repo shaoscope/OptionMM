@@ -61,7 +61,7 @@ namespace OptionMM
                 strategy.Option.StrikePrice = double.Parse(strTemp[2]);
                 strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
                 strategy.Future.InstrumentID = configValues[instrumentID][0];
-                strategy.IsMarketMakingContract = bool.Parse(configValues[instrumentID][1]);
+                strategy.IsMarketMakingContract = configValues[instrumentID][1] == "1" ? true : false;
                 //加入仓位信息
                 foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
                 {
@@ -74,8 +74,13 @@ namespace OptionMM
                         strategy.Option.shortPosition = position;
                     }
                 }
+                //Thread.Sleep(300);
                 strategy.Configuration();
                 //插入策略
+                //if (strategy.IsMarketMakingContract)
+                //{
+                //    this.optionPanel.AddStrategy(strategy);
+                //}
                 this.optionPanel.AddStrategy(strategy);
             }
 
@@ -119,7 +124,10 @@ namespace OptionMM
             this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)positionHedge.FutureHedgeVolume["IF1406"];
         }
 
-
+        /// <summary>
+        /// 读取XML并初始化面板
+        /// </summary>
+        /// <param name="strFile"></param>
         private void InitFromXML(string strFile)
         {
             
@@ -191,7 +199,7 @@ namespace OptionMM
                 {
                     Strategy strategy = (Strategy)dataRow.Tag;
                     strategy.Start();
-                    Thread.Sleep(300);
+                    //Thread.Sleep(300);
                 }
                 areAllRunning = true;
                 this.startAllButton.Text = "全部停止";
@@ -202,7 +210,7 @@ namespace OptionMM
                 {
                     Strategy strategy = (Strategy)dataRow.Tag;
                     strategy.Stop();
-                    Thread.Sleep(300);
+                    //Thread.Sleep(300);
                 }
                 areAllRunning = false;
                 this.startAllButton.Text = "全部启动";

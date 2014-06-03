@@ -23,7 +23,7 @@ namespace OptionMM
         public static readonly double Volatility = 0.30;
 
         //到期天数
-        public static readonly int[] DaysToMaturity = { 15, 35, 55 };
+        public static readonly int[] DaysToMaturity = { 14, 34, 54 };
 
         //test
         //test

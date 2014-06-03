@@ -68,7 +68,23 @@ namespace OptionMM
             cells[7].Value = strategy.Option.shortPosition != null ? strategy.Option.shortPosition.Position : 0;
             cells[8].Value = strategy.Option.ImpliedVolatility;
             cells[9].Value = strategy.Option.OptionValue.Delta;
-            cells[10].Value = "停止";
+            string runningStatus = "";
+            if (strategy.IsMarketMakingContract)
+            {
+                if (strategy.IsRunning)
+                {
+                    runningStatus = "正在运行";
+                }
+                else
+                {
+                    runningStatus = "停止";
+                }
+            }
+            else
+            {
+                runningStatus = "非做市合约";
+            }
+            cells[10].Value = runningStatus;
             this.dataTable.Rows.Add(strategy);
         }
 

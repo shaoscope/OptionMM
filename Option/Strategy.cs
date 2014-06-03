@@ -44,6 +44,8 @@ namespace OptionMM
         /// </summary>
         private bool isMarketMakingContract = false;
 
+        private System.Threading.Timer panelRefreshTimer;
+
         /// <summary>
         /// 获取或者设置本合约是否是做市合约
         /// </summary>
@@ -72,8 +74,8 @@ namespace OptionMM
             TDManager.TD.OnTraded += TD_OnTraded;
             TDManager.TD.OnTrading += TD_OnTrading;
             TDManager.TD.OnCancelAction += TD_OnCancelAction;
-            ////刷新面板定时器
-            //this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
+            //刷新面板定时器
+            this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
         }
 
         private void TD_OnCancelAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo)
@@ -135,7 +137,11 @@ namespace OptionMM
         public void Start()
         {
             //启动策略
-            isRunning = true;
+            if (this.isMarketMakingContract)
+            {
+                Thread.Sleep(300);
+                isRunning = true;
+            }
         }
 
         /// <summary>
@@ -268,6 +274,10 @@ namespace OptionMM
             }
         }
 
+        /// <summary>
+        /// 询价行情到来时的响应
+        /// </summary>
+        /// <param name="pForQuoteRsp"></param>
         private void MD_OnForQuote(ThostFtdcForQuoteRspField pForQuoteRsp)
         {
             if (this.option.InstrumentID == pForQuoteRsp.InstrumentID)
@@ -297,14 +307,14 @@ namespace OptionMM
                 this.future.LastMarket = md;
                 //计算期权理论价格
                 OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
-                    this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility, 
+                    this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility,
                     StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
                 this.option.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
             }
             else if (this.option.InstrumentID == md.InstrumentID)
             {
                 this.option.LastMarket = md;
-                //计算隐含波动率
+                ////计算隐含波动率
                 if (this.future.LastMarket != null)
                 {
                     this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.future.LastMarket.LastPrice, this.option.StrikePrice,
@@ -321,20 +331,19 @@ namespace OptionMM
                     this.CancelOrder();
                     //计算报价
                     double[] quote = this.CalculateQuote();
-                    if (isRunning)
-                    {
-                        this.lastUpdateDateTime = updateDateTime;
-                        this.PlaceOrder(quote);
-                    }
-                    else if(hasForQuote)
-                    {
-                        this.lastUpdateDateTime = updateDateTime;
-                        hasForQuote = false;
-                        this.PlaceOrder(quote);
-                    }
+                    //if (isRunning)
+                    //{
+                    //    this.lastUpdateDateTime = updateDateTime;
+                    //    this.PlaceOrder(quote);
+                    //}
+                    //else if (hasForQuote)
+                    //{
+                    //    this.lastUpdateDateTime = updateDateTime;
+                    //    hasForQuote = false;
+                    //    this.PlaceOrder(quote);
+                    //}
                 }
             }
-            this.panelRefreshCallback(null);
         }
 
         /// <summary>
@@ -416,7 +425,10 @@ namespace OptionMM
             #endregion
 
             #region 计算报单价格--隐含波动率计算法
+            if (this.option.InstrumentID.Contains("1406"))
+            {
 
+            }
             #endregion
 
             this.option.MMQuotation.BidQuote = bidQuote;
@@ -424,6 +436,36 @@ namespace OptionMM
             quote[0] = bidQuote;
             quote[1] = askQuote;
             return quote;
+        }
+
+
+        private double get1406CallImpliedVolatility(double strikePrice)
+        {
+            return 0.0025 * strikePrice * strikePrice - 0.0259 * strikePrice + 0.3402;
+        }
+
+        private double get1406PutImpliedVolatility(double strikePrice)
+        {
+            return 0.0014 * strikePrice * strikePrice - 0.016 * strikePrice + 0.3013;
+        }
+
+        private double get1407CallImpliedVolatility(double strikePrice)
+        {
+            return 0.0013 * strikePrice * strikePrice - 0.0084 * strikePrice + 0.2909;
+        }
+
+        private double get1407PutImpliedVolatility(double strikePrice)
+        {
+            return 0.001 * strikePrice * strikePrice - 0.0069 * strikePrice + 0.2912;
+        }
+        private double get1408CallImpliedVolatility(double strikePrice)
+        {
+            return -0.001 * strikePrice * strikePrice - 0.0048 * strikePrice + 0.2831;
+        }
+
+        private double get1408PutImpliedVolatility(double strikePrice)
+        {
+            return -0.0015 * strikePrice * strikePrice - 0.0115 * strikePrice + 0.2517;
         }
 
         /// <summary>
@@ -552,7 +594,23 @@ namespace OptionMM
             this.Cells["cShortVolume"].Value = this.option.shortPosition.Position;
             this.Cells["cImpliedVolatility"].Value = this.option.ImpliedVolatility;
             this.Cells["cDelta"].Value = this.option.OptionValue.Delta;
-            this.Cells["cRunningStatus"].Value = this.isRunning == true ? "正在运行" : "停止";
+            string runningStatus = "";
+            if(this.isMarketMakingContract)
+            {
+                if(this.isRunning)
+                {
+                    runningStatus = "正在运行";
+                }
+                else
+                {
+                    runningStatus = "停止";
+                }
+            }
+            else
+            {
+                runningStatus = "非做市合约";
+            }
+            this.Cells["cRunningStatus"].Value = runningStatus;
         }
 
         /// <summary>
@@ -562,16 +620,27 @@ namespace OptionMM
         {
             this.isRunning = false;
             this.panelRefreshCallback(null);
+            Thread.Sleep(300);
             //MDManager.MD.OnTick -= MD_OnTick;
             //TDManager.TD.OnCanceled -= TD_OnCanceled;
             //TDManager.TD.OnTraded -= TD_OnTraded;
             //TDManager.TD.OnTrading -= TD_OnTrading;
         }
 
-
+        /// <summary>
+        /// 重写ToString函数
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
-            return this.option.InstrumentID + "," + this.option.LastMarket.LastPrice + "," + this.option.ImpliedVolatility + "," + this.option.OptionValue.Delta;
+            if(this.option.LastMarket == null)
+            {
+                return "";
+            }
+            else
+            {
+                return this.option.InstrumentID + "," + this.option.LastMarket.LastPrice + "," + this.option.ImpliedVolatility + "," + this.option.OptionValue.Delta;
+            }
         }
     }//class
 }
