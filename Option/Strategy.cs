@@ -331,17 +331,17 @@ namespace OptionMM
                     this.CancelOrder();
                     //计算报价
                     double[] quote = this.CalculateQuote();
-                    //if (isRunning)
-                    //{
-                    //    this.lastUpdateDateTime = updateDateTime;
-                    //    this.PlaceOrder(quote);
-                    //}
-                    //else if (hasForQuote)
-                    //{
-                    //    this.lastUpdateDateTime = updateDateTime;
-                    //    hasForQuote = false;
-                    //    this.PlaceOrder(quote);
-                    //}
+                    if (isRunning)
+                    {
+                        this.lastUpdateDateTime = updateDateTime;
+                        this.PlaceOrder(quote);
+                    }
+                    else if (hasForQuote)
+                    {
+                        this.lastUpdateDateTime = updateDateTime;
+                        hasForQuote = false;
+                        this.PlaceOrder(quote);
+                    }
                 }
             }
         }

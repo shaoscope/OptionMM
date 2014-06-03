@@ -77,11 +77,11 @@ namespace OptionMM
                 //Thread.Sleep(300);
                 strategy.Configuration();
                 //插入策略
-                //if (strategy.IsMarketMakingContract)
-                //{
-                //    this.optionPanel.AddStrategy(strategy);
-                //}
-                this.optionPanel.AddStrategy(strategy);
+                if (strategy.IsMarketMakingContract)
+                {
+                    this.optionPanel.AddStrategy(strategy);
+                }
+                //this.optionPanel.AddStrategy(strategy);
             }
 
             this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 10 * 1000);
