@@ -315,32 +315,33 @@ namespace OptionMM
             {
                 this.option.LastMarket = md;
                 ////计算隐含波动率
-                if (this.future.LastMarket != null && this.isMarketMakingContract)
+                if (this.future.LastMarket != null)
                 {
                     this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.future.LastMarket.LastPrice, this.option.StrikePrice,
                         StaticFunction.GetDaysToMaturity(this.option.InstrumentID), GlobalValues.InterestRate, md.LastPrice, this.option.OptionType);
-                }
-                string[] updateDateTimeString = md.UpdateTime.Split(':');
-                DateTime updateDateTime = new DateTime();
-                updateDateTime = updateDateTime.AddHours(double.Parse(updateDateTimeString[0]));
-                updateDateTime = updateDateTime.AddMinutes(double.Parse(updateDateTimeString[1]));
-                updateDateTime = updateDateTime.AddSeconds(double.Parse(updateDateTimeString[2]));
-                if ((updateDateTime - lastUpdateDateTime).TotalSeconds > this.ReplaceOrderDuration)
-                {
-                    //撤单
-                    this.CancelOrder();
-                    //计算报价
-                    double[] quote = this.CalculateQuote();
-                    if (isRunning)
+
+                    string[] updateDateTimeString = md.UpdateTime.Split(':');
+                    DateTime updateDateTime = new DateTime();
+                    updateDateTime = updateDateTime.AddHours(double.Parse(updateDateTimeString[0]));
+                    updateDateTime = updateDateTime.AddMinutes(double.Parse(updateDateTimeString[1]));
+                    updateDateTime = updateDateTime.AddSeconds(double.Parse(updateDateTimeString[2]));
+                    if ((updateDateTime - lastUpdateDateTime).TotalSeconds > this.ReplaceOrderDuration)
                     {
-                        this.lastUpdateDateTime = updateDateTime;
-                        this.PlaceOrder(quote);
-                    }
-                    else if (hasForQuote)
-                    {
-                        this.lastUpdateDateTime = updateDateTime;
-                        hasForQuote = false;
-                        this.PlaceOrder(quote);
+                        //撤单
+                        this.CancelOrder();
+                        //计算报价
+                        double[] quote = this.CalculateQuote();
+                        if (isRunning)
+                        {
+                            this.lastUpdateDateTime = updateDateTime;
+                            this.PlaceOrder(quote);
+                        }
+                        else if (hasForQuote)
+                        {
+                            this.lastUpdateDateTime = updateDateTime;
+                            hasForQuote = false;
+                            this.PlaceOrder(quote);
+                        }
                     }
                 }
             }
@@ -353,9 +354,9 @@ namespace OptionMM
         private double[] CalculateQuote()
         {
             double[] quote = new double[] { 0, 0 };
-            #region 计算报单价格--最大区间计算法
             double bidQuote = 0;
             double askQuote = 0;
+            #region 计算报单价格--最大区间计算法
             if (this.option.InstrumentID.Contains("1406"))
             {
                 if (this.option.LastMarket.LastPrice < 10)
@@ -425,10 +426,70 @@ namespace OptionMM
             #endregion
 
             #region 计算报单价格--隐含波动率计算法
-            if (this.option.InstrumentID.Contains("1406"))
-            {
-
-            }
+            //if (this.option.InstrumentID.Contains("1406"))
+            //{
+            //    if (this.option.OptionType == OptionTypeEnum.call)
+            //    {
+            //        double volatility = get1406CallImpliedVolatility(this.option.StrikePrice);
+            //        double bidVolatility = volatility - 0.01;
+            //        double askVolatility = volatility + 0.01;
+            //        OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
+            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, bidVolatility,
+            //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
+            //        bidQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
+            //        optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
+            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, askVolatility,
+            //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
+            //        askQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
+            //    }
+            //    else if (this.option.OptionType == OptionTypeEnum.put)
+            //    {
+            //        double volatility = get1406PutImpliedVolatility(this.option.StrikePrice);
+            //        double bidVolatility = volatility - 0.01;
+            //        double askVolatility = volatility + 0.01;
+            //        OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
+            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, bidVolatility,
+            //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
+            //        bidQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
+            //        optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
+            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, askVolatility,
+            //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
+            //        askQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
+            //    }
+            //}
+            //else
+            //{
+            //    if (this.option.LastMarket.LastPrice < 10)
+            //    {
+            //        bidQuote = this.option.LastMarket.LastPrice - 0.5;
+            //        askQuote = this.option.LastMarket.LastPrice + 0.5;
+            //    }
+            //    else if (this.option.LastMarket.LastPrice < 20)
+            //    {
+            //        bidQuote = this.option.LastMarket.LastPrice - 1;
+            //        askQuote = this.option.LastMarket.LastPrice + 1;
+            //    }
+            //    else if (this.option.LastMarket.LastPrice < 50)
+            //    {
+            //        bidQuote = this.option.LastMarket.LastPrice - 2;
+            //        askQuote = this.option.LastMarket.LastPrice + 2;
+            //    }
+            //    else if (this.option.LastMarket.LastPrice < 100)
+            //    {
+            //        bidQuote = this.option.LastMarket.LastPrice - 4;
+            //        askQuote = this.option.LastMarket.LastPrice + 4;
+            //    }
+            //    else if (this.option.LastMarket.LastPrice < 250)
+            //    {
+            //        bidQuote = this.option.LastMarket.LastPrice - 7.5;
+            //        askQuote = this.option.LastMarket.LastPrice + 7.5;
+            //    }
+            //    else
+            //    {
+            //        bidQuote = this.option.LastMarket.LastPrice - 12.5;
+            //        askQuote = this.option.LastMarket.LastPrice + 12.5;
+            //    }
+            //}
             #endregion
 
             this.option.MMQuotation.BidQuote = bidQuote;
@@ -441,12 +502,12 @@ namespace OptionMM
 
         private double get1406CallImpliedVolatility(double strikePrice)
         {
-            return 0.0025 * strikePrice * strikePrice - 0.0259 * strikePrice + 0.3402;
+            return 0.000001007 * strikePrice * strikePrice - 0.004444 * strikePrice + 5.178;
         }
 
         private double get1406PutImpliedVolatility(double strikePrice)
         {
-            return 0.0014 * strikePrice * strikePrice - 0.016 * strikePrice + 0.3013;
+            return 0.0000005747 * strikePrice * strikePrice - 0.002561 * strikePrice + 3.11;
         }
 
         private double get1407CallImpliedVolatility(double strikePrice)
@@ -522,36 +583,40 @@ namespace OptionMM
             double bidQuote = quote[0];
             double askQuote = quote[1];
             #region 下单--平仓优先
-            //平仓优先
-            if (this.option.shortPosition.Position >= 10)
-            {
-                this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidQuote);
-                if (this.option.longPosition.Position >= 10)
-                {
-                    this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askQuote);
-                }
-                else
-                {
-                    this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
-                }
-            }
-            else if (this.option.longPosition.Position >= 10)
-            {
-                this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askQuote);
-                if (this.option.shortPosition.Position >= 10)
-                {
-                    this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidQuote);
-                }
-                else
-                {
-                    this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
-                }
-            }
-            else
-            {
-                this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
-                this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
-            }
+            //if (this.option.shortPosition.Position >= 10)
+            //{
+            //    this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidQuote);
+            //    if (this.option.longPosition.Position >= 10)
+            //    {
+            //        this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askQuote);
+            //    }
+            //    else
+            //    {
+            //        this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
+            //    }
+            //}
+            //else if (this.option.longPosition.Position >= 10)
+            //{
+            //    this.option.CloseLongOptionOrderRef = TDManager.TD.Sell(this.option.InstrumentID, placeOrderVolume, askQuote);
+            //    if (this.option.shortPosition.Position >= 10)
+            //    {
+            //        this.option.CloseShortOptionOrderRef = TDManager.TD.BuyToCover(this.option.InstrumentID, placeOrderVolume, bidQuote);
+            //    }
+            //    else
+            //    {
+            //        this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+            //    }
+            //}
+            //else
+            //{
+            //    this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+            //    this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
+            //}
+            #endregion
+
+            #region 直接开仓
+            this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+            this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
             #endregion
         }
 
@@ -618,9 +683,12 @@ namespace OptionMM
         /// </summary>
         public void Stop()
         {
-            this.isRunning = false;
-            this.panelRefreshCallback(null);
-            Thread.Sleep(300);
+            if(isMarketMakingContract && isRunning)
+            {
+                this.isRunning = false;
+                this.panelRefreshCallback(null);
+                Thread.Sleep(300);
+            }
             //MDManager.MD.OnTick -= MD_OnTick;
             //TDManager.TD.OnCanceled -= TD_OnCanceled;
             //TDManager.TD.OnTraded -= TD_OnTraded;

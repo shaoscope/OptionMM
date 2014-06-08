@@ -36,9 +36,14 @@
             this.startAllButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.optionPanel = new OptionMM.OptionPanel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.parityButton = new System.Windows.Forms.Button();
+            this.arbitrageRichTextBox = new System.Windows.Forms.RichTextBox();
+            this.coveredButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuBarPanel.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -53,7 +58,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1161, 665);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1594, 665);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // menuBarPanel
@@ -67,7 +72,7 @@
             this.menuBarPanel.Location = new System.Drawing.Point(0, 0);
             this.menuBarPanel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 1);
             this.menuBarPanel.Name = "menuBarPanel";
-            this.menuBarPanel.Size = new System.Drawing.Size(1161, 29);
+            this.menuBarPanel.Size = new System.Drawing.Size(1594, 29);
             this.menuBarPanel.TabIndex = 1;
             // 
             // forQuoteInfoLabel
@@ -101,7 +106,7 @@
             this.riskManagementButton.Dock = System.Windows.Forms.DockStyle.Right;
             this.riskManagementButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.riskManagementButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.riskManagementButton.Location = new System.Drawing.Point(1086, 0);
+            this.riskManagementButton.Location = new System.Drawing.Point(1519, 0);
             this.riskManagementButton.Name = "riskManagementButton";
             this.riskManagementButton.Size = new System.Drawing.Size(75, 29);
             this.riskManagementButton.TabIndex = 1;
@@ -128,13 +133,14 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 950F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Controls.Add(this.optionPanel, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.panel1, 1, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 30);
             this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1161, 635);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1594, 635);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // optionPanel
@@ -147,11 +153,56 @@
             this.optionPanel.Size = new System.Drawing.Size(950, 635);
             this.optionPanel.TabIndex = 0;
             // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.panel1.Controls.Add(this.parityButton);
+            this.panel1.Controls.Add(this.arbitrageRichTextBox);
+            this.panel1.Controls.Add(this.coveredButton);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(950, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(644, 635);
+            this.panel1.TabIndex = 1;
+            // 
+            // parityButton
+            // 
+            this.parityButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.parityButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.parityButton.Location = new System.Drawing.Point(14, 50);
+            this.parityButton.Name = "parityButton";
+            this.parityButton.Size = new System.Drawing.Size(107, 29);
+            this.parityButton.TabIndex = 3;
+            this.parityButton.Text = "平价套利";
+            this.parityButton.UseVisualStyleBackColor = true;
+            this.parityButton.Click += new System.EventHandler(this.parityButton_Click);
+            // 
+            // arbitrageRichTextBox
+            // 
+            this.arbitrageRichTextBox.Location = new System.Drawing.Point(139, 15);
+            this.arbitrageRichTextBox.Name = "arbitrageRichTextBox";
+            this.arbitrageRichTextBox.Size = new System.Drawing.Size(493, 469);
+            this.arbitrageRichTextBox.TabIndex = 2;
+            this.arbitrageRichTextBox.Text = "";
+            // 
+            // coveredButton
+            // 
+            this.coveredButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.coveredButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.coveredButton.Location = new System.Drawing.Point(14, 15);
+            this.coveredButton.Name = "coveredButton";
+            this.coveredButton.Size = new System.Drawing.Size(107, 29);
+            this.coveredButton.TabIndex = 1;
+            this.coveredButton.Text = "单期权上限套利";
+            this.coveredButton.UseVisualStyleBackColor = true;
+            this.coveredButton.Click += new System.EventHandler(this.coveredButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1161, 665);
+            this.ClientSize = new System.Drawing.Size(1594, 665);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "MainForm";
             this.Text = "MainForm";
@@ -161,6 +212,7 @@
             this.menuBarPanel.ResumeLayout(false);
             this.menuBarPanel.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -175,6 +227,10 @@
         public System.Windows.Forms.Label forQuoteInfoLabel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         public OptionPanel optionPanel;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button coveredButton;
+        private System.Windows.Forms.RichTextBox arbitrageRichTextBox;
+        private System.Windows.Forms.Button parityButton;
 
 
     }

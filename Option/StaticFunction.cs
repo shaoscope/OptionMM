@@ -64,12 +64,18 @@ namespace OptionMM
             double lower = 0;
             double upper = 10;
             double impliedVolatility = 0;
-            while (Math.Abs(upper - lower) > 0.0005)
+            double impliedPrice = 0;
+            while (Math.Abs(upper - lower) > 0.001)
             {
                 impliedVolatility = (lower + upper) / 2;
                 OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(optionType,
                     underlyingPrice, strikePrice, interestRate, impliedVolatility, daysToMaturity);
                 OptionValue optionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
+                if(impliedPrice == optionValue.Price)
+                {
+                    break;
+                }
+                impliedPrice = optionValue.Price;
                 if (optionValue.Price >= marketPrice)
                 {
                     upper = impliedVolatility;
@@ -101,6 +107,14 @@ namespace OptionMM
             else if (instrumentID.Contains("1408"))
             {
                 daysToMaturity = GlobalValues.DaysToMaturity[2];
+            }
+            else if(instrumentID.Contains("1409"))
+            {
+                daysToMaturity = GlobalValues.DaysToMaturity[3];
+            }
+            else if(instrumentID.Contains("1412"))
+            {
+                daysToMaturity = GlobalValues.DaysToMaturity[4];
             }
             return daysToMaturity;
         }

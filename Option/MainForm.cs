@@ -11,6 +11,7 @@ using System.Threading;
 using System.Xml;
 using System.Reflection;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace OptionMM
 {
@@ -75,11 +76,6 @@ namespace OptionMM
                     }
                 }
                 strategy.Configuration();
-                //插入策略
-                //if (strategy.IsMarketMakingContract)
-                //{
-                //    this.optionPanel.AddStrategy(strategy);
-                //}
                 this.optionPanel.AddStrategy(strategy);
             }
             this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 10 * 1000);
@@ -226,6 +222,125 @@ namespace OptionMM
         {
             RiskManagementForm riskManagementForm = new RiskManagementForm();
             riskManagementForm.ShowDialog();
+        }
+
+        /// <summary>
+        /// 寻找单期权上下限套利机会
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void coveredButton_Click(object sender, EventArgs e)
+        {
+            this.arbitrageRichTextBox.Clear();
+            scanCoveredTask = new Task(ScanCovered);
+            scanCoveredTask.Start();
+            scanCoveredTask.ContinueWith(ScanArbitrageFinished);
+        }
+
+        /// <summary>
+        /// 扫描上限先套利Task
+        /// </summary>
+        private Task scanCoveredTask;
+
+        /// <summary>
+        /// 扫描上下限套利方法
+        /// </summary>
+        private void ScanCovered()
+        {
+            //下限套利
+            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            {
+                Strategy strategy = (Strategy)dataRow.Tag;
+                if (strategy.Option.OptionType == OptionTypeEnum.call && strategy.Future.LastMarket.LastPrice > strategy.Option.StrikePrice &&
+                    strategy.Option.LastMarket.LastPrice < strategy.Future.LastMarket.LastPrice - strategy.Option.StrikePrice)
+                {
+                    //Long Call + Short IF
+                    string appendingText = "\n" + strategy.Option.InstrumentID + "--Long";
+                    this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                }
+                else if (strategy.Option.OptionType == OptionTypeEnum.put && strategy.Option.StrikePrice > strategy.Future.LastMarket.LastPrice &&
+                    strategy.Option.LastMarket.LastPrice < strategy.Option.StrikePrice - strategy.Future.LastMarket.LastPrice)
+                {
+                    //Long Put + Long IF
+                    string appendingText = "\n" + strategy.Option.InstrumentID + "--Short";
+                    this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 扫描套利机会完成
+        /// </summary>
+        private void ScanArbitrageFinished(Task task)
+        {
+            try
+            {
+                //MessageBox.Show("套利机会扫描完成");
+            }
+            catch
+            {
+                
+            }
+            finally
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// 扫描平价套利Task
+        /// </summary>
+        private Task scanParityTask;
+
+        /// <summary>
+        /// 扫描平价套利机会
+        /// </summary>
+        private void ScanParity()
+        {
+            Dictionary<string, Strategy> strategyDictionary = new Dictionary<string,Strategy>();
+            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            {
+                Strategy strategy = (Strategy)dataRow.Tag;
+                strategyDictionary.Add(strategy.Option.InstrumentID, strategy);
+            }
+            foreach(Strategy strategyCall in strategyDictionary.Values)
+            {
+                if(strategyCall.Option.OptionType == OptionTypeEnum.call)
+                {
+                    string parityPutInstrumentID = strategyCall.Option.InstrumentID.Replace('C', 'P');
+                    Strategy strategyPut = strategyDictionary[parityPutInstrumentID];
+                    if(strategyCall.Option.LastMarket.LastPrice + strategyCall.Option.StrikePrice > strategyPut.Option.LastMarket.LastPrice + strategyPut.Future.LastMarket.LastPrice)
+                    {
+                        //Long Put + Short Call
+                        string appendingText = "\n" + strategyPut.Option.InstrumentID + "--Long + " + strategyCall.Option.InstrumentID + "--Short";
+                        this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                    }
+                    else if (strategyCall.Option.LastMarket.LastPrice + strategyCall.Option.StrikePrice < strategyPut.Option.LastMarket.LastPrice + strategyPut.Future.LastMarket.LastPrice)
+                    {
+                        //Long Call + Short Put
+                        string appendingText = "\n" + strategyCall.Option.InstrumentID + "--Long + " + strategyPut.Option.InstrumentID + "--Short";
+                        this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                    }
+                }
+            }
+        }
+
+        private void AppendTextToArbitrageRichTextBox(string appendingText)
+        {
+            this.arbitrageRichTextBox.AppendText(appendingText);
+        }
+
+        /// <summary>
+        /// 寻找平价套利机会
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void parityButton_Click(object sender, EventArgs e)
+        {
+            this.arbitrageRichTextBox.Clear();
+            scanParityTask = new Task(ScanParity);
+            scanParityTask.Start();
+            scanParityTask.ContinueWith(ScanArbitrageFinished);
         }
 
 
