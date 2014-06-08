@@ -48,12 +48,15 @@ namespace OptionMM
         //仓位对冲定时器
         private System.Threading.Timer positionHedgeTimer;
 
-        private System.Threading.Timer recordVolatilityTimer; 
+        private System.Threading.Timer recordVolatilityTimer;
+
+        public static Future Future;
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             //加载面板
             InitFromXML("Option.xml");
+            Future = new Future("IF1406");
             foreach (string instrumentID in configValues.Keys)
             {
                 Strategy strategy = new Strategy();
@@ -61,7 +64,6 @@ namespace OptionMM
                 string[] strTemp = instrumentID.Split('-');
                 strategy.Option.StrikePrice = double.Parse(strTemp[2]);
                 strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
-                strategy.Future.InstrumentID = configValues[instrumentID][0];
                 strategy.IsMarketMakingContract = configValues[instrumentID][1] == "1" ? true : false;
                 //加入仓位信息
                 foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
@@ -78,7 +80,7 @@ namespace OptionMM
                 strategy.Configuration();
                 this.optionPanel.AddStrategy(strategy);
             }
-            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 1 * 10 * 1000);
+            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 10 * 1000);
             this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
         }
 
@@ -106,18 +108,21 @@ namespace OptionMM
         /// <param name="state"></param>
         private void positionHedgeCallBack(object state)
         {            
-            PositionHedge positionHedge = new PositionHedge(PositionList, this.optionPanel.dataTable);
-            this.BeginInvoke(new Action<PositionHedge>(this.RefreshHedgeVolumeLabel), positionHedge);
-            //positionHedge.DoHedge();
+            //PositionHedge positionHedge = new PositionHedge(PositionList, this.optionPanel.dataTable);
+            //this.BeginInvoke(new Action<PositionHedge>(this.RefreshHedgeVolumeLabel), positionHedge);
+            //positionHedge.AutoHedge();
+            Future.DeltaHedge(this.optionPanel.dataTable);
+            this.BeginInvoke(new Action<Future>(this.RefreshHedgeVolumeLabel), Future);
+            //Future.AutoHedge();
         }
 
         /// <summary>
         /// 更新面板对冲手数
         /// </summary>
-        /// <param name="positionHedge"></param>
-        private void RefreshHedgeVolumeLabel(PositionHedge positionHedge)
+        /// <param name="future"></param>
+        private void RefreshHedgeVolumeLabel(Future future)
         {
-            this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)positionHedge.FutureHedgeVolume["IF1406"];
+            this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)future.HedgeVolume;
         }
 
         /// <summary>
@@ -231,7 +236,7 @@ namespace OptionMM
         /// <param name="e"></param>
         private void coveredButton_Click(object sender, EventArgs e)
         {
-            this.arbitrageRichTextBox.Clear();
+            this.coveredPanel.dataTable.Dispose();
             scanCoveredTask = new Task(ScanCovered);
             scanCoveredTask.Start();
             scanCoveredTask.ContinueWith(ScanArbitrageFinished);
@@ -251,19 +256,21 @@ namespace OptionMM
             foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
             {
                 Strategy strategy = (Strategy)dataRow.Tag;
-                if (strategy.Option.OptionType == OptionTypeEnum.call && strategy.Future.LastMarket.LastPrice > strategy.Option.StrikePrice &&
-                    strategy.Option.LastMarket.LastPrice < strategy.Future.LastMarket.LastPrice - strategy.Option.StrikePrice)
+                if (strategy.Option.OptionType == OptionTypeEnum.call && MainForm.Future.LastMarket.LastPrice > strategy.Option.StrikePrice &&
+                    strategy.Option.LastMarket.AskPrice1 < MainForm.Future.LastMarket.LastPrice - strategy.Option.StrikePrice)
                 {
                     //Long Call + Short IF
-                    string appendingText = "\n" + strategy.Option.InstrumentID + "--Long";
-                    this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                    double coveredInterval = MainForm.Future.LastMarket.LastPrice - strategy.Option.StrikePrice - strategy.Option.LastMarket.AskPrice1;
+                    Covered covered = new Covered(strategy.Option.InstrumentID, 0, coveredInterval, 0);
+                    this.BeginInvoke(new Action<Covered>(this.AddCovered), covered);
                 }
-                else if (strategy.Option.OptionType == OptionTypeEnum.put && strategy.Option.StrikePrice > strategy.Future.LastMarket.LastPrice &&
-                    strategy.Option.LastMarket.LastPrice < strategy.Option.StrikePrice - strategy.Future.LastMarket.LastPrice)
+                else if (strategy.Option.OptionType == OptionTypeEnum.put && strategy.Option.StrikePrice > MainForm.Future.LastMarket.LastPrice &&
+                    strategy.Option.LastMarket.AskPrice1 < strategy.Option.StrikePrice - MainForm.Future.LastMarket.LastPrice)
                 {
                     //Long Put + Long IF
-                    string appendingText = "\n" + strategy.Option.InstrumentID + "--Short";
-                    this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                    double coveredInterval = strategy.Option.StrikePrice - MainForm.Future.LastMarket.LastPrice - strategy.Option.LastMarket.AskPrice1;
+                    Covered covered = new Covered(strategy.Option.InstrumentID, 0, coveredInterval, 0);
+                    this.BeginInvoke(new Action<Covered>(this.AddCovered), covered);
                 }
             }
         }
@@ -309,27 +316,39 @@ namespace OptionMM
                 {
                     string parityPutInstrumentID = strategyCall.Option.InstrumentID.Replace('C', 'P');
                     Strategy strategyPut = strategyDictionary[parityPutInstrumentID];
-                    if(strategyCall.Option.LastMarket.LastPrice + strategyCall.Option.StrikePrice > strategyPut.Option.LastMarket.LastPrice + strategyPut.Future.LastMarket.LastPrice)
+                    if (strategyCall.Option.LastMarket.BidPrice1 + strategyCall.Option.StrikePrice > strategyPut.Option.LastMarket.AskPrice1 + MainForm.Future.LastMarket.LastPrice)
                     {
                         //Long Put + Short Call
-                        string appendingText = "\n" + strategyPut.Option.InstrumentID + "--Long + " + strategyCall.Option.InstrumentID + "--Short";
-                        this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                        double parityInterval = strategyCall.Option.LastMarket.BidPrice1 + strategyCall.Option.StrikePrice - strategyPut.Option.LastMarket.AskPrice1 - MainForm.Future.LastMarket.LastPrice;
+                        Parity parity = new Parity(strategyCall.Option.InstrumentID, EnumPosiDirectionType.Short, strategyPut.Option.InstrumentID, EnumPosiDirectionType.Long, parityInterval);
+                        this.BeginInvoke(new Action<Parity>(this.AddPrity), parity);
                     }
-                    else if (strategyCall.Option.LastMarket.LastPrice + strategyCall.Option.StrikePrice < strategyPut.Option.LastMarket.LastPrice + strategyPut.Future.LastMarket.LastPrice)
+                    else if (strategyCall.Option.LastMarket.AskPrice1 + strategyCall.Option.StrikePrice < strategyPut.Option.LastMarket.BidPrice1 + MainForm.Future.LastMarket.LastPrice)
                     {
                         //Long Call + Short Put
-                        string appendingText = "\n" + strategyCall.Option.InstrumentID + "--Long + " + strategyPut.Option.InstrumentID + "--Short";
-                        this.BeginInvoke(new Action<string>(this.AppendTextToArbitrageRichTextBox), appendingText);
+                        double parityInterval = strategyPut.Option.LastMarket.BidPrice1 + MainForm.Future.LastMarket.LastPrice - strategyCall.Option.LastMarket.AskPrice1 - strategyCall.Option.StrikePrice;
+                        Parity parity = new Parity(strategyCall.Option.InstrumentID, EnumPosiDirectionType.Long, strategyPut.Option.InstrumentID, EnumPosiDirectionType.Short, parityInterval);
+                        this.BeginInvoke(new Action<Parity>(this.AddPrity), parity);
                     }
                 }
             }
         }
 
-        private void AppendTextToArbitrageRichTextBox(string appendingText)
+        /// <summary>
+        /// 添加上下限套利
+        /// </summary>
+        /// <param name="covered"></param>
+        private void AddCovered(Covered covered)
         {
-            this.arbitrageRichTextBox.AppendText(appendingText);
+
+            this.coveredPanel.AddCovered(covered);
         }
 
+
+        private void AddPrity(Parity parity)
+        {
+            this.parityPanel.AddParity(parity);
+        }
         /// <summary>
         /// 寻找平价套利机会
         /// </summary>
@@ -337,7 +356,7 @@ namespace OptionMM
         /// <param name="e"></param>
         private void parityButton_Click(object sender, EventArgs e)
         {
-            this.arbitrageRichTextBox.Clear();
+            this.parityPanel.dataTable.Dispose();
             scanParityTask = new Task(ScanParity);
             scanParityTask.Start();
             scanParityTask.ContinueWith(ScanArbitrageFinished);

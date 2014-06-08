@@ -22,18 +22,6 @@ namespace OptionMM
             set { this.option = value; }
         }
 
-        //期货合约
-        private Future future;
-
-        /// <summary>
-        /// 获取或者设置期权对应的期货合约
-        /// </summary>
-        public Future Future
-        {
-            get { return this.future; }
-            set { this.future = value; }
-        }
-
         /// <summary>
         /// 上一次下单时间
         /// </summary>
@@ -59,7 +47,6 @@ namespace OptionMM
         {
             this.Tag = this;
             option = new Option();
-            future = new Future();
         }
 
         /// <summary>
@@ -67,7 +54,7 @@ namespace OptionMM
         /// </summary>
         public void Configuration()
         {
-            MDManager.MD.SubscribeMarketData(new string[] { this.future.InstrumentID, this.option.InstrumentID });
+            MDManager.MD.SubscribeMarketData(new string[] { this.option.InstrumentID });
             MDManager.MD.OnTick += MD_OnTick;
             MDManager.MD.OnForQuote += MD_OnForQuote;
             TDManager.TD.OnCanceled += TD_OnCanceled;
@@ -232,10 +219,6 @@ namespace OptionMM
                     this.option.CloseShortOptionOrder = pOrder;
                 }
             }
-            else if(pOrder.InstrumentID == this.future.InstrumentID)
-            {
-
-            }
         }
 
         void TD_OnTraded(ThostFtdcOrderField pOrder)
@@ -268,10 +251,6 @@ namespace OptionMM
                     this.option.CloseShortOptionOrderRef = null;
                 }
             }
-            else if(pOrder.InstrumentID == this.future.InstrumentID)
-            {
-
-            }
         }
 
         /// <summary>
@@ -302,22 +281,18 @@ namespace OptionMM
         /// <param name="md"></param>
         private void MD_OnTick(ThostFtdcDepthMarketDataField md)
         {
-            if (this.future.InstrumentID == md.InstrumentID)
-            {
-                this.future.LastMarket = md;
-                //计算期权理论价格
-                OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
-                    this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility,
-                    StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
-                this.option.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
-            }
-            else if (this.option.InstrumentID == md.InstrumentID)
+            if (this.option.InstrumentID == md.InstrumentID)
             {
                 this.option.LastMarket = md;
+                //计算期权理论价格
+                OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
+                    MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility,
+                    StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
+                this.option.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
                 ////计算隐含波动率
-                if (this.future.LastMarket != null)
+                if (MainForm.Future.LastMarket != null)
                 {
-                    this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.future.LastMarket.LastPrice, this.option.StrikePrice,
+                    this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice,
                         StaticFunction.GetDaysToMaturity(this.option.InstrumentID), GlobalValues.InterestRate, md.LastPrice, this.option.OptionType);
 
                     string[] updateDateTimeString = md.UpdateTime.Split(':');
