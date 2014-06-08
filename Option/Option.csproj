@@ -48,19 +48,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Parity.cs" />
     <Compile Include="Covered.cs" />
+    <Compile Include="CoveredPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CoveredPanel.designer.cs" />
+    <Compile Include="Parity.cs" />
     <Compile Include="ParityPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ParityPanel.designer.cs">
       <DependentUpon>ParityPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CoveredPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="CoveredPanel.designer.cs">
-      <DependentUpon>CoveredPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="GreeksPanel.cs">
       <SubType>UserControl</SubType>
@@ -111,11 +109,9 @@
     <Compile Include="Strategy.cs" />
     <Compile Include="TDManager.cs" />
     <Compile Include="TraderAPI.cs" />
+    <EmbeddedResource Include="CoveredPanel.resx" />
     <EmbeddedResource Include="ParityPanel.resx">
       <DependentUpon>ParityPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CoveredPanel.resx">
-      <DependentUpon>CoveredPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GreeksPanel.resx">
       <DependentUpon>GreeksPanel.cs</DependentUpon>
