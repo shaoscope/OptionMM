@@ -847,10 +847,10 @@ namespace CTP
 
         public bool IsTradingOrder(ThostFtdcOrderField pOrder)
         {
-            //return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
-            //        (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
-            //        (pOrder.OrderStatus != EnumOrderStatusType.AllTraded));
-            return pOrder.OrderStatus != EnumOrderStatusType.Canceled;
+            return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
+                    (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
+                    (pOrder.OrderStatus != EnumOrderStatusType.AllTraded));
+            //return pOrder.OrderStatus != EnumOrderStatusType.Canceled;
         }
 
         public bool IsErrorOrder(ThostFtdcOrderField pOrder)
