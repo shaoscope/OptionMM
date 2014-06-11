@@ -236,7 +236,7 @@ namespace CTP
                 if (!string.IsNullOrEmpty(pRspUserLogin.MaxOrderRef))
                     iNextOrderRef = Convert.ToInt32(pRspUserLogin.MaxOrderRef);
                 //iNextOrderRef++;
-                ORDER_REF = iNextOrderRef;
+                ORDER_REF = iNextOrderRef + 100000;
                 ///投资者结算结果确认
                 ReqSettlementInfoConfirm();
             }
@@ -670,34 +670,34 @@ namespace CTP
             CurrentOrder = pOrder;
             if (IsTradingOrder(pOrder))
             {
-                if (IsMyOrder(pOrder))
-                {
-                    if (pOrder.ExchangeID != null && pOrder.ExchangeID != "" && pOrder.OrderSysID != null && pOrder.OrderSysID != "")
-                    {
-                        if (pOrder.OrderStatus != EnumOrderStatusType.Unknown)
-                        {
-                            OrderSignal Signal = new OrderSignal();
-                            Signal.FrontID = pOrder.FrontID;
-                            Signal.OrderRef = pOrder.OrderRef;
-                            Signal.SessionID = pOrder.SessionID;
-                            lock (TradingLock)
-                            {
-                                if (TradingOrderMap.ContainsKey(Signal))
-                                {
-                                    TradingOrderMap[Signal] = pOrder;
-                                }
-                                else
-                                {
-                                    TradingOrderMap.Add(Signal, pOrder);
-                                }
-                            }
-                            lock (InputLock)
-                            {
-                                InputOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
-                            }
-                        }
-                    }
-                }
+                //if (IsMyOrder(pOrder))
+                //{
+                //    if (pOrder.ExchangeID != null && pOrder.ExchangeID != "" && pOrder.OrderSysID != null && pOrder.OrderSysID != "")
+                //    {
+                //        if (pOrder.OrderStatus != EnumOrderStatusType.Unknown)
+                //        {
+                //            OrderSignal Signal = new OrderSignal();
+                //            Signal.FrontID = pOrder.FrontID;
+                //            Signal.OrderRef = pOrder.OrderRef;
+                //            Signal.SessionID = pOrder.SessionID;
+                //            lock (TradingLock)
+                //            {
+                //                if (TradingOrderMap.ContainsKey(Signal))
+                //                {
+                //                    TradingOrderMap[Signal] = pOrder;
+                //                }
+                //                else
+                //                {
+                //                    TradingOrderMap.Add(Signal, pOrder);
+                //                }
+                //            }
+                //            lock (InputLock)
+                //            {
+                //                InputOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                //            }
+                //        }
+                //    }
+                //}
 
                 Trading(pOrder);
             }
@@ -830,7 +830,8 @@ namespace CTP
 
         public bool IsMyOrder(ThostFtdcOrderField pOrder)
         {
-            return ((pOrder.FrontID == FRONT_ID) && (pOrder.SessionID == SESSION_ID));
+            return true;
+            //return ((pOrder.FrontID == FRONT_ID) && (pOrder.SessionID == SESSION_ID));
         }
 
         public bool IsMyTrade(ThostFtdcOrderField pOrder, ThostFtdcTradeField pTrade)
@@ -847,10 +848,11 @@ namespace CTP
 
         public bool IsTradingOrder(ThostFtdcOrderField pOrder)
         {
+            //return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
+            //        (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
+            //        (pOrder.OrderStatus != EnumOrderStatusType.AllTraded));
             return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
-                    (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
-                    (pOrder.OrderStatus != EnumOrderStatusType.AllTraded));
-            //return pOrder.OrderStatus != EnumOrderStatusType.Canceled;
+                    (pOrder.OrderStatus != EnumOrderStatusType.Canceled));
         }
 
         public bool IsErrorOrder(ThostFtdcOrderField pOrder)

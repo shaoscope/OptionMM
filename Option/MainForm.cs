@@ -50,6 +50,8 @@ namespace OptionMM
 
         private System.Threading.Timer recordVolatilityTimer;
 
+        private System.Threading.Timer writeXmlTimer;
+
         public static Future Future;
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -77,11 +79,24 @@ namespace OptionMM
                         strategy.Option.shortPosition = position;
                     }
                 }
+                strategy.Option.longPosition.PositionCost = double.Parse(configValues[instrumentID][3]);
+                strategy.Option.shortPosition.PositionCost = double.Parse(configValues[instrumentID][5]);
                 strategy.Configuration();
                 this.optionPanel.AddStrategy(strategy);
             }
-            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 10 * 1000, 10 * 1000);
+            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 10 * 1000);
             this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
+            this.writeXmlTimer = new System.Threading.Timer(this.writerXmlCallBack, null, 10 * 1000, 10 * 1000);
+
+        }
+
+        /// <summary>
+        /// 保存XML文件回调
+        /// </summary>
+        /// <param name="state"></param>
+        private void writerXmlCallBack(object state)
+        {
+            this.WriterXML("Option.xml");
         }
 
         /// <summary>
@@ -102,18 +117,17 @@ namespace OptionMM
             fileWriter.Close();
         }
 
+        
+
         /// <summary>
         /// 仓位对冲回调
         /// </summary>
         /// <param name="state"></param>
         private void positionHedgeCallBack(object state)
-        {            
-            //PositionHedge positionHedge = new PositionHedge(PositionList, this.optionPanel.dataTable);
-            //this.BeginInvoke(new Action<PositionHedge>(this.RefreshHedgeVolumeLabel), positionHedge);
-            //positionHedge.AutoHedge();
+        {
             Future.DeltaHedge(this.optionPanel.dataTable);
             this.BeginInvoke(new Action<Future>(this.RefreshHedgeVolumeLabel), Future);
-            //Future.AutoHedge();
+            Future.AutoHedge();
         }
 
         /// <summary>
@@ -151,7 +165,7 @@ namespace OptionMM
                     if ((xmlRder.Name == "Option") && (xmlRder.HasAttributes))
                     {
                         string strID = null;
-                        string[] Property = new string[2];
+                        string[] Property = new string[6];
                         for (int i = 0; i < xmlRder.AttributeCount; i++)
                         {
                             xmlRder.MoveToAttribute(i);
@@ -166,6 +180,22 @@ namespace OptionMM
                             else if(xmlRder.Name == "做市合约")
                             {
                                 Property[1] = xmlRder.Value;
+                            }
+                            else if(xmlRder.Name == "多头仓位数")
+                            {
+                                Property[2] = xmlRder.Value;
+                            }
+                            else if(xmlRder.Name == "多头持仓均价")
+                            {
+                                Property[3] = xmlRder.Value;
+                            }
+                            else if(xmlRder.Name == "空头仓位数")
+                            {
+                                Property[4] = xmlRder.Value;
+                            }
+                            else if(xmlRder.Name == "空头持仓均价")
+                            {
+                                Property[5] = xmlRder.Value;
                             }
                         }
                         configValues.Add(strID, Property);
@@ -236,7 +266,7 @@ namespace OptionMM
         /// <param name="e"></param>
         private void coveredButton_Click(object sender, EventArgs e)
         {
-            this.coveredPanel.dataTable.Dispose();
+            this.coveredPanel.dataTable.Rows.Clear();
             scanCoveredTask = new Task(ScanCovered);
             scanCoveredTask.Start();
             scanCoveredTask.ContinueWith(ScanArbitrageFinished);
@@ -356,10 +386,60 @@ namespace OptionMM
         /// <param name="e"></param>
         private void parityButton_Click(object sender, EventArgs e)
         {
-            this.parityPanel.dataTable.Dispose();
+            this.parityPanel.dataTable.Rows.Clear();
             scanParityTask = new Task(ScanParity);
             scanParityTask.Start();
             scanParityTask.ContinueWith(ScanArbitrageFinished);
+        }
+
+        /// <summary>
+        /// 窗口正在关闭时执行的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.WriterXML("Option.xml");
+        }
+
+        /// <summary>
+        /// 将程序运行状态写入XML
+        /// </summary>
+        private void WriterXML(string strFile)
+        {
+            lock (this)
+            {
+                string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
+                XmlDocument xmlDoc = new XmlDocument();
+                try
+                {
+                    xmlDoc.Load(strFullPathFile);
+                    XmlNodeList xnl = xmlDoc.SelectSingleNode("root").ChildNodes;
+                    int itemIndex = 0;
+                    foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+                    {
+                        Strategy strategy = (Strategy)dataRow.Tag;
+                        XmlElement xe = (XmlElement)xnl.Item(itemIndex++);
+                        if (xe.Attributes["InstrumentID"].Value == strategy.Option.InstrumentID)
+                        {
+                            xe.SetAttribute("多头仓位数", strategy.Option.longPosition.Position.ToString());
+                            xe.SetAttribute("多头持仓均价", strategy.Option.longPosition.PositionCost.ToString());
+                            xe.SetAttribute("空头仓位数", strategy.Option.shortPosition.Position.ToString());
+                            xe.SetAttribute("空头持仓均价", strategy.Option.shortPosition.PositionCost.ToString());
+                        }
+                    }
+                    xmlDoc.Save(strFullPathFile);
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+
+                }
+            }
+
         }
 
 

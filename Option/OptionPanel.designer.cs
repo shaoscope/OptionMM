@@ -31,8 +31,8 @@ namespace OptionMM
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -44,6 +44,8 @@ namespace OptionMM
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataTable = new System.Windows.Forms.DataGridView();
             this.cOptionID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cBidQuote = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -52,7 +54,9 @@ namespace OptionMM
             this.cAskPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cAskQuote = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cLongVolume = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cLongAveragePrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cShortVolume = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cShortAveragePrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cImpliedVolatility = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cDelta = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cRunningStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -85,18 +89,20 @@ namespace OptionMM
             this.cAskPrice,
             this.cAskQuote,
             this.cLongVolume,
+            this.cLongAveragePrice,
             this.cShortVolume,
+            this.cShortAveragePrice,
             this.cImpliedVolatility,
             this.cDelta,
             this.cRunningStatus});
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataTable.DefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataTable.DefaultCellStyle = dataGridViewCellStyle15;
             this.dataTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataTable.EnableHeadersVisualStyles = false;
             this.dataTable.Location = new System.Drawing.Point(0, 0);
@@ -104,9 +110,9 @@ namespace OptionMM
             this.dataTable.MultiSelect = false;
             this.dataTable.Name = "dataTable";
             this.dataTable.RowHeadersVisible = false;
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.HotTrack;
-            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataTable.RowsDefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.HotTrack;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataTable.RowsDefaultCellStyle = dataGridViewCellStyle16;
             this.dataTable.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("宋体", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.dataTable.RowTemplate.Height = 40;
             this.dataTable.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
@@ -205,13 +211,25 @@ namespace OptionMM
             this.cLongVolume.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.cLongVolume.Width = 80;
             // 
-            // cShortVolume
+            // cLongAveragePrice
             // 
             dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle9.Format = "N0";
-            dataGridViewCellStyle9.NullValue = null;
-            this.cShortVolume.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle9.Format = "F2";
+            this.cLongAveragePrice.DefaultCellStyle = dataGridViewCellStyle9;
+            this.cLongAveragePrice.HeaderText = "多头均价";
+            this.cLongAveragePrice.Name = "cLongAveragePrice";
+            this.cLongAveragePrice.ReadOnly = true;
+            this.cLongAveragePrice.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.cLongAveragePrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cLongAveragePrice.Width = 80;
+            // 
+            // cShortVolume
+            // 
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle10.Format = "N0";
+            dataGridViewCellStyle10.NullValue = null;
+            this.cShortVolume.DefaultCellStyle = dataGridViewCellStyle10;
             this.cShortVolume.HeaderText = "空头仓位";
             this.cShortVolume.Name = "cShortVolume";
             this.cShortVolume.ReadOnly = true;
@@ -219,13 +237,24 @@ namespace OptionMM
             this.cShortVolume.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.cShortVolume.Width = 80;
             // 
+            // cShortAveragePrice
+            // 
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle11.Format = "F2";
+            this.cShortAveragePrice.DefaultCellStyle = dataGridViewCellStyle11;
+            this.cShortAveragePrice.HeaderText = "空头均价";
+            this.cShortAveragePrice.Name = "cShortAveragePrice";
+            this.cShortAveragePrice.ReadOnly = true;
+            this.cShortAveragePrice.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.cShortAveragePrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
             // cImpliedVolatility
             // 
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle10.Format = "p2";
-            dataGridViewCellStyle10.NullValue = null;
-            this.cImpliedVolatility.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle12.Format = "p2";
+            dataGridViewCellStyle12.NullValue = null;
+            this.cImpliedVolatility.DefaultCellStyle = dataGridViewCellStyle12;
             this.cImpliedVolatility.HeaderText = "隐含波动率";
             this.cImpliedVolatility.Name = "cImpliedVolatility";
             this.cImpliedVolatility.ReadOnly = true;
@@ -234,11 +263,11 @@ namespace OptionMM
             // 
             // cDelta
             // 
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle11.Format = "F6";
-            dataGridViewCellStyle11.NullValue = null;
-            this.cDelta.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle13.Format = "F6";
+            dataGridViewCellStyle13.NullValue = null;
+            this.cDelta.DefaultCellStyle = dataGridViewCellStyle13;
             this.cDelta.HeaderText = "Delta";
             this.cDelta.Name = "cDelta";
             this.cDelta.ReadOnly = true;
@@ -248,8 +277,8 @@ namespace OptionMM
             // 
             // cRunningStatus
             // 
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.cRunningStatus.DefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.cRunningStatus.DefaultCellStyle = dataGridViewCellStyle14;
             this.cRunningStatus.HeaderText = "运行状态";
             this.cRunningStatus.Name = "cRunningStatus";
             this.cRunningStatus.ReadOnly = true;
@@ -280,7 +309,9 @@ namespace OptionMM
         private DataGridViewTextBoxColumn cAskPrice;
         private DataGridViewTextBoxColumn cAskQuote;
         private DataGridViewTextBoxColumn cLongVolume;
+        private DataGridViewTextBoxColumn cLongAveragePrice;
         private DataGridViewTextBoxColumn cShortVolume;
+        private DataGridViewTextBoxColumn cShortAveragePrice;
         private DataGridViewTextBoxColumn cImpliedVolatility;
         private DataGridViewTextBoxColumn cDelta;
         private DataGridViewTextBoxColumn cRunningStatus;

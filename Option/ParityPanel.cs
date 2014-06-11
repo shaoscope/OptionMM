@@ -59,9 +59,10 @@ namespace OptionMM
             parity.CreateCells(this.dataTable);
             DataGridViewCellCollection cells = parity.Cells;
             cells[0].Value = parity.CallInstrumentID;
-            cells[1].Value = parity.PositionVolume;
-            cells[2].Value = parity.ParityInterval;
-            cells[3].Value = parity.AveragePrice;
+            cells[1].Value = parity.CallDirection;
+            cells[2].Value = parity.PutInstrumentID;
+            cells[3].Value = parity.PutDirection;
+            cells[4].Value = parity.ParityInterval;
             this.dataTable.Rows.Add(parity);
         }
 

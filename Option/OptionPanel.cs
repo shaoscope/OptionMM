@@ -65,9 +65,11 @@ namespace OptionMM
             cells[4].Value = strategy.Option.LastMarket != null ? strategy.Option.LastMarket.AskPrice1 : 0;
             cells[5].Value = strategy.Option.MMQuotation.AskQuote;
             cells[6].Value = strategy.Option.longPosition != null ? strategy.Option.longPosition.Position : 0;
-            cells[7].Value = strategy.Option.shortPosition != null ? strategy.Option.shortPosition.Position : 0;
-            cells[8].Value = strategy.Option.ImpliedVolatility;
-            cells[9].Value = strategy.Option.OptionValue.Delta;
+            cells[7].Value = strategy.Option.longPosition != null ? strategy.Option.longPosition.PositionCost : 0;
+            cells[8].Value = strategy.Option.shortPosition != null ? strategy.Option.shortPosition.Position : 0;
+            cells[9].Value = strategy.Option.shortPosition != null ? strategy.Option.shortPosition.PositionCost : 0;
+            cells[10].Value = strategy.Option.ImpliedVolatility;
+            cells[11].Value = strategy.Option.OptionValue.Delta;
             string runningStatus = "";
             if (strategy.IsMarketMakingContract)
             {

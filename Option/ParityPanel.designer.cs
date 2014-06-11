@@ -31,17 +31,19 @@ namespace OptionMM
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataTable = new System.Windows.Forms.DataGridView();
             this.cOptionID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cVolume = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cCoveredInterval = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cCoveredAveragePrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cParityInterval = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -67,15 +69,16 @@ namespace OptionMM
             this.cOptionID,
             this.cVolume,
             this.cCoveredInterval,
-            this.cCoveredAveragePrice});
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataTable.DefaultCellStyle = dataGridViewCellStyle6;
+            this.cCoveredAveragePrice,
+            this.cParityInterval});
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataTable.DefaultCellStyle = dataGridViewCellStyle7;
             this.dataTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataTable.EnableHeadersVisualStyles = false;
             this.dataTable.Location = new System.Drawing.Point(0, 0);
@@ -83,9 +86,9 @@ namespace OptionMM
             this.dataTable.MultiSelect = false;
             this.dataTable.Name = "dataTable";
             this.dataTable.RowHeadersVisible = false;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.HotTrack;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataTable.RowsDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.HotTrack;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataTable.RowsDefaultCellStyle = dataGridViewCellStyle8;
             this.dataTable.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("宋体", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.dataTable.RowTemplate.Height = 40;
             this.dataTable.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
@@ -102,7 +105,7 @@ namespace OptionMM
             dataGridViewCellStyle2.Format = "g";
             dataGridViewCellStyle2.NullValue = null;
             this.cOptionID.DefaultCellStyle = dataGridViewCellStyle2;
-            this.cOptionID.HeaderText = "合约代码";
+            this.cOptionID.HeaderText = "看涨合约代码";
             this.cOptionID.Name = "cOptionID";
             this.cOptionID.ReadOnly = true;
             this.cOptionID.Resizable = System.Windows.Forms.DataGridViewTriState.False;
@@ -113,14 +116,14 @@ namespace OptionMM
             // 
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle3.Format = "N0";
             dataGridViewCellStyle3.NullValue = null;
             this.cVolume.DefaultCellStyle = dataGridViewCellStyle3;
-            this.cVolume.HeaderText = "持仓手数";
+            this.cVolume.HeaderText = "看涨合约方向";
             this.cVolume.Name = "cVolume";
             this.cVolume.ReadOnly = true;
             this.cVolume.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.cVolume.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cVolume.Width = 120;
             // 
             // cCoveredInterval
             // 
@@ -129,32 +132,41 @@ namespace OptionMM
             dataGridViewCellStyle4.Format = "F2";
             dataGridViewCellStyle4.NullValue = null;
             this.cCoveredInterval.DefaultCellStyle = dataGridViewCellStyle4;
-            this.cCoveredInterval.HeaderText = "套利区间";
+            this.cCoveredInterval.HeaderText = "看跌合约代码";
             this.cCoveredInterval.Name = "cCoveredInterval";
             this.cCoveredInterval.ReadOnly = true;
             this.cCoveredInterval.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.cCoveredInterval.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cCoveredInterval.Width = 80;
+            this.cCoveredInterval.Width = 120;
             // 
             // cCoveredAveragePrice
             // 
             dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle5.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle5.Format = "F2";
             dataGridViewCellStyle5.NullValue = null;
             this.cCoveredAveragePrice.DefaultCellStyle = dataGridViewCellStyle5;
-            this.cCoveredAveragePrice.HeaderText = "持仓均价";
+            this.cCoveredAveragePrice.HeaderText = "看跌合约方向";
             this.cCoveredAveragePrice.Name = "cCoveredAveragePrice";
             this.cCoveredAveragePrice.ReadOnly = true;
             this.cCoveredAveragePrice.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.cCoveredAveragePrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCoveredAveragePrice.Width = 120;
             // 
-            // CoveredPanel
+            // cParityInterval
+            // 
+            dataGridViewCellStyle6.Format = "F2";
+            this.cParityInterval.DefaultCellStyle = dataGridViewCellStyle6;
+            this.cParityInterval.HeaderText = "套利区间";
+            this.cParityInterval.Name = "cParityInterval";
+            this.cParityInterval.ReadOnly = true;
+            this.cParityInterval.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            // 
+            // ParityPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.dataTable);
-            this.Name = "CoveredPanel";
+            this.Name = "ParityPanel";
             this.Size = new System.Drawing.Size(615, 100);
             ((System.ComponentModel.ISupportInitialize)(this.dataTable)).EndInit();
             this.ResumeLayout(false);
@@ -168,6 +180,7 @@ namespace OptionMM
         private DataGridViewTextBoxColumn cVolume;
         private DataGridViewTextBoxColumn cCoveredInterval;
         private DataGridViewTextBoxColumn cCoveredAveragePrice;
+        private DataGridViewTextBoxColumn cParityInterval;
 
     }
 }
