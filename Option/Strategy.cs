@@ -139,128 +139,156 @@ namespace OptionMM
         /// <param name="pOrder"></param>
         void TD_OnTrading(ThostFtdcOrderField pOrder)
         {
-            if (pOrder.InstrumentID == this.option.InstrumentID && pOrder.VolumeTraded != 0)
+            if (pOrder.InstrumentID == this.option.InstrumentID)
             {
-                if (!this.tradingOrderDictionary.ContainsKey(pOrder.OrderRef))
+                Console.WriteLine("期权收到报单回报：" + pOrder.InstrumentID + " " + pOrder.Direction + " " + pOrder.CombOffsetFlag_0 +
+                    pOrder.UpdateTime + " " + pOrder.OrderRef + " " + pOrder.FrontID + " " + pOrder.SessionID);
+                if (pOrder.VolumeTraded != 0)
                 {
-                    if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                    if (!this.tradingOrderDictionary.ContainsKey(pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID))
                     {
-                        if (this.option.longPosition.Position + pOrder.VolumeTraded == 0)
+                        if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
                         {
-                            this.option.longPosition.PositionCost = 0;
+                            if (this.option.longPosition.Position + pOrder.VolumeTraded == 0)
+                            {
+                                this.option.longPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position +
+                                    pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.longPosition.Position + pOrder.VolumeTraded);
+                            }
+                            this.option.longPosition.Position += pOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            if (this.option.shortPosition.Position + pOrder.VolumeTraded == 0)
+                            {
+                                this.option.shortPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position +
+                                    pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.shortPosition.Position + pOrder.VolumeTraded);
+                            }
+                            this.option.shortPosition.Position -= pOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                        {
+                            if (this.option.shortPosition.Position + pOrder.VolumeTraded == 0)
+                            {
+                                this.option.shortPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position +
+                                    pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.shortPosition.Position + pOrder.VolumeTraded);
+                            }
+                            this.option.shortPosition.Position += pOrder.VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            if (this.option.longPosition.Position + pOrder.VolumeTraded == 0)
+                            {
+                                this.option.longPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position +
+                                    pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.longPosition.Position + pOrder.VolumeTraded);
+                            }
+                            this.option.longPosition.Position -= pOrder.VolumeTraded;
+                        }
+                        if (pOrder.VolumeTotal != 0)
+                        {
+                            this.tradingOrderDictionary.Add(pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID, pOrder);
+                        }
+                    }
+                    else
+                    {
+                        if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                        {
+                            if (this.option.longPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded) == 0)
+                            {
+                                this.option.longPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position -
+                                    pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded)) / (this.option.longPosition.Position -
+                                    (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded));
+                            }
+                            this.option.longPosition.Position += pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            if (this.option.shortPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded) == 0)
+                            {
+                                this.option.shortPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position -
+                                    pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded)) / (this.option.shortPosition.Position -
+                                    (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded));
+                            }
+                            this.option.shortPosition.Position -= pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                        {
+                            if (this.option.shortPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded) == 0)
+                            {
+                                this.option.shortPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position -
+                                    pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded)) / (this.option.shortPosition.Position -
+                                    (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded));
+                            }
+                            this.option.shortPosition.Position += pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded;
+                        }
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        {
+                            if (this.option.longPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded) == 0)
+                            {
+                                this.option.longPosition.PositionCost = 0;
+                            }
+                            else
+                            {
+                                this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position -
+                                    pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded)) / (this.option.longPosition.Position -
+                                    (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded));
+                            }
+                            this.option.longPosition.Position -= pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded;
+                        }
+                        if (pOrder.VolumeTotal == 0)
+                        {
+                            this.tradingOrderDictionary.Remove(pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID);
                         }
                         else
                         {
-                            this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position +
-                                pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.longPosition.Position + pOrder.VolumeTraded);
+                            this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID] = pOrder;
                         }
-                        this.option.longPosition.Position += pOrder.VolumeTraded;
-                    }
-                    else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
-                    {
-                        if (this.option.shortPosition.Position + pOrder.VolumeTraded == 0)
-                        {
-                            this.option.shortPosition.PositionCost = 0;
-                        }
-                        else
-                        {
-                            this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position +
-                                pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.shortPosition.Position + pOrder.VolumeTraded);
-                        }
-                        this.option.shortPosition.Position -= pOrder.VolumeTraded;
-                    }
-                    else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
-                    {
-                        if (this.option.shortPosition.Position + pOrder.VolumeTraded == 0)
-                        {
-                            this.option.shortPosition.PositionCost = 0;
-                        }
-                        else
-                        {
-                            this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position +
-                                pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.shortPosition.Position + pOrder.VolumeTraded);
-                        }
-                        this.option.shortPosition.Position += pOrder.VolumeTraded;
-                    }
-                    else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
-                    {
-                        if (this.option.longPosition.Position + pOrder.VolumeTraded == 0)
-                        {
-                            this.option.longPosition.PositionCost = 0;
-                        }
-                        else
-                        {
-                            this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position +
-                                pOrder.LimitPrice * pOrder.VolumeTraded) / (this.option.longPosition.Position + pOrder.VolumeTraded);
-                        }
-                        this.option.longPosition.Position -= pOrder.VolumeTraded;
-                    }
-                    if(pOrder.VolumeTotal != 0)
-                    {
-                        this.tradingOrderDictionary.Add(pOrder.OrderRef, pOrder);
                     }
                 }
                 else
                 {
-                    if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                    if (this.option.PlaceLongOptionOrderRef == pOrder.OrderRef)
                     {
-                        if (this.option.longPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded) == 0)
-                        {
-                            this.option.longPosition.PositionCost = 0;
-                        }
-                        else
-                        {
-                            this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position -
-                                pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded)) / (this.option.longPosition.Position -
-                                (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded));
-                        }
-                        this.option.longPosition.Position += pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded;
+                        this.option.LongOptionOrder = pOrder;
                     }
-                    else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                    else if (this.option.PlaceShortOptionOrderRef == pOrder.OrderRef)
                     {
-                        if (this.option.shortPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded) == 0)
-                        {
-                            this.option.shortPosition.PositionCost = 0;
-                        }
-                        else
-                        {
-                            this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position -
-                                pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded)) / (this.option.shortPosition.Position -
-                                (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded));
-                        }
-                        this.option.shortPosition.Position -= pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded;
+                        this.option.ShortOptionOrder = pOrder;
                     }
-                    else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Open)
+                    else if (this.option.CloseLongOptionOrderRef == pOrder.OrderRef)
                     {
-                        if (this.option.shortPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded) == 0)
-                        {
-                            this.option.shortPosition.PositionCost = 0;
-                        }
-                        else
-                        {
-                            this.option.shortPosition.PositionCost = (this.option.shortPosition.PositionCost * this.option.shortPosition.Position -
-                                pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded)) / (this.option.shortPosition.Position -
-                                (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded));
-                        }
-                        this.option.shortPosition.Position += pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded;
+                        this.option.CloseLongOptionOrder = pOrder;
                     }
-                    else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                    else if (this.option.CloseShortOptionOrderRef == pOrder.OrderRef)
                     {
-                        if (this.option.longPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded) == 0)
-                        {
-                            this.option.longPosition.PositionCost = 0;
-                        }
-                        else
-                        {
-                            this.option.longPosition.PositionCost = (this.option.longPosition.PositionCost * this.option.longPosition.Position -
-                                pOrder.LimitPrice * (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded)) / (this.option.longPosition.Position -
-                                (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded));
-                        }
-                        this.option.longPosition.Position -= pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef].VolumeTraded;
-                    }
-                    if(pOrder.VolumeTotal == 0)
-                    {
-                        this.tradingOrderDictionary.Remove(pOrder.OrderRef);
+                        this.option.CloseShortOptionOrder = pOrder;
                     }
                 }
             }

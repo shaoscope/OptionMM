@@ -35,13 +35,13 @@
             this.riskManagementButton = new System.Windows.Forms.Button();
             this.startAllButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.optionPanel = new OptionMM.OptionPanel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.parityButton = new System.Windows.Forms.Button();
-            this.coveredButton = new System.Windows.Forms.Button();
-            this.optionPanel = new OptionMM.OptionPanel();
             this.coveredPanel = new OptionMM.CoveredPanel();
             this.parityPanel = new OptionMM.ParityPanel();
+            this.parityButton = new System.Windows.Forms.Button();
+            this.coveredButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuBarPanel.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -85,7 +85,7 @@
             this.forQuoteInfoLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.forQuoteInfoLabel.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.forQuoteInfoLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.forQuoteInfoLabel.Location = new System.Drawing.Point(288, 8);
+            this.forQuoteInfoLabel.Location = new System.Drawing.Point(401, 8);
             this.forQuoteInfoLabel.Name = "forQuoteInfoLabel";
             this.forQuoteInfoLabel.Size = new System.Drawing.Size(74, 18);
             this.forQuoteInfoLabel.TabIndex = 3;
@@ -146,6 +146,16 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(1642, 635);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
+            // optionPanel
+            // 
+            this.optionPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.optionPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.optionPanel.Location = new System.Drawing.Point(0, 0);
+            this.optionPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.optionPanel.Name = "optionPanel";
+            this.optionPanel.Size = new System.Drawing.Size(1130, 635);
+            this.optionPanel.TabIndex = 0;
+            // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
@@ -173,6 +183,22 @@
             this.tableLayoutPanel3.Size = new System.Drawing.Size(616, 360);
             this.tableLayoutPanel3.TabIndex = 5;
             // 
+            // coveredPanel
+            // 
+            this.coveredPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.coveredPanel.Location = new System.Drawing.Point(3, 3);
+            this.coveredPanel.Name = "coveredPanel";
+            this.coveredPanel.Size = new System.Drawing.Size(610, 107);
+            this.coveredPanel.TabIndex = 4;
+            // 
+            // parityPanel
+            // 
+            this.parityPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.parityPanel.Location = new System.Drawing.Point(3, 116);
+            this.parityPanel.Name = "parityPanel";
+            this.parityPanel.Size = new System.Drawing.Size(610, 241);
+            this.parityPanel.TabIndex = 5;
+            // 
             // parityButton
             // 
             this.parityButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -196,32 +222,6 @@
             this.coveredButton.Text = "单期权上限套利";
             this.coveredButton.UseVisualStyleBackColor = true;
             this.coveredButton.Click += new System.EventHandler(this.coveredButton_Click);
-            // 
-            // optionPanel
-            // 
-            this.optionPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.optionPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.optionPanel.Location = new System.Drawing.Point(0, 0);
-            this.optionPanel.Margin = new System.Windows.Forms.Padding(0);
-            this.optionPanel.Name = "optionPanel";
-            this.optionPanel.Size = new System.Drawing.Size(1130, 635);
-            this.optionPanel.TabIndex = 0;
-            // 
-            // coveredPanel
-            // 
-            this.coveredPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.coveredPanel.Location = new System.Drawing.Point(3, 3);
-            this.coveredPanel.Name = "coveredPanel";
-            this.coveredPanel.Size = new System.Drawing.Size(610, 107);
-            this.coveredPanel.TabIndex = 4;
-            // 
-            // parityPanel
-            // 
-            this.parityPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.parityPanel.Location = new System.Drawing.Point(3, 116);
-            this.parityPanel.Name = "parityPanel";
-            this.parityPanel.Size = new System.Drawing.Size(610, 241);
-            this.parityPanel.TabIndex = 5;
             // 
             // MainForm
             // 

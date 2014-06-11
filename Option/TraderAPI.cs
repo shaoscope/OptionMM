@@ -667,37 +667,72 @@ namespace CTP
         ///报单通知
         void OnRtnOrder(ThostFtdcOrderField pOrder)
         {
+            Console.WriteLine("平台收到报单回报：" + pOrder.InstrumentID + " " + pOrder.Direction + " " + pOrder.CombOffsetFlag_0 + 
+                pOrder.UpdateTime + " " + pOrder.OrderRef + " " + pOrder.FrontID + " " + pOrder.SessionID);
             CurrentOrder = pOrder;
             if (IsTradingOrder(pOrder))
             {
-                //if (IsMyOrder(pOrder))
-                //{
-                //    if (pOrder.ExchangeID != null && pOrder.ExchangeID != "" && pOrder.OrderSysID != null && pOrder.OrderSysID != "")
-                //    {
-                //        if (pOrder.OrderStatus != EnumOrderStatusType.Unknown)
-                //        {
-                //            OrderSignal Signal = new OrderSignal();
-                //            Signal.FrontID = pOrder.FrontID;
-                //            Signal.OrderRef = pOrder.OrderRef;
-                //            Signal.SessionID = pOrder.SessionID;
-                //            lock (TradingLock)
-                //            {
-                //                if (TradingOrderMap.ContainsKey(Signal))
-                //                {
-                //                    TradingOrderMap[Signal] = pOrder;
-                //                }
-                //                else
-                //                {
-                //                    TradingOrderMap.Add(Signal, pOrder);
-                //                }
-                //            }
-                //            lock (InputLock)
-                //            {
-                //                InputOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
-                //            }
-                //        }
-                //    }
-                //}
+                if (IsMyOrder(pOrder))
+                {
+                    if (pOrder.ExchangeID != null && pOrder.ExchangeID != "" && pOrder.OrderSysID != null && pOrder.OrderSysID != "")
+                    {
+                        if (pOrder.OrderStatus != EnumOrderStatusType.Unknown)
+                        {
+                            OrderSignal Signal = new OrderSignal();
+                            Signal.FrontID = pOrder.FrontID;
+                            Signal.OrderRef = pOrder.OrderRef;
+                            Signal.SessionID = pOrder.SessionID;
+                            lock (TradingLock)
+                            {
+                                if (TradingOrderMap.ContainsKey(Signal))
+                                {
+                                    TradingOrderMap[Signal] = pOrder;
+                                }
+                                else
+                                {
+                                    TradingOrderMap.Add(Signal, pOrder);
+                                }
+                            }
+                            lock (InputLock)
+                            {
+                                InputOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                            }
+                        }
+                        if(pOrder.OrderStatus != EnumOrderStatusType.AllTraded)
+                        {
+                            OrderSignal Signal = new OrderSignal();
+                            Signal.FrontID = pOrder.FrontID;
+                            Signal.OrderRef = pOrder.OrderRef;
+                            Signal.SessionID = pOrder.SessionID;
+                            lock (TradingLock)
+                            {
+                                TradingOrderMap.Remove(Signal);
+                            }
+                            if (FinishedOrderMap.ContainsKey(Signal))
+                            {
+                                FinishedOrderMap[Signal] = pOrder;
+                            }
+                            else
+                            {
+                                FinishedOrderMap.Add(Signal, pOrder);
+                            }
+                            lock (ActionLock)
+                            {
+                                if (ActionOrderMap.ContainsKey(Signal))
+                                {
+                                    ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                                }
+                            }
+                            lock (InputLock)
+                            {
+                                if (InputOrderMap.ContainsKey(Signal))
+                                {
+                                    InputOrderMap.Remove(Signal);
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Trading(pOrder);
             }

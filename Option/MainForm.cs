@@ -84,7 +84,7 @@ namespace OptionMM
                 strategy.Configuration();
                 this.optionPanel.AddStrategy(strategy);
             }
-            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 10 * 1000);
+            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 5 * 1000);
             this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
             this.writeXmlTimer = new System.Threading.Timer(this.writerXmlCallBack, null, 10 * 1000, 10 * 1000);
 
@@ -136,7 +136,7 @@ namespace OptionMM
         /// <param name="future"></param>
         private void RefreshHedgeVolumeLabel(Future future)
         {
-            this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)future.HedgeVolume;
+            this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)future.HedgeVolume + "-(" + future.longPosition.Position + "-" + future.shortPosition.Position + ")=" + ((int)future.HedgeVolume - (future.longPosition.Position - future.shortPosition.Position));
         }
 
         /// <summary>

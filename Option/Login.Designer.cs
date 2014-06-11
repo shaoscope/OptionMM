@@ -38,8 +38,8 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.login_Button = new System.Windows.Forms.Button();
+            this.exit_Button = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.loginStatusLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -132,25 +132,25 @@
             this.textBox5.TabIndex = 9;
             this.textBox5.Text = "tcp://27.115.78.201:31205";
             // 
-            // button1
+            // login_Button
             // 
-            this.button1.Location = new System.Drawing.Point(51, 227);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "登陆";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.login_Button.Location = new System.Drawing.Point(51, 227);
+            this.login_Button.Name = "login_Button";
+            this.login_Button.Size = new System.Drawing.Size(75, 23);
+            this.login_Button.TabIndex = 10;
+            this.login_Button.Text = "登陆";
+            this.login_Button.UseVisualStyleBackColor = true;
+            this.login_Button.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button2
+            // exit_Button
             // 
-            this.button2.Location = new System.Drawing.Point(150, 227);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 11;
-            this.button2.Text = "退出";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.exit_Button.Location = new System.Drawing.Point(150, 227);
+            this.exit_Button.Name = "exit_Button";
+            this.exit_Button.Size = new System.Drawing.Size(75, 23);
+            this.exit_Button.TabIndex = 11;
+            this.exit_Button.Text = "退出";
+            this.exit_Button.UseVisualStyleBackColor = true;
+            this.exit_Button.Click += new System.EventHandler(this.button2_Click);
             // 
             // label6
             // 
@@ -178,8 +178,8 @@
             this.ClientSize = new System.Drawing.Size(477, 262);
             this.Controls.Add(this.loginStatusLabel);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.exit_Button);
+            this.Controls.Add(this.login_Button);
             this.Controls.Add(this.textBox5);
             this.Controls.Add(this.textBox4);
             this.Controls.Add(this.textBox3);
@@ -194,6 +194,7 @@
             this.MinimizeBox = false;
             this.Name = "Login";
             this.Text = "Login";
+            this.Load += new System.EventHandler(this.LoginForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -211,9 +212,9 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.TextBox textBox5;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label loginStatusLabel;
+        public System.Windows.Forms.Button login_Button;
+        public System.Windows.Forms.Button exit_Button;
     }
 }

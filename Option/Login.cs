@@ -29,7 +29,7 @@ namespace OptionMM
 
         private void button1_Click(object sender, EventArgs e)
         {
-            button1.Enabled = false;
+            login_Button.Enabled = false;
             if (td != null)
                 td = null;
             if (md != null)
@@ -61,10 +61,15 @@ namespace OptionMM
             else
             {
                 //登陆失败
-                button1.Text = "登陆";
-                button1.Enabled = true;
+                login_Button.Text = "登陆";
+                login_Button.Enabled = true;
                 this.DialogResult = DialogResult.No;
             }
+        }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            this.login_Button.PerformClick();
         }
     }
 }
