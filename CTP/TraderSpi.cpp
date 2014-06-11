@@ -8,7 +8,8 @@
 #include "TraderSpi.h"
 #include "CTPTraderAdapter.h"
 #include "Callbacks.h"
-
+#include <iostream>
+using namespace std;
 
 namespace Native
 {
@@ -808,6 +809,8 @@ namespace Native
 
 	///报单通知
 	void CTraderSpi::OnRtnOrder(CThostFtdcOrderField *pOrder){
+		cout << "接口收到报单回报：" << pOrder->InstrumentID << " " << pOrder->Direction << " " << pOrder->CombOffsetFlag <<
+			pOrder->UpdateTime << " " << pOrder->OrderRef << " " << pOrder->FrontID << " " << pOrder->SessionID << endl;
 		m_pAdapter->OnRtnOrder(MNConv<ThostFtdcOrderField^, CThostFtdcOrderField>::N2M(pOrder));
 	};
 
