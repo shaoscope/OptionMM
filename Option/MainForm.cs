@@ -443,5 +443,68 @@ namespace OptionMM
         }
 
 
+        /// <summary>
+        /// 扫描平价套利Task
+        /// </summary>
+        private Task scanVerticalTask;
+
+        private void verticalButton_Click(object sender, EventArgs e)
+        {
+            this.verticalPanel.dataTable.Rows.Clear();
+            scanVerticalTask = new Task(ScanVertical);
+            scanVerticalTask.Start();
+            scanVerticalTask.ContinueWith(ScanArbitrageFinished);
+        }
+
+        /// <summary>
+        /// 扫描垂直套利机会
+        /// </summary>
+        private void ScanVertical()
+        {
+            List<Strategy> strategyList = new List<Strategy>();
+            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            {
+                Strategy strategy = (Strategy)dataRow.Tag;
+                if (strategy.Option.InstrumentID.Contains("IF1406"))
+                {
+                    strategyList.Add(strategy);
+                }
+            }
+            for (int i = 0; i < strategyList.Count - 1; i ++ )
+            {
+                Strategy strategyLower = strategyList[i];
+                for(int j = i+1; j < strategyList.Count; j++)
+                {
+                    Strategy strategyUpper = strategyList[j];
+                    if (strategyLower.Option.OptionType == strategyUpper.Option.OptionType && strategyUpper.Option.OptionType == OptionTypeEnum.call)
+                    {
+                        if (strategyUpper.Option.StrikePrice - strategyLower.Option.StrikePrice < strategyLower.Option.LastMarket.AskPrice1 - strategyUpper.Option.LastMarket.BidPrice1)
+                        {
+                            double verticalInterval = strategyLower.Option.LastMarket.AskPrice1 - strategyUpper.Option.LastMarket.BidPrice1 -
+                                strategyUpper.Option.StrikePrice + strategyLower.Option.StrikePrice;
+                            Vertical vertical = new Vertical(strategyUpper.Option.InstrumentID, EnumPosiDirectionType.Long, strategyLower.Option.InstrumentID, EnumPosiDirectionType.Short, verticalInterval);
+                            this.BeginInvoke(new Action<Vertical>(this.AddVertical), vertical);
+                        }
+                    }
+                    else if (strategyLower.Option.OptionType == strategyUpper.Option.OptionType && strategyUpper.Option.OptionType == OptionTypeEnum.put)
+                    {
+                        if (strategyUpper.Option.StrikePrice - strategyLower.Option.StrikePrice < strategyUpper.Option.LastMarket.BidPrice1 - strategyLower.Option.LastMarket.AskPrice1)
+                        {
+                            double verticalInterval = strategyUpper.Option.LastMarket.BidPrice1 - strategyLower.Option.LastMarket.AskPrice1 -
+                                strategyUpper.Option.StrikePrice + strategyLower.Option.StrikePrice;
+                            Vertical vertical = new Vertical(strategyUpper.Option.InstrumentID, EnumPosiDirectionType.Short, strategyLower.Option.InstrumentID, EnumPosiDirectionType.Long, verticalInterval);
+                            this.BeginInvoke(new Action<Vertical>(this.AddVertical), vertical);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void AddVertical(Vertical vertical)
+        {
+            this.verticalPanel.AddVertical(vertical);
+        }
+
     }//class
 }//namespace

@@ -37,9 +37,11 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.optionPanel = new OptionMM.OptionPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.verticalButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.coveredPanel = new OptionMM.CoveredPanel();
             this.parityPanel = new OptionMM.ParityPanel();
+            this.verticalPanel = new OptionMM.VerticalPanel();
             this.parityButton = new System.Windows.Forms.Button();
             this.coveredButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
@@ -61,7 +63,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1642, 665);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1793, 665);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // menuBarPanel
@@ -75,7 +77,7 @@
             this.menuBarPanel.Location = new System.Drawing.Point(0, 0);
             this.menuBarPanel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 1);
             this.menuBarPanel.Name = "menuBarPanel";
-            this.menuBarPanel.Size = new System.Drawing.Size(1642, 29);
+            this.menuBarPanel.Size = new System.Drawing.Size(1793, 29);
             this.menuBarPanel.TabIndex = 1;
             // 
             // forQuoteInfoLabel
@@ -109,7 +111,7 @@
             this.riskManagementButton.Dock = System.Windows.Forms.DockStyle.Right;
             this.riskManagementButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.riskManagementButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.riskManagementButton.Location = new System.Drawing.Point(1567, 0);
+            this.riskManagementButton.Location = new System.Drawing.Point(1718, 0);
             this.riskManagementButton.Name = "riskManagementButton";
             this.riskManagementButton.Size = new System.Drawing.Size(75, 29);
             this.riskManagementButton.TabIndex = 1;
@@ -143,7 +145,7 @@
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1642, 635);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1793, 635);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // optionPanel
@@ -159,6 +161,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.panel1.Controls.Add(this.verticalButton);
             this.panel1.Controls.Add(this.tableLayoutPanel3);
             this.panel1.Controls.Add(this.parityButton);
             this.panel1.Controls.Add(this.coveredButton);
@@ -166,8 +169,20 @@
             this.panel1.Location = new System.Drawing.Point(1130, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(512, 635);
+            this.panel1.Size = new System.Drawing.Size(663, 635);
             this.panel1.TabIndex = 1;
+            // 
+            // verticalButton
+            // 
+            this.verticalButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.verticalButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.verticalButton.Location = new System.Drawing.Point(229, 3);
+            this.verticalButton.Name = "verticalButton";
+            this.verticalButton.Size = new System.Drawing.Size(107, 29);
+            this.verticalButton.TabIndex = 6;
+            this.verticalButton.Text = "垂直套利";
+            this.verticalButton.UseVisualStyleBackColor = true;
+            this.verticalButton.Click += new System.EventHandler(this.verticalButton_Click);
             // 
             // tableLayoutPanel3
             // 
@@ -175,12 +190,14 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel3.Controls.Add(this.coveredPanel, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.parityPanel, 0, 1);
+            this.tableLayoutPanel3.Controls.Add(this.verticalPanel, 0, 2);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 38);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 2;
+            this.tableLayoutPanel3.RowCount = 3;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 31.66667F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 68.33334F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(616, 360);
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 228F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(632, 517);
             this.tableLayoutPanel3.TabIndex = 5;
             // 
             // coveredPanel
@@ -188,16 +205,24 @@
             this.coveredPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.coveredPanel.Location = new System.Drawing.Point(3, 3);
             this.coveredPanel.Name = "coveredPanel";
-            this.coveredPanel.Size = new System.Drawing.Size(610, 107);
+            this.coveredPanel.Size = new System.Drawing.Size(626, 85);
             this.coveredPanel.TabIndex = 4;
             // 
             // parityPanel
             // 
             this.parityPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.parityPanel.Location = new System.Drawing.Point(3, 116);
+            this.parityPanel.Location = new System.Drawing.Point(3, 94);
             this.parityPanel.Name = "parityPanel";
-            this.parityPanel.Size = new System.Drawing.Size(610, 241);
+            this.parityPanel.Size = new System.Drawing.Size(626, 191);
             this.parityPanel.TabIndex = 5;
+            // 
+            // verticalPanel
+            // 
+            this.verticalPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.verticalPanel.Location = new System.Drawing.Point(3, 291);
+            this.verticalPanel.Name = "verticalPanel";
+            this.verticalPanel.Size = new System.Drawing.Size(626, 223);
+            this.verticalPanel.TabIndex = 6;
             // 
             // parityButton
             // 
@@ -227,7 +252,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1642, 665);
+            this.ClientSize = new System.Drawing.Size(1793, 665);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "MainForm";
             this.Text = "MainForm";
@@ -260,6 +285,8 @@
         public CoveredPanel coveredPanel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         public ParityPanel parityPanel;
+        private System.Windows.Forms.Button verticalButton;
+        private VerticalPanel verticalPanel;
 
 
     }

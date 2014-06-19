@@ -17,13 +17,13 @@ namespace OptionMM
             this.instrumentID = instrumentID;
             foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
             {
-                if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
+                if ((position.InstrumentID == "IF1406" || position.InstrumentID == "IF1407" || position.InstrumentID == "IF1409" || position.InstrumentID == "IF1412") && position.PosiDirection == EnumPosiDirectionType.Long)
                 {
-                    this.longPosition = position;
+                    this.longPosition.Position += position.Position;
                 }
-                else if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
+                else if ((position.InstrumentID == "IF1406" || position.InstrumentID == "IF1407" || position.InstrumentID == "IF1409" || position.InstrumentID == "IF1412") && position.PosiDirection == EnumPosiDirectionType.Short)
                 {
-                    this.shortPosition = position;
+                    this.shortPosition.Position += position.Position;
                 }
             }
             MDManager.MD.SubscribeMarketData(new string[] { InstrumentID });
@@ -38,10 +38,8 @@ namespace OptionMM
         /// <param name="pOrder"></param>
         private void TD_OnTrading(ThostFtdcOrderField pOrder)
         {
-            if (pOrder.InstrumentID == this.InstrumentID)
+            if (pOrder.InstrumentID == "IF1406" || pOrder.InstrumentID == "IF1407" || pOrder.InstrumentID == "IF1409" || pOrder.InstrumentID == "IF1412")
             {
-                Console.WriteLine("期货收到报单回报：" + pOrder.InstrumentID + " " + pOrder.Direction + " " + pOrder.CombOffsetFlag_0 + 
-                    pOrder.UpdateTime + " " + pOrder.OrderRef + " " + pOrder.FrontID + " " + pOrder.SessionID);
                 if (pOrder.VolumeTraded != 0)
                 {
                     if (!this.tradingOrderDictionary.ContainsKey(pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID))
@@ -59,7 +57,7 @@ namespace OptionMM
                             }
                             this.longPosition.Position += pOrder.VolumeTraded;
                         }
-                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 != EnumOffsetFlagType.Open)
                         {
                             if (this.shortPosition.Position + pOrder.VolumeTraded == 0)
                             {
@@ -85,7 +83,7 @@ namespace OptionMM
                             }
                             this.shortPosition.Position += pOrder.VolumeTraded;
                         }
-                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 != EnumOffsetFlagType.Open)
                         {
                             if (this.longPosition.Position + pOrder.VolumeTraded == 0)
                             {
@@ -119,7 +117,7 @@ namespace OptionMM
                             }
                             this.longPosition.Position += pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded;
                         }
-                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        else if (pOrder.Direction == EnumDirectionType.Buy && pOrder.CombOffsetFlag_0 != EnumOffsetFlagType.Open)
                         {
                             if (this.shortPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded) == 0)
                             {
@@ -147,7 +145,7 @@ namespace OptionMM
                             }
                             this.shortPosition.Position += pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded;
                         }
-                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 == EnumOffsetFlagType.Close)
+                        else if (pOrder.Direction == EnumDirectionType.Sell && pOrder.CombOffsetFlag_0 != EnumOffsetFlagType.Open)
                         {
                             if (this.longPosition.Position - (pOrder.VolumeTraded - this.tradingOrderDictionary[pOrder.OrderRef + "-" + pOrder.FrontID + "-" + pOrder.SessionID].VolumeTraded) == 0)
                             {
@@ -227,8 +225,6 @@ namespace OptionMM
         public void AutoHedge()
         {
             int adjustVolume = (int)hedgeVolume - (this.longPosition.Position - this.shortPosition.Position);
-            //Console.WriteLine("======================================对冲" + hedgeVolume + "-(" + this.longPosition.Position + "-" + this.shortPosition.Position + ")=" + adjustVolume);
-            //Console.WriteLine("应该对冲期货手数：" + adjustVolume);
             return;
             if (adjustVolume >= 8)
             {

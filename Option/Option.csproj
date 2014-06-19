@@ -55,7 +55,14 @@
     <Compile Include="CoveredPanel.designer.cs">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Vertical.cs" />
     <Compile Include="Parity.cs" />
+    <Compile Include="VerticalPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VerticalPanel.designer.cs">
+      <DependentUpon>VerticalPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="ParityPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -113,6 +120,9 @@
     <Compile Include="TraderAPI.cs" />
     <EmbeddedResource Include="CoveredPanel.resx">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VerticalPanel.resx">
+      <DependentUpon>VerticalPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ParityPanel.resx">
       <DependentUpon>ParityPanel.cs</DependentUpon>

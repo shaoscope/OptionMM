@@ -667,8 +667,6 @@ namespace CTP
         ///报单通知
         void OnRtnOrder(ThostFtdcOrderField pOrder)
         {
-            Console.WriteLine("平台收到报单回报：" + pOrder.InstrumentID + " " + pOrder.Direction + " " + pOrder.CombOffsetFlag_0 + 
-                pOrder.UpdateTime + " " + pOrder.OrderRef + " " + pOrder.FrontID + " " + pOrder.SessionID);
             CurrentOrder = pOrder;
             if (IsTradingOrder(pOrder))
             {
