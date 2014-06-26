@@ -17,13 +17,16 @@ namespace OptionMM
             this.instrumentID = instrumentID;
             foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
             {
-                if ((position.InstrumentID == "IF1406" || position.InstrumentID == "IF1407" || position.InstrumentID == "IF1409" || position.InstrumentID == "IF1412") && position.PosiDirection == EnumPosiDirectionType.Long)
+                if (position != null)
                 {
-                    this.longPosition.Position += position.Position;
-                }
-                else if ((position.InstrumentID == "IF1406" || position.InstrumentID == "IF1407" || position.InstrumentID == "IF1409" || position.InstrumentID == "IF1412") && position.PosiDirection == EnumPosiDirectionType.Short)
-                {
-                    this.shortPosition.Position += position.Position;
+                    if ((position.InstrumentID == "IF1407" || position.InstrumentID == "IF1408" || position.InstrumentID == "IF1409" || position.InstrumentID == "IF1412") && position.PosiDirection == EnumPosiDirectionType.Long)
+                    {
+                        this.longPosition.Position += position.Position;
+                    }
+                    else if ((position.InstrumentID == "IF1407" || position.InstrumentID == "IF1408" || position.InstrumentID == "IF1409" || position.InstrumentID == "IF1412") && position.PosiDirection == EnumPosiDirectionType.Short)
+                    {
+                        this.shortPosition.Position += position.Position;
+                    }
                 }
             }
             MDManager.MD.SubscribeMarketData(new string[] { InstrumentID });
@@ -38,7 +41,7 @@ namespace OptionMM
         /// <param name="pOrder"></param>
         private void TD_OnTrading(ThostFtdcOrderField pOrder)
         {
-            if (pOrder.InstrumentID == "IF1406" || pOrder.InstrumentID == "IF1407" || pOrder.InstrumentID == "IF1409" || pOrder.InstrumentID == "IF1412")
+            if (pOrder.InstrumentID == "IF1407" || pOrder.InstrumentID == "IF1408" || pOrder.InstrumentID == "IF1409" || pOrder.InstrumentID == "IF1412")
             {
                 if (pOrder.VolumeTraded != 0)
                 {

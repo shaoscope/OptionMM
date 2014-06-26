@@ -379,7 +379,7 @@ namespace OptionMM
                         double[] quote = this.CalculateQuote();
                         if (isRunning)
                         {
-                            this.ReplaceOrderDuration = 10;
+                            this.ReplaceOrderDuration = 11;
                             this.lastUpdateDateTime = updateDateTime;
                             this.PlaceOrder(quote);
                         }
@@ -409,90 +409,126 @@ namespace OptionMM
             {
                 if (this.option.LastMarket.LastPrice < 10)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 0.3;
-                    askQuote = bidQuote + 0.5;
-                    //bidQuote = this.option.LastMarket.LastPrice - 0.3;
-                    //askQuote = this.option.LastMarket.LastPrice + 0.2;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 0.3;
+                        askQuote = bidQuote + 0.5;
+                        //bidQuote = this.option.LastMarket.LastPrice - 0.3;
+                        //askQuote = this.option.LastMarket.LastPrice + 0.2;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 20)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 0.5;
-                    askQuote = bidQuote + 1;
-                    //bidQuote = this.option.LastMarket.LastPrice - 0.5;
-                    //askQuote = this.option.LastMarket.LastPrice + 0.5;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 0.5;
+                        askQuote = bidQuote + 1;
+                        //bidQuote = this.option.LastMarket.LastPrice - 0.5;
+                        //askQuote = this.option.LastMarket.LastPrice + 0.5;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 50)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 1.3;
-                    askQuote = bidQuote + 2.5;
-                    //bidQuote = this.option.LastMarket.LastPrice - 1.3;
-                    //askQuote = this.option.LastMarket.LastPrice + 1.2;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 1.3;
+                        askQuote = bidQuote + 2.5;
+                        //bidQuote = this.option.LastMarket.LastPrice - 1.3;
+                        //askQuote = this.option.LastMarket.LastPrice + 1.2;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 100)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 2.5;
-                    askQuote = bidQuote + 5;
-                    //bidQuote = this.option.LastMarket.LastPrice - 2.5;
-                    //askQuote = this.option.LastMarket.LastPrice + 2.5;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 2.5;
+                        askQuote = bidQuote + 5;
+                        //bidQuote = this.option.LastMarket.LastPrice - 2.5;
+                        //askQuote = this.option.LastMarket.LastPrice + 2.5;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 250)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 4;
-                    askQuote = bidQuote + 8;
-                    //bidQuote = this.option.LastMarket.LastPrice - 4;
-                    //askQuote = this.option.LastMarket.LastPrice + 4;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 4;
+                        askQuote = bidQuote + 8;
+                        //bidQuote = this.option.LastMarket.LastPrice - 4;
+                        //askQuote = this.option.LastMarket.LastPrice + 4;
+                    }
                 }
                 else
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 0.3;
-                    askQuote = bidQuote + 7.5;
-                    //bidQuote = this.option.LastMarket.LastPrice - 7.5;
-                    //askQuote = this.option.LastMarket.LastPrice + 7.5;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 7.5;
+                        askQuote = bidQuote + 15;
+                        //bidQuote = this.option.LastMarket.LastPrice - 7.5;
+                        //askQuote = this.option.LastMarket.LastPrice + 7.5;
+                    }
                 }
             }
             else
             {
                 if (this.option.LastMarket.LastPrice < 10)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 0.5;
-                    askQuote = bidQuote + 1;
-                    //bidQuote = this.option.LastMarket.LastPrice - 0.5;
-                    //askQuote = this.option.LastMarket.LastPrice + 0.5;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 0.5;
+                        askQuote = bidQuote + 1;
+                        //bidQuote = this.option.LastMarket.LastPrice - 0.5;
+                        //askQuote = this.option.LastMarket.LastPrice + 0.5;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 20)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 1;
-                    askQuote = bidQuote + 2;
-                    //bidQuote = this.option.LastMarket.LastPrice - 1;
-                    //askQuote = this.option.LastMarket.LastPrice + 1;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 1;
+                        askQuote = bidQuote + 2;
+                        //bidQuote = this.option.LastMarket.LastPrice - 1;
+                        //askQuote = this.option.LastMarket.LastPrice + 1;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 50)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 2;
-                    askQuote = bidQuote + 4;
-                    //bidQuote = this.option.LastMarket.LastPrice - 2;
-                    //askQuote = this.option.LastMarket.LastPrice + 2;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 2;
+                        askQuote = bidQuote + 4;
+                        //bidQuote = this.option.LastMarket.LastPrice - 2;
+                        //askQuote = this.option.LastMarket.LastPrice + 2;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 100)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 4;
-                    askQuote = bidQuote + 8;
-                    //bidQuote = this.option.LastMarket.LastPrice - 4;
-                    //askQuote = this.option.LastMarket.LastPrice + 4;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 4;
+                        askQuote = bidQuote + 8;
+                        //bidQuote = this.option.LastMarket.LastPrice - 4;
+                        //askQuote = this.option.LastMarket.LastPrice + 4;
+                    }
                 }
                 else if (this.option.LastMarket.LastPrice < 250)
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 7.5;
-                    askQuote = bidQuote + 15;
-                    bidQuote = this.option.LastMarket.LastPrice - 7.5;
-                    askQuote = this.option.LastMarket.LastPrice + 7.5;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 7.5;
+                        askQuote = bidQuote + 15;
+                        //bidQuote = this.option.LastMarket.LastPrice - 7.5;
+                        //askQuote = this.option.LastMarket.LastPrice + 7.5;
+                    }
                 }
                 else
                 {
-                    bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 12.5;
-                    askQuote = bidQuote + 25;
-                    //bidQuote = this.option.LastMarket.LastPrice - 12.5;
-                    //askQuote = this.option.LastMarket.LastPrice + 12.5;
+                    if (this.option.LastMarket.BidPrice1 < 99999 && this.option.LastMarket.AskPrice1 < 99999)
+                    {
+                        bidQuote = Math.Round((this.option.LastMarket.AskPrice1 + this.option.LastMarket.BidPrice1) / 2, 1) - 12.5;
+                        askQuote = bidQuote + 25;
+                        //bidQuote = this.option.LastMarket.LastPrice - 12.5;
+                        //askQuote = this.option.LastMarket.LastPrice + 12.5;
+                    }
                 }
             }
             #endregion
@@ -503,7 +539,7 @@ namespace OptionMM
             //{
             //    if (this.option.LastMarket.LastPrice < 10)
             //    {
-            //        if(this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if(this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -516,7 +552,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 20)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -529,7 +565,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 50)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -542,7 +578,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 100)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -555,7 +591,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 250)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -568,7 +604,7 @@ namespace OptionMM
             //    }
             //    else
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -584,7 +620,7 @@ namespace OptionMM
             //{
             //    if (this.option.LastMarket.LastPrice < 10)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -597,7 +633,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 20)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -610,7 +646,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 50)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -623,7 +659,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 100)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -636,7 +672,7 @@ namespace OptionMM
             //    }
             //    else if (this.option.LastMarket.LastPrice < 250)
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -649,7 +685,7 @@ namespace OptionMM
             //    }
             //    else
             //    {
-            //        if (this.option.LastMarket.BidPrice1 == double.MaxValue)
+            //        if (this.option.LastMarket.BidPrice1 > 99999)
             //        {
             //            bidQuote = 0;
             //            askQuote = 0;
@@ -668,29 +704,29 @@ namespace OptionMM
             //{
             //    if (this.option.OptionType == OptionTypeEnum.call)
             //    {
-            //        double volatility = get1406CallImpliedVolatility(this.option.StrikePrice);
-            //        double bidVolatility = volatility - 0.01;
-            //        double askVolatility = volatility + 0.01;
+            //        double[] volatilityInfo = get1406CallImpliedVolatility(this.option.StrikePrice);
+            //        double bidVolatility = volatilityInfo[0] - volatilityInfo[1] * 0.01;
+            //        double askVolatility = volatilityInfo[0] + volatilityInfo[1] * 0.01;
             //        OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
-            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, bidVolatility,
+            //            MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, bidVolatility,
             //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
             //        bidQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
             //        optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
-            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, askVolatility,
+            //            MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, askVolatility,
             //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
             //        askQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
             //    }
             //    else if (this.option.OptionType == OptionTypeEnum.put)
             //    {
-            //        double volatility = get1406PutImpliedVolatility(this.option.StrikePrice);
-            //        double bidVolatility = volatility - 0.01;
-            //        double askVolatility = volatility + 0.01;
+            //        double[] volatilityInfo = get1406PutImpliedVolatility(this.option.StrikePrice);
+            //        double bidVolatility = volatilityInfo[0] - volatilityInfo[1] * 0.01;
+            //        double askVolatility = volatilityInfo[0] + volatilityInfo[1] * 0.01;
             //        OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
-            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, bidVolatility,
+            //            MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, bidVolatility,
             //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
             //        bidQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
             //        optionPricingModelParams = new OptionPricingModelParams(this.option.OptionType,
-            //            this.future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, askVolatility,
+            //            MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice, GlobalValues.InterestRate, askVolatility,
             //            StaticFunction.GetDaysToMaturity(this.option.InstrumentID));
             //        askQuote = OptionPricingModel.EuropeanBS(optionPricingModelParams).Price;
             //    }
@@ -737,34 +773,67 @@ namespace OptionMM
             return quote;
         }
 
-
-        private double get1406CallImpliedVolatility(double strikePrice)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strikePrice"></param>
+        /// <returns>隐含波动率和波动速率的数组</returns>
+        private double[] get1406CallImpliedVolatility(double strikePrice)
         {
-            return 0.000001007 * strikePrice * strikePrice - 0.004444 * strikePrice + 5.178;
+            return new double[] { 0.000001007 * strikePrice * strikePrice - 0.004444 * strikePrice + 5.178, Math.Abs(2 * 0.000001007 * strikePrice - 0.004444) };
         }
 
-        private double get1406PutImpliedVolatility(double strikePrice)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strikePrice"></param>
+        /// <returns>隐含波动率和波动速率的数组</returns>
+        private double[] get1406PutImpliedVolatility(double strikePrice)
         {
-            return 0.0000005747 * strikePrice * strikePrice - 0.002561 * strikePrice + 3.11;
+            return new double[] { 0.0000005747 * strikePrice * strikePrice - 0.002561 * strikePrice + 3.11, Math.Abs(2 * 0.0000005747 * strikePrice - 0.002561) };
         }
 
-        private double get1407CallImpliedVolatility(double strikePrice)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strikePrice"></param>
+        /// <returns>隐含波动率和波动速率的数组</returns>
+        private double[] get1407CallImpliedVolatility(double strikePrice)
         {
-            return 0.0013 * strikePrice * strikePrice - 0.0084 * strikePrice + 0.2909;
+            return new double[] { 0.0013 * strikePrice * strikePrice - 0.0084 * strikePrice + 0.2909, Math.Abs(2 * 0.0013 * strikePrice - 0.0084) };
         }
 
-        private double get1407PutImpliedVolatility(double strikePrice)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strikePrice"></param>
+        /// <returns>隐含波动率和波动速率的数组</returns>
+        private double[] get1407PutImpliedVolatility(double strikePrice)
         {
-            return 0.001 * strikePrice * strikePrice - 0.0069 * strikePrice + 0.2912;
-        }
-        private double get1408CallImpliedVolatility(double strikePrice)
-        {
-            return -0.001 * strikePrice * strikePrice - 0.0048 * strikePrice + 0.2831;
+            return new double[] { 0.001 * strikePrice * strikePrice - 0.0069 * strikePrice + 0.2912, Math.Abs(2 * 0.001 * strikePrice - 0.0069) };
         }
 
-        private double get1408PutImpliedVolatility(double strikePrice)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strikePrice"></param>
+        /// <returns>隐含波动率和波动速率的数组</returns>
+        private double[] get1408CallImpliedVolatility(double strikePrice)
         {
-            return -0.0015 * strikePrice * strikePrice - 0.0115 * strikePrice + 0.2517;
+            return new double[] { -0.001 * strikePrice * strikePrice - 0.0048 * strikePrice + 0.2831, Math.Abs(2 * -0.001 * strikePrice - 0.0048) };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strikePrice"></param>
+        /// <returns>隐含波动率和波动速率的数组</returns>
+        private double[] get1408PutImpliedVolatility(double strikePrice)
+        {
+            return new double[] { -0.0015 * strikePrice * strikePrice - 0.0115 * strikePrice + 0.2517, Math.Abs(2 * -0.0015 * strikePrice - 0.0115) };
         }
 
         /// <summary>
@@ -855,8 +924,8 @@ namespace OptionMM
             #region 直接开仓
             if (bidQuote >= 0.1)
             {
-                this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
-                this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
+                //this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+                //this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
             }
             #endregion
         }

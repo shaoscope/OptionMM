@@ -58,7 +58,7 @@ namespace OptionMM
         {
             //加载面板
             InitFromXML("Option.xml");
-            Future = new Future("IF1406");
+            Future = new Future("IF1407");
             foreach (string instrumentID in configValues.Keys)
             {
                 Strategy strategy = new Strategy();
@@ -70,13 +70,16 @@ namespace OptionMM
                 //加入仓位信息
                 foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
                 {
-                    if(position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
+                    if (position != null)
                     {
-                        strategy.Option.longPosition = position;
-                    }
-                    else if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
-                    {
-                        strategy.Option.shortPosition = position;
+                        if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
+                        {
+                            strategy.Option.longPosition = position;
+                        }
+                        else if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
+                        {
+                            strategy.Option.shortPosition = position;
+                        }
                     }
                 }
                 strategy.Option.longPosition.PositionCost = double.Parse(configValues[instrumentID][3]);
