@@ -11,6 +11,32 @@ namespace CTP
     public delegate void OrderHandle(ThostFtdcOrderField pOrder);
     public delegate void CancelActionHandle(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo);
     public delegate void PositionHandle(ThostFtdcInvestorPositionField position);
+    public delegate void OrderRefReplaceHandle(string orderrefold, string orderrefnew);
+
+    public class Order
+    {
+        public ThostFtdcInputOrderField InputOrder;
+        public DateTime InputTime;
+        public ThostFtdcInputOrderActionField CancelOrder;
+        public DateTime CancelTime;
+        //最新标志
+        public OrderSignal Signal;
+        //重发前标志
+        public List<OrderSignal> OrigialSignal;
+        public ThostFtdcOrderField OrderField;
+
+        public Order(ThostFtdcInputOrderField pInput, DateTime pTime)
+        {
+            InputOrder = pInput;
+            InputTime = pTime;
+        }
+
+        public void Cancel(ThostFtdcInputOrderActionField pInputAction, DateTime pTime)
+        {
+            CancelOrder = pInputAction;
+            CancelTime = pTime;
+        }
+    }
 
     public struct OrderSignal
     {
@@ -23,7 +49,17 @@ namespace CTP
 
     public class TraderAPI
     {
-        private System.Threading.Timer OrderTimer;
+        //private System.Threading.Timer OrderTimer;
+        private Thread OrderReSender = null;
+
+        public event OrderRefReplaceHandle OnOrderRefReplace;
+        public void OrderRefReplace(string orderrefold, string orderrefnew)
+        {
+            if (OnOrderRefReplace != null)
+            {
+                OnOrderRefReplace(orderrefold, orderrefnew);
+            }
+        }
 
         public event OrderHandle OnTrading;
         public void Trading(ThostFtdcOrderField pOrder)
@@ -72,6 +108,8 @@ namespace CTP
         string INSTRUMENT_ID = "m1305";
         //EnumDirectionType DIRECTION = EnumDirectionType.Sell;
         int iRequestID = 0;
+        int MaxOrderExcuteCount = 50;
+        
         //public int TodayCancel = 0;
         //public int TodayInsertOrder = 0;
 
@@ -83,17 +121,28 @@ namespace CTP
         /// <summary>
         /// 系统启动前今天的报单情况
         /// </summary>
-        public Dictionary<OrderSignal, ThostFtdcOrderField> TodayTradingOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
-        public Dictionary<OrderSignal, ThostFtdcOrderField> TodayFinishedOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
+        //public Dictionary<OrderSignal, Order> TodayTradingOrderMap = new Dictionary<OrderSignal, Order>();
+        //public Dictionary<OrderSignal, Order> TodayFinishedOrderMap = new Dictionary<OrderSignal, Order>();
 
         /// <summary>
         /// 系统启动后今天的报单情况
         /// </summary>
-        public Dictionary<OrderSignal, ThostFtdcInputOrderField> InputOrderMap = new Dictionary<OrderSignal, ThostFtdcInputOrderField>();
-        public Dictionary<OrderSignal, ThostFtdcOrderField> TradingOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
-        public Dictionary<OrderSignal, ThostFtdcOrderField> FinishedOrderMap = new Dictionary<OrderSignal, ThostFtdcOrderField>();
-        public Dictionary<OrderSignal, ThostFtdcInputOrderActionField> ActionOrderMap = new Dictionary<OrderSignal, ThostFtdcInputOrderActionField>();
+        public List<Order> ReInputOrderMap = new List<Order>();
+        public List<Order> WaitInputOrderMap = new List<Order>();
+        object ReInputOrderMapLock = new object();
+        object WaitInputOrderMapLock = new object();
 
+        //public Dictionary<OrderSignal, ThostFtdcInputOrderActionField> ReCancelOrderMap = new Dictionary<OrderSignal, ThostFtdcInputOrderActionField>();
+        //public Dictionary<OrderSignal, ThostFtdcInputOrderActionField> WaitCancelOrderMap = new Dictionary<OrderSignal, ThostFtdcInputOrderActionField>();
+        //object ReCancelOrderMapLock = new object();
+        //object WaitCancelOrderMapLock = new object();
+
+        public Dictionary<OrderSignal, Order> TradingOrderMap = new Dictionary<OrderSignal, Order>();
+        object TradingOrderMapLock = new object();
+        public Dictionary<OrderSignal, Order> FinishedOrderMap = new Dictionary<OrderSignal, Order>();
+
+        //public Dictionary<DateTime, OrderSignal> OrderTimeMap = new Dictionary<DateTime, OrderSignal>();
+        //object OrderTimeLock = new object();
 
         public List<ThostFtdcInvestorPositionField> positionList = new List<ThostFtdcInvestorPositionField>();
 
@@ -106,7 +155,7 @@ namespace CTP
             api = new CTPTraderAdapter();
             AddEvent();
         }
-
+        
         private void AddEvent()
         {
             api.OnFrontConnected += new FrontConnected(OnFrontConnected);
@@ -117,6 +166,7 @@ namespace CTP
             api.OnRspOrderAction += new RspOrderAction(OnRspOrderAction);
             api.OnRspQryOrder += new RspQryOrder(OnRspQryOrder);
             api.OnRspQryTrade += new RspQryTrade(OnRspQryTrade);
+            //api.OnErrRtnOrderInsert += new ErrRtnOrderInsert(OnErrRtnOrderInsert);
             api.OnRspOrderInsert += new RspOrderInsert(OnRspOrderInsert);
             api.OnRspQryInstrument += new RspQryInstrument(OnRspQryInstrument);
             api.OnRspQryInvestorPosition += new RspQryInvestorPosition(OnRspQryInvestorPosition);
@@ -134,7 +184,10 @@ namespace CTP
             {
                 api.RegisterFront(FRONT_ADDR);
                 api.Init();
-                this.OrderTimer = new System.Threading.Timer(this.OrderManagerCallBack, null, 1000, 1000);
+                //OrderReSender.Start();
+                //this.OrderTimer = new System.Threading.Timer(this.OrderManagerCallBack, null, 1000, 1000);
+                OrderReSender = new Thread(new ThreadStart(OrderReSendCallBack));
+                OrderReSender.Start();
                 //ReqQryOrder();
                 //Thread.Sleep(1000);
                 //ReqQryTrade();
@@ -143,7 +196,8 @@ namespace CTP
             }
             catch (Exception e)
             {
-
+                //Console.WriteLine(e.Message);
+                //GUIRefresh.UpdateMessageBox(e.Message);
             }
             finally
             {
@@ -155,50 +209,170 @@ namespace CTP
         List<OrderSignal> ActionList = new List<OrderSignal>();
         object InputLock = new object();
         object ActionLock = new object();
+        
+        //bool OrderManagerRunning = false;
+        bool OrderReSendRun = false;
+        bool OrderReSendRunning = false;
+
+        bool IsReSending = false;
         /// <summary>
-        /// 订单管理器
+        /// 订单重发器
         /// </summary>
-        /// <param name="state"></param>
-        private void OrderManagerCallBack(object state)
+        private void OrderReSendCallBack()
         {
-            lock (this)
+            OrderReSendRun = true;
+            OrderReSendRunning = true;
+            while(OrderReSendRun)
             {
-                //检查报单
-                foreach (OrderSignal os in InputList)
+                //优先撤单
+                lock (TradingOrderMapLock)
                 {
-                    if (this.InputOrderMap.ContainsKey(os))
+                    foreach (Order pOrder in TradingOrderMap.Values)
                     {
-                        //检查了两遍，重发
-                        this.ReReqOrderInsert(InputOrderMap[os]);
-                    }
-                }
-                InputList = new List<OrderSignal>();
-                lock (InputLock)
-                {
-                    foreach (OrderSignal os in InputOrderMap.Keys)
-                    {
-                        InputList.Add(os);
+                        if (pOrder.CancelOrder != null)
+                        {
+                            //重新撤单
+                            ReReqOrderAction(pOrder.CancelOrder);
+                        }
                     }
                 }
 
-                //检查撤单
-                foreach (OrderSignal os in ActionList)
+                if (ReInputOrderMap.Count > 0)
                 {
-                    if (this.ActionOrderMap.ContainsKey(os))
+                    List<Order> SendingList = new List<Order>();
+                    lock (ReInputOrderMapLock)
                     {
-                        //检查了两遍，重发
-                        this.ReqOrderAction(ActionOrderMap[os]);
+                        if (ReInputOrderMap.Count > 0)
+                        {
+                            foreach (Order pOrder in ReInputOrderMap)
+                            {
+                                SendingList.Add(pOrder);
+                            }
+                            ReInputOrderMap.Clear();
+                        }
+                    }
+                    foreach (Order pOrder in SendingList)
+                    {
+                        lock (TradingOrderMapLock)
+                        {
+                            if (TradingOrderMap.ContainsKey(pOrder.Signal))
+                            {
+                                if (TradingOrderMap[pOrder.Signal].CancelOrder != null)
+                                {
+                                    ThostFtdcInputOrderField req = new ThostFtdcInputOrderField();
+                                    ///经纪公司代码
+                                    req.BrokerID = BROKER_ID;
+                                    ///投资者代码
+                                    req.InvestorID = INVESTOR_ID;
+                                    ///合约代码
+                                    req.InstrumentID = pOrder.InputOrder.InstrumentID;
+
+                                    ///用户代码
+                                    //	TThostFtdcUserIDType	UserID;
+                                    ///报单价格条件: 限价
+                                    req.OrderPriceType = CTP.EnumOrderPriceTypeType.LimitPrice;
+                                    ///买卖方向: 
+                                    req.Direction = pOrder.InputOrder.Direction;
+                                    ///组合开平标志: 开仓
+                                    req.CombOffsetFlag_0 = pOrder.InputOrder.CombOffsetFlag_0;
+
+                                    ///组合投机套保标志
+                                    req.CombHedgeFlag_0 = pOrder.InputOrder.CombHedgeFlag_0;
+                                    ///价格
+                                    req.LimitPrice = pOrder.InputOrder.LimitPrice;
+                                    ///数量: 1
+                                    req.VolumeTotalOriginal = pOrder.InputOrder.VolumeTotalOriginal;
+                                    ///有效期类型: 当日有效
+                                    req.TimeCondition = pOrder.InputOrder.TimeCondition;
+                                    ///GTD日期
+                                    //	TThostFtdcDateType	GTDDate;
+                                    ///成交量类型: 任何数量
+                                    req.VolumeCondition = pOrder.InputOrder.VolumeCondition;
+                                    ///最小成交量: 1
+                                    req.MinVolume = pOrder.InputOrder.MinVolume;
+                                    ///触发条件: 立即
+                                    req.ContingentCondition = pOrder.InputOrder.ContingentCondition;
+                                    ///止损价
+                                    //	TThostFtdcPriceType	StopPrice;
+                                    ///强平原因: 非强平
+                                    req.ForceCloseReason = pOrder.InputOrder.ForceCloseReason;
+                                    ///自动挂起标志: 否
+                                    req.IsAutoSuspend = pOrder.InputOrder.IsAutoSuspend;
+                                    ///业务单元
+                                    //	TThostFtdcBusinessUnitType	BusinessUnit;
+                                    ///请求编号
+                                    //	TThostFtdcRequestIDType	RequestID;
+                                    ///用户强评标志: 否
+                                    req.UserForceClose = pOrder.InputOrder.UserForceClose;
+
+                                    ORDER_REF++;
+                                    OrderSignal OldSignal = new OrderSignal();
+                                    OldSignal.FrontID = FRONT_ID;
+                                    OldSignal.OrderRef = req.OrderRef;
+                                    OldSignal.SessionID = SESSION_ID;
+
+                                    req.OrderRef = ORDER_REF.ToString();
+                                    OrderSignal newSignal = new OrderSignal();
+                                    newSignal.FrontID = FRONT_ID;
+                                    newSignal.OrderRef = req.OrderRef;
+                                    newSignal.SessionID = SESSION_ID;
+                                    DateTime logtime = DateTime.Now;
+                                    Order newOrder = new Order(req, logtime);
+                                    newOrder.OrigialSignal.Add(pOrder.Signal);
+                                    TradingOrderMap.Add(newSignal, newOrder);
+                                    ReReqOrderInsert(newOrder);
+                                    //重发OrderRef更新回调
+                                    OrderRefReplace(OldSignal.OrderRef, newOrder.InputOrder.OrderRef);
+
+                                    FinishedOrderMap.Add(OldSignal, pOrder);
+                                    TradingOrderMap.Remove(OldSignal);
+                                }
+                            }
+                            else
+                            {
+                                //报错，不存在这种需要重发，但是没在发送队列中的情况。
+                            }
+                        }
                     }
                 }
-                ActionList = new List<OrderSignal>();
-                lock (ActionLock)
+                else if (WaitInputOrderMap.Count > 0)
                 {
-                    foreach (OrderSignal os in ActionOrderMap.Keys)
+                    List<Order> SendingList = new List<Order>();
+                    lock (WaitInputOrderMapLock)
                     {
-                        ActionList.Add(os);
+                        if (WaitInputOrderMap.Count > 0)
+                        {
+                            foreach (Order pOrder in WaitInputOrderMap)
+                            {
+                                SendingList.Add(pOrder);
+                            }
+                            WaitInputOrderMap.Clear();
+                        }
+                    }
+                    foreach (Order pOrder in SendingList)
+                    {
+                        lock (TradingOrderMapLock)
+                        {
+                            ORDER_REF++;
+
+                            pOrder.InputOrder.OrderRef = ORDER_REF.ToString();
+                            pOrder.Signal.OrderRef = ORDER_REF.ToString();
+                            OrderSignal Signal = new OrderSignal();
+                            Signal.FrontID = FRONT_ID;
+                            Signal.OrderRef = ORDER_REF.ToString();
+                            Signal.SessionID = SESSION_ID;
+
+                            TradingOrderMap.Add(Signal, pOrder);
+                            ReReqOrderInsert(pOrder);
+                        }
                     }
                 }
+                else// if (ReInputOrderMap.Count <= 0 && WaitInputOrderMap.Count <= 0)
+                    IsReSending = false;
+                
+                Thread.Sleep(500);
             }
+            OrderReSendRunning = false;
         }
 
         public void Release()
@@ -206,6 +380,13 @@ namespace CTP
             if (api != null)
             {
                 g_logined = false;
+                OrderReSendRun = false;
+                Thread.Sleep(50);
+                if(OrderReSendRunning)
+                {
+                    OrderReSender.Abort();
+                }
+                
                 api.Release();
                 api = null;
             }
@@ -236,7 +417,7 @@ namespace CTP
                 if (!string.IsNullOrEmpty(pRspUserLogin.MaxOrderRef))
                     iNextOrderRef = Convert.ToInt32(pRspUserLogin.MaxOrderRef);
                 //iNextOrderRef++;
-                ORDER_REF = iNextOrderRef + 100000;
+                ORDER_REF = iNextOrderRef;
                 ///投资者结算结果确认
                 ReqSettlementInfoConfirm();
             }
@@ -408,18 +589,18 @@ namespace CTP
                 Signal.SessionID = pOrder.SessionID;
                 //Signal.ExchangeID = pOrder.ExchangeID;
                 //Signal.OrderSysID = pOrder.OrderSysID;
-                if (pOrder.OrderStatus == EnumOrderStatusType.Canceled)
-                {
-                    TodayFinishedOrderMap.Add(Signal, pOrder);
-                }
-                else if (pOrder.OrderStatus == EnumOrderStatusType.AllTraded)
-                {
-                    TodayFinishedOrderMap.Add(Signal, pOrder);
-                }
-                else
-                {
-                    TodayTradingOrderMap.Add(Signal, pOrder);
-                }
+                //if (pOrder.OrderStatus == EnumOrderStatusType.Canceled)
+                //{
+                //    TodayFinishedOrderMap.Add(Signal, pOrder);
+                //}
+                //else if (pOrder.OrderStatus == EnumOrderStatusType.AllTraded)
+                //{
+                //    TodayFinishedOrderMap.Add(Signal, pOrder);
+                //}
+                //else
+                //{
+                //    TodayTradingOrderMap.Add(Signal, pOrder);
+                //}
             }
             if (bIsLast)
             {
@@ -459,14 +640,19 @@ namespace CTP
         /// 重发
         /// </summary>
         /// <param name="req"></param>
-        private void ReReqOrderInsert(ThostFtdcInputOrderField req)
+        private void ReReqOrderInsert(Order pOrder)//ThostFtdcInputOrderField req)
         {
-            api.ReqOrderInsert(req, ++iRequestID);
+            DateTime logtime = DateTime.Now;
+            api.ReqOrderInsert(pOrder.InputOrder, ++iRequestID);
+
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + pOrder.InputOrder.OrderRef + "," + pOrder.InputOrder.InstrumentID + "," + pOrder.InputOrder.Direction.ToString()
+            //        + "," + pOrder.InputOrder.CombOffsetFlag_0.ToString());
         }
 
         private string ReqOrderInsert(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
         {
-            ORDER_REF++;
+            int iResult = 0;
+            
             ThostFtdcInputOrderField req = new ThostFtdcInputOrderField();
             ///经纪公司代码
             req.BrokerID = BROKER_ID;
@@ -474,8 +660,7 @@ namespace CTP
             req.InvestorID = INVESTOR_ID;
             ///合约代码
             req.InstrumentID = instrumentID;
-            ///报单引用
-            req.OrderRef = ORDER_REF.ToString();
+            
             ///用户代码
             //	TThostFtdcUserIDType	UserID;
             ///报单价格条件: 限价
@@ -513,44 +698,68 @@ namespace CTP
             //	TThostFtdcRequestIDType	RequestID;
             ///用户强评标志: 否
             req.UserForceClose = 0;
-            int iResult = api.ReqOrderInsert(req, ++iRequestID);
-            StackTrace trace = new StackTrace();
-            Type StragetyType = trace.GetFrame(2).GetMethod().ReflectedType;
-            OrderSignal Signal = new OrderSignal();
-            Signal.FrontID = FRONT_ID;
-            Signal.OrderRef = req.OrderRef;
-            Signal.SessionID = SESSION_ID;
-            if (!InputOrderMap.ContainsKey(Signal))
+            ORDER_REF++;
+            req.OrderRef = ORDER_REF.ToString();
+            
+            DateTime logtime = DateTime.Now;
+
+            Order newOrder = new Order(req, logtime);
+            if (IsReSending)
             {
-                lock (InputLock)
+                //有重发的命令，将命令加入等待队列
+                lock (WaitInputOrderMapLock)
                 {
-                    InputOrderMap.Add(Signal, req);
+                    WaitInputOrderMap.Add(newOrder);
                 }
             }
+            else
+            {
+                lock (TradingOrderMapLock)
+                {
+                    ///报单引用
+                    OrderSignal Signal = new OrderSignal();
+                    Signal.FrontID = FRONT_ID;
+                    Signal.OrderRef = req.OrderRef;
+                    Signal.SessionID = SESSION_ID;
+
+                    TradingOrderMap.Add(Signal, newOrder);
+                }
+                iResult = api.ReqOrderInsert(req, ++iRequestID);
+                //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderInsert" + "," + ORDER_REF.ToString() + "," + req.InstrumentID + "," + req.Direction.ToString()
+                //    + "," + req.CombOffsetFlag_0.ToString());
+            }
+
             return req.OrderRef;
         }
 
+        Dictionary<OrderSignal, Order> InputOrderErrorMap = new Dictionary<OrderSignal, Order>();
         void OnRspOrderInsert(ThostFtdcInputOrderField pInputOrder, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             //交易系统已接收报单
             IsErrorRspInfo(pRspInfo);
+            {
+                OrderSignal Signal = new OrderSignal();
+                Signal.FrontID = FRONT_ID;
+                Signal.OrderRef = pInputOrder.OrderRef;
+                Signal.SessionID = SESSION_ID;
+                lock (TradingOrderMapLock)
+                {
+                    if (TradingOrderMap.ContainsKey(Signal))
+                    {
+                        InputOrderErrorMap.Add(Signal, TradingOrderMap[Signal]);
+                        TradingOrderMap.Remove(Signal);
+                    }
+                }
+            }
         }
 
-        object TradingLock = new object();
         public void ReqOrderActionAll()
         {
-            //foreach (OrderSignal signal in InputOrderMap.Keys)
-            //{
-            //    if (TradingOrderMap.ContainsKey(signal))
-            //    {
-            //        ReqOrderAction(TradingOrderMap[signal]);
-            //    }
-            //}
-            lock (TradingLock)
+            lock (TradingOrderMapLock)
             {
                 foreach (OrderSignal signal in TradingOrderMap.Keys)
                 {
-                    ReqOrderAction(TradingOrderMap[signal]);
+                    ReqOrderAction(TradingOrderMap[signal].OrderField);
                 }
             }
         }
@@ -576,8 +785,22 @@ namespace CTP
             //GUIRefresh.UpdateListBox2("--->>> 报单录入请求: " + ((iResult == 0) ? "成功" : "失败"));
         }
 
+        public int ReReqOrderAction(ThostFtdcInputOrderActionField pInputOrderAction)
+        {
+            int iResult = 0;
+            iResult = api.ReqOrderAction(pInputOrderAction, ++iRequestID);
+
+            DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + pInputOrderAction.OrderRef);
+     
+            return iResult;
+            //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
+            //GUIRefresh.UpdateListBox2("--->>> 报单录入请求: " + ((iResult == 0) ? "成功" : "失败"));
+        }
+
         public int ReqOrderAction(ThostFtdcOrderField pOrder)
         {
+            int iResult = 0;
             ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
             ///操作标志
             req.ActionFlag = CTP.EnumActionFlagType.Delete;
@@ -611,27 +834,18 @@ namespace CTP
             ///数量变化
             //	TThostFtdcVolumeType	VolumeChange;
 
-            int iResult = api.ReqOrderAction(req, ++iRequestID);
+            
             OrderSignal Signal = new OrderSignal();
             Signal.FrontID = pOrder.FrontID;
             Signal.OrderRef = pOrder.OrderRef;
             Signal.SessionID = pOrder.SessionID;
-            //Signal.ExchangeID = pOrder.ExchangeID;
-            //Signal.OrderSysID = pOrder.OrderSysID;
-            lock (ActionLock)
+            DateTime logtime = DateTime.Now;
+            lock (TradingOrderMapLock)
             {
-                if (!ActionOrderMap.ContainsKey(Signal))
-                {
-                    ActionOrderMap.Add(Signal, req);
-                }
+                TradingOrderMap[Signal].Cancel(req, logtime);
             }
-            lock (InputLock)
-            {
-                if (InputOrderMap.ContainsKey(Signal))
-                {
-                    InputOrderMap.Remove(Signal);
-                }
-            }
+            iResult = api.ReqOrderAction(req, ++iRequestID);
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + req.OrderRef);
             //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             //GUIRefresh.UpdateListBox2("--->>> 撤单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             return iResult;
@@ -655,6 +869,8 @@ namespace CTP
         /// <param name="bIsLast"></param>
         public void OnRspOrderAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
+            DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRspOrderAction" + "," + pInputOrderAction.OrderRef + "," + pRspInfo.ErrorMsg);
             if (IsErrorRspInfo(pRspInfo))
             {
             }
@@ -667,6 +883,8 @@ namespace CTP
         ///报单通知
         void OnRtnOrder(ThostFtdcOrderField pOrder)
         {
+            DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRtnOrder" + "," + pOrder.OrderRef + "," + pOrder.OrderStatus + "," + pOrder.StatusMsg);
             CurrentOrder = pOrder;
             if (IsTradingOrder(pOrder))
             {
@@ -680,52 +898,11 @@ namespace CTP
                             Signal.FrontID = pOrder.FrontID;
                             Signal.OrderRef = pOrder.OrderRef;
                             Signal.SessionID = pOrder.SessionID;
-                            lock (TradingLock)
+                            lock (TradingOrderMapLock)
                             {
                                 if (TradingOrderMap.ContainsKey(Signal))
                                 {
-                                    TradingOrderMap[Signal] = pOrder;
-                                }
-                                else
-                                {
-                                    TradingOrderMap.Add(Signal, pOrder);
-                                }
-                            }
-                            lock (InputLock)
-                            {
-                                InputOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
-                            }
-                        }
-                        if(pOrder.OrderStatus != EnumOrderStatusType.AllTraded)
-                        {
-                            OrderSignal Signal = new OrderSignal();
-                            Signal.FrontID = pOrder.FrontID;
-                            Signal.OrderRef = pOrder.OrderRef;
-                            Signal.SessionID = pOrder.SessionID;
-                            lock (TradingLock)
-                            {
-                                TradingOrderMap.Remove(Signal);
-                            }
-                            if (FinishedOrderMap.ContainsKey(Signal))
-                            {
-                                FinishedOrderMap[Signal] = pOrder;
-                            }
-                            else
-                            {
-                                FinishedOrderMap.Add(Signal, pOrder);
-                            }
-                            lock (ActionLock)
-                            {
-                                if (ActionOrderMap.ContainsKey(Signal))
-                                {
-                                    ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
-                                }
-                            }
-                            lock (InputLock)
-                            {
-                                if (InputOrderMap.ContainsKey(Signal))
-                                {
-                                    InputOrderMap.Remove(Signal);
+                                    TradingOrderMap[Signal].OrderField = pOrder;
                                 }
                             }
                         }
@@ -742,20 +919,35 @@ namespace CTP
                     Signal.FrontID = pOrder.FrontID;
                     Signal.OrderRef = pOrder.OrderRef;
                     Signal.SessionID = pOrder.SessionID;
-                    TradingOrderMap.Remove(Signal);
-                    if (FinishedOrderMap.ContainsKey(Signal))
+                    //TradingOrderMap.Remove(Signal);
+                    lock (TradingOrderMapLock)
                     {
-                        FinishedOrderMap[Signal] = pOrder;
-                    }
-                    else
-                    {
-                        FinishedOrderMap.Add(Signal, pOrder);
-                    }
-                    lock (ActionLock)
-                    {
-                        if (ActionOrderMap.ContainsKey(Signal))
+                        if (TradingOrderMap.ContainsKey(Signal))
                         {
-                            ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                            if (TradingOrderMap[Signal].CancelOrder != null)
+                            {
+                                TradingOrderMap[Signal].OrderField = pOrder;
+                                FinishedOrderMap.Add(Signal, TradingOrderMap[Signal]);
+
+                                TradingOrderMap.Remove(Signal);
+                            }
+                            else
+                            {
+                                if (TradingOrderMap[Signal].OrderField == null || TradingOrderMap[Signal].OrderField.OrderStatus == EnumOrderStatusType.Unknown)
+                                {
+                                    //柜台自动撤单，需要重发
+                                    lock (ReInputOrderMapLock)
+                                    {
+                                        TradingOrderMap[Signal].OrderField = pOrder;
+                                        IsReSending = true;
+                                        ReInputOrderMap.Add(TradingOrderMap[Signal]);
+                                    }
+                                }
+                                else
+                                {
+                                    //系统外撤单，不处理。
+                                }
+                            }
                         }
                     }
                 }
@@ -770,30 +962,12 @@ namespace CTP
                     Signal.FrontID = pOrder.FrontID;
                     Signal.OrderRef = pOrder.OrderRef;
                     Signal.SessionID = pOrder.SessionID;
-                    lock (TradingLock)
+                    lock (TradingOrderMapLock)
                     {
-                        TradingOrderMap.Remove(Signal);
-                    }
-                    if (FinishedOrderMap.ContainsKey(Signal))
-                    {
-                        FinishedOrderMap[Signal] = pOrder;
-                    }
-                    else
-                    {
-                        FinishedOrderMap.Add(Signal, pOrder);
-                    }
-                    lock (ActionLock)
-                    {
-                        if (ActionOrderMap.ContainsKey(Signal))
+                        if (TradingOrderMap.ContainsKey(Signal))
                         {
-                            ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
-                        }
-                    }
-                    lock (InputLock)
-                    {
-                        if (InputOrderMap.ContainsKey(Signal))
-                        {
-                            InputOrderMap.Remove(Signal);
+                            FinishedOrderMap.Add(Signal, TradingOrderMap[Signal]);
+                            TradingOrderMap.Remove(Signal);
                         }
                     }
                 }
@@ -806,16 +980,27 @@ namespace CTP
                 Signal.FrontID = pOrder.FrontID;
                 Signal.OrderRef = pOrder.OrderRef;
                 Signal.SessionID = pOrder.SessionID;
-                lock (TradingLock)
+                lock (TradingOrderMapLock)
                 {
-                    TradingOrderMap.Remove(Signal);
-                }
-                FinishedOrderMap.Add(Signal, pOrder);
-                lock (ActionLock)
-                {
-                    if (ActionOrderMap.ContainsKey(Signal))
+                    if (TradingOrderMap.ContainsKey(Signal))
                     {
-                        ActionOrderMap.Remove(Signal);   //交易所已经接收的报单，不需要维护重发。
+                        FinishedOrderMap.Add(Signal, TradingOrderMap[Signal]);
+                        TradingOrderMap.Remove(Signal);
+                    }
+                }
+            }
+            else if (pOrder.OrderStatus == EnumOrderStatusType.NoTradeNotQueueing)
+            {
+                OrderSignal Signal = new OrderSignal();
+                Signal.FrontID = pOrder.FrontID;
+                Signal.OrderRef = pOrder.OrderRef;
+                Signal.SessionID = pOrder.SessionID;
+                lock (TradingOrderMapLock)
+                {
+                    if (TradingOrderMap.ContainsKey(Signal))
+                    {
+                        FinishedOrderMap.Add(Signal, TradingOrderMap[Signal]);
+                        TradingOrderMap.Remove(Signal);
                     }
                 }
             }
@@ -847,6 +1032,8 @@ namespace CTP
 
         void OnRspError(ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
+            DateTime logtime = DateTime.Now;
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRspError" + "," + pRspInfo.ErrorMsg);
             IsErrorRspInfo(pRspInfo);
         }
 
@@ -881,11 +1068,11 @@ namespace CTP
 
         public bool IsTradingOrder(ThostFtdcOrderField pOrder)
         {
-            //return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
-            //        (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
-            //        (pOrder.OrderStatus != EnumOrderStatusType.AllTraded));
             return ((pOrder.OrderStatus != EnumOrderStatusType.PartTradedNotQueueing) &&
-                    (pOrder.OrderStatus != EnumOrderStatusType.Canceled));
+                    (pOrder.OrderStatus != EnumOrderStatusType.Canceled) &&
+                    (pOrder.OrderStatus != EnumOrderStatusType.AllTraded) &&
+                    (pOrder.OrderStatus != EnumOrderStatusType.NoTradeNotQueueing));
+            //return pOrder.OrderStatus != EnumOrderStatusType.Canceled;
         }
 
         public bool IsErrorOrder(ThostFtdcOrderField pOrder)
@@ -967,5 +1154,9 @@ namespace CTP
         {
             return ReqOrderAction(pInputOrderAction);
         }
+        //public int CancelOrder(ThostFtdcInputOrderField pInputOrderAction)
+        //{
+        //    return this.ReqOrderAction(pInputOrderAction);
+        //}
     }
 }

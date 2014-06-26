@@ -100,6 +100,8 @@ namespace OptionMM
         private void writerXmlCallBack(object state)
         {
             this.WriterXML("Option.xml");
+            this.positionHedgeTimer.Dispose();
+            this.recordVolatilityTimer.Dispose();
         }
 
         /// <summary>

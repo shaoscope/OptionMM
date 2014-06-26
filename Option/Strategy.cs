@@ -61,8 +61,20 @@ namespace OptionMM
             TDManager.TD.OnTraded += TD_OnTraded;
             TDManager.TD.OnTrading += TD_OnTrading;
             TDManager.TD.OnCancelAction += TD_OnCancelAction;
+            TDManager.TD.OnOrderRefReplace += TD_OnOrderRefReplace;
             //刷新面板定时器
             this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
+        }
+        private void TD_OnOrderRefReplace(string orderRefOld, string orderRefNew)
+        {
+            if (this.option.PlaceLongOptionOrderRef == orderRefOld)
+            {
+                this.option.PlaceLongOptionOrderRef = orderRefNew;
+            }
+            else if (this.option.PlaceShortOptionOrderRef == orderRefOld)
+            {
+                this.option.PlaceShortOptionOrderRef = orderRefNew;
+            }
         }
 
         private void TD_OnCancelAction(ThostFtdcInputOrderActionField pInputOrderAction, ThostFtdcRspInfoField pRspInfo)
@@ -924,8 +936,8 @@ namespace OptionMM
             #region 直接开仓
             if (bidQuote >= 0.1)
             {
-                //this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
-                //this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
+                this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+                this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
             }
             #endregion
         }

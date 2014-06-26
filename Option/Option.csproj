@@ -55,6 +55,7 @@
     <Compile Include="CoveredPanel.designer.cs">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="TraderAPI.cs" />
     <Compile Include="Vertical.cs" />
     <Compile Include="Parity.cs" />
     <Compile Include="VerticalPanel.cs">
@@ -117,7 +118,7 @@
     <Compile Include="Greeks.cs" />
     <Compile Include="Strategy.cs" />
     <Compile Include="TDManager.cs" />
-    <Compile Include="TraderAPI.cs" />
+    <Compile Include="TraderAPIb.cs" />
     <EmbeddedResource Include="CoveredPanel.resx">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </EmbeddedResource>
