@@ -368,8 +368,9 @@ namespace CTP
                     }
                 }
                 else// if (ReInputOrderMap.Count <= 0 && WaitInputOrderMap.Count <= 0)
+                {
                     IsReSending = false;
-                
+                }
                 Thread.Sleep(500);
             }
             OrderReSendRunning = false;

@@ -118,7 +118,6 @@
     <Compile Include="Greeks.cs" />
     <Compile Include="Strategy.cs" />
     <Compile Include="TDManager.cs" />
-    <Compile Include="TraderAPIb.cs" />
     <EmbeddedResource Include="CoveredPanel.resx">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </EmbeddedResource>

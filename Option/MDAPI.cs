@@ -89,7 +89,7 @@ namespace CTP
         {
             int iRet;
             iRet = api.SubscribeMarketData(ppInstrumentID);
-            //SubscribeForQuoteRsp(ppInstrumentID);
+            SubscribeForQuoteRsp(ppInstrumentID);
             return iRet;
         }
 

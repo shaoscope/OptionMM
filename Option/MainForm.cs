@@ -99,9 +99,9 @@ namespace OptionMM
         /// <param name="state"></param>
         private void writerXmlCallBack(object state)
         {
-            this.WriterXML("Option.xml");
             this.positionHedgeTimer.Dispose();
             this.recordVolatilityTimer.Dispose();
+            this.WriterXML("Option.xml");
         }
 
         /// <summary>
@@ -404,6 +404,10 @@ namespace OptionMM
         /// <param name="e"></param>
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            this.positionHedgeTimer.Dispose();
+            this.recordVolatilityTimer.Dispose();
+            TDManager.TD.Release();
+            MDManager.MD.Release();
             this.WriterXML("Option.xml");
         }
 
