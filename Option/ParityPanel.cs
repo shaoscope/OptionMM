@@ -75,7 +75,7 @@ namespace OptionMM
         {
             if (this.dataTable.SelectedRows.Count == 1)
             {
-                Covered covered = (Covered)this.dataTable.SelectedRows[0].Tag;
+                Parity covered = (Parity)this.dataTable.SelectedRows[0].Tag;
 
             }
         }

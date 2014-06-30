@@ -36,7 +36,7 @@
             this.greeksPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.greeksPanel.Location = new System.Drawing.Point(12, 12);
             this.greeksPanel.Name = "greeksPanel";
-            this.greeksPanel.Size = new System.Drawing.Size(615, 100);
+            this.greeksPanel.Size = new System.Drawing.Size(622, 268);
             this.greeksPanel.TabIndex = 0;
             // 
             // RiskManagementForm

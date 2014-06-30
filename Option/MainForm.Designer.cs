@@ -194,9 +194,9 @@
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 38);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 3;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 31.66667F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 68.33334F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 228F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 47.09302F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 52.90698F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 179F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(632, 517);
             this.tableLayoutPanel3.TabIndex = 5;
             // 
@@ -205,23 +205,23 @@
             this.coveredPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.coveredPanel.Location = new System.Drawing.Point(3, 3);
             this.coveredPanel.Name = "coveredPanel";
-            this.coveredPanel.Size = new System.Drawing.Size(626, 85);
+            this.coveredPanel.Size = new System.Drawing.Size(626, 153);
             this.coveredPanel.TabIndex = 4;
             // 
             // parityPanel
             // 
             this.parityPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.parityPanel.Location = new System.Drawing.Point(3, 94);
+            this.parityPanel.Location = new System.Drawing.Point(3, 162);
             this.parityPanel.Name = "parityPanel";
-            this.parityPanel.Size = new System.Drawing.Size(626, 191);
+            this.parityPanel.Size = new System.Drawing.Size(626, 172);
             this.parityPanel.TabIndex = 5;
             // 
             // verticalPanel
             // 
             this.verticalPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.verticalPanel.Location = new System.Drawing.Point(3, 291);
+            this.verticalPanel.Location = new System.Drawing.Point(3, 340);
             this.verticalPanel.Name = "verticalPanel";
-            this.verticalPanel.Size = new System.Drawing.Size(626, 223);
+            this.verticalPanel.Size = new System.Drawing.Size(626, 174);
             this.verticalPanel.TabIndex = 6;
             // 
             // parityButton

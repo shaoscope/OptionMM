@@ -54,6 +54,11 @@ namespace OptionMM
 
         public static Future Future;
 
+        /// <summary>
+        /// 启动报价任务
+        /// </summary>
+        private Task startUpMMTask;
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             //加载面板
@@ -231,14 +236,10 @@ namespace OptionMM
         {
             if (!areAllRunning)
             {
-                foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
-                {
-                    Strategy strategy = (Strategy)dataRow.Tag;
-                    strategy.Start();
-                    //Thread.Sleep(300);
-                }
-                areAllRunning = true;
-                this.startAllButton.Text = "全部停止";
+                startUpMMTask = new Task(startUpMM);
+                startUpMMTask.Start();
+                startUpMMTask.ContinueWith(StartUpMMFinished);
+                
             }
             else
             {
@@ -246,10 +247,31 @@ namespace OptionMM
                 {
                     Strategy strategy = (Strategy)dataRow.Tag;
                     strategy.Stop();
-                    //Thread.Sleep(300);
                 }
                 areAllRunning = false;
                 this.startAllButton.Text = "全部启动";
+            }
+        }
+
+        /// <summary>
+        /// 报价全部启动完成事件
+        /// </summary>
+        /// <param name="task"></param>
+        private void StartUpMMFinished(Task task)
+        {
+            areAllRunning = true;
+            this.BeginInvoke(new Action(()=>this.startAllButton.Text = "全部停止"));
+        }
+
+        /// <summary>
+        /// 启动报价方法
+        /// </summary>
+        private void startUpMM()
+        {
+            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            {
+                Strategy strategy = (Strategy)dataRow.Tag;
+                strategy.Start();
             }
         }
 
@@ -474,7 +496,7 @@ namespace OptionMM
             foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
             {
                 Strategy strategy = (Strategy)dataRow.Tag;
-                if (strategy.Option.InstrumentID.Contains("IF1406"))
+                if (strategy.Option.InstrumentID.Contains("IF1407"))
                 {
                     strategyList.Add(strategy);
                 }

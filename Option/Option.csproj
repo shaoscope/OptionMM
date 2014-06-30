@@ -55,6 +55,8 @@
     <Compile Include="CoveredPanel.designer.cs">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="FullPath.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="TraderAPI.cs" />
     <Compile Include="Vertical.cs" />
     <Compile Include="Parity.cs" />
@@ -170,7 +172,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Option.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>

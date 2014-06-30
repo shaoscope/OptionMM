@@ -30,9 +30,11 @@ namespace OptionMM
         private void RiskManagementForm_Load(object sender, EventArgs e)
         {
             List<string> instrumentIDList = new List<string>();
-            instrumentIDList.Add("IO1406");
             instrumentIDList.Add("IO1407");
             instrumentIDList.Add("IO1408");
+            instrumentIDList.Add("IO1409");
+            instrumentIDList.Add("IO1412");
+            instrumentIDList.Add("IO1503");
             //instrumentIDList.Add("IOALL");
             foreach(string instrumentID in instrumentIDList)
             {

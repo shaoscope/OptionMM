@@ -5,6 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading;
 using System.Reflection;
+using OptionMM;
 
 namespace CTP
 {
@@ -109,7 +110,7 @@ namespace CTP
         //EnumDirectionType DIRECTION = EnumDirectionType.Sell;
         int iRequestID = 0;
         int MaxOrderExcuteCount = 50;
-        
+
         //public int TodayCancel = 0;
         //public int TodayInsertOrder = 0;
 
@@ -127,8 +128,10 @@ namespace CTP
         /// <summary>
         /// 系统启动后今天的报单情况
         /// </summary>
-        public List<Order> ReInputOrderMap = new List<Order>();
-        public List<Order> WaitInputOrderMap = new List<Order>();
+        //public List<Order> ReInputOrderMap = new List<Order>();
+        //public List<Order> WaitInputOrderMap = new List<Order>();
+        public Dictionary<OrderSignal, Order> ReInputOrderMap = new Dictionary<OrderSignal, Order>();
+        public Dictionary<OrderSignal, Order> WaitInputOrderMap = new Dictionary<OrderSignal, Order>();
         object ReInputOrderMapLock = new object();
         object WaitInputOrderMapLock = new object();
 
@@ -155,7 +158,7 @@ namespace CTP
             api = new CTPTraderAdapter();
             AddEvent();
         }
-        
+
         private void AddEvent()
         {
             api.OnFrontConnected += new FrontConnected(OnFrontConnected);
@@ -209,7 +212,7 @@ namespace CTP
         List<OrderSignal> ActionList = new List<OrderSignal>();
         object InputLock = new object();
         object ActionLock = new object();
-        
+
         //bool OrderManagerRunning = false;
         bool OrderReSendRun = false;
         bool OrderReSendRunning = false;
@@ -222,19 +225,42 @@ namespace CTP
         {
             OrderReSendRun = true;
             OrderReSendRunning = true;
-            while(OrderReSendRun)
+            while (OrderReSendRun)
             {
                 //优先撤单
                 lock (TradingOrderMapLock)
                 {
-                    foreach (Order pOrder in TradingOrderMap.Values)
+                    foreach (OrderSignal signal in TradingOrderMap.Keys)
                     {
-                        if (pOrder.CancelOrder != null)
+                        //撤单的不再重发
+                        if (ReInputOrderMap.ContainsKey(signal))
+                        {
+                            lock (ReInputOrderMapLock)
+                            {
+                                ReInputOrderMap.Remove(signal);
+                            }
+                        }
+                        else if (WaitInputOrderMap.ContainsKey(signal))
+                        {
+                            lock (WaitInputOrderMapLock)
+                            {
+                                WaitInputOrderMap.Remove(signal);
+                            }
+                        }
+                        else
                         {
                             //重新撤单
-                            ReReqOrderAction(pOrder.CancelOrder);
+                            ReReqOrderAction(TradingOrderMap[signal].CancelOrder);
                         }
                     }
+                    //foreach (Order pOrder in TradingOrderMap.Values)
+                    //{
+                    //    if (pOrder.CancelOrder != null)
+                    //    {
+                    //        //重新撤单
+                    //        ReReqOrderAction(pOrder.CancelOrder);
+                    //    }
+                    //}
                 }
 
                 if (ReInputOrderMap.Count > 0)
@@ -244,7 +270,7 @@ namespace CTP
                     {
                         if (ReInputOrderMap.Count > 0)
                         {
-                            foreach (Order pOrder in ReInputOrderMap)
+                            foreach (Order pOrder in ReInputOrderMap.Values)
                             {
                                 SendingList.Add(pOrder);
                             }
@@ -319,6 +345,7 @@ namespace CTP
                                     DateTime logtime = DateTime.Now;
                                     Order newOrder = new Order(req, logtime);
                                     newOrder.OrigialSignal.Add(pOrder.Signal);
+                                    newOrder.Signal = newSignal;
                                     TradingOrderMap.Add(newSignal, newOrder);
                                     ReReqOrderInsert(newOrder);
                                     //重发OrderRef更新回调
@@ -342,7 +369,7 @@ namespace CTP
                     {
                         if (WaitInputOrderMap.Count > 0)
                         {
-                            foreach (Order pOrder in WaitInputOrderMap)
+                            foreach (Order pOrder in WaitInputOrderMap.Values)
                             {
                                 SendingList.Add(pOrder);
                             }
@@ -355,23 +382,26 @@ namespace CTP
                         {
                             ORDER_REF++;
 
+                            string strOrderRef = pOrder.InputOrder.OrderRef;
                             pOrder.InputOrder.OrderRef = ORDER_REF.ToString();
                             pOrder.Signal.OrderRef = ORDER_REF.ToString();
                             OrderSignal Signal = new OrderSignal();
                             Signal.FrontID = FRONT_ID;
                             Signal.OrderRef = ORDER_REF.ToString();
                             Signal.SessionID = SESSION_ID;
+                            pOrder.Signal = Signal;
 
                             TradingOrderMap.Add(Signal, pOrder);
                             ReReqOrderInsert(pOrder);
+                            //重发OrderRef更新回调
+                            OrderRefReplace(strOrderRef, pOrder.InputOrder.OrderRef);
                         }
                     }
                 }
                 else// if (ReInputOrderMap.Count <= 0 && WaitInputOrderMap.Count <= 0)
-                {
                     IsReSending = false;
-                }
-                Thread.Sleep(500);
+
+                Thread.Sleep(100);
             }
             OrderReSendRunning = false;
         }
@@ -383,11 +413,11 @@ namespace CTP
                 g_logined = false;
                 OrderReSendRun = false;
                 Thread.Sleep(50);
-                if(OrderReSendRunning)
+                if (OrderReSendRunning)
                 {
                     OrderReSender.Abort();
                 }
-                
+
                 api.Release();
                 api = null;
             }
@@ -646,6 +676,8 @@ namespace CTP
             DateTime logtime = DateTime.Now;
             api.ReqOrderInsert(pOrder.InputOrder, ++iRequestID);
 
+            Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + pOrder.InputOrder.OrderRef + ","
+                   + pOrder.InputOrder.InstrumentID + "," + pOrder.InputOrder.Direction.ToString() + "," + pOrder.InputOrder.CombOffsetFlag_0.ToString());
             //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + pOrder.InputOrder.OrderRef + "," + pOrder.InputOrder.InstrumentID + "," + pOrder.InputOrder.Direction.ToString()
             //        + "," + pOrder.InputOrder.CombOffsetFlag_0.ToString());
         }
@@ -653,7 +685,7 @@ namespace CTP
         private string ReqOrderInsert(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
         {
             int iResult = 0;
-            
+
             ThostFtdcInputOrderField req = new ThostFtdcInputOrderField();
             ///经纪公司代码
             req.BrokerID = BROKER_ID;
@@ -661,7 +693,7 @@ namespace CTP
             req.InvestorID = INVESTOR_ID;
             ///合约代码
             req.InstrumentID = instrumentID;
-            
+
             ///用户代码
             //	TThostFtdcUserIDType	UserID;
             ///报单价格条件: 限价
@@ -701,7 +733,7 @@ namespace CTP
             req.UserForceClose = 0;
             ORDER_REF++;
             req.OrderRef = ORDER_REF.ToString();
-            
+
             DateTime logtime = DateTime.Now;
 
             Order newOrder = new Order(req, logtime);
@@ -710,7 +742,11 @@ namespace CTP
                 //有重发的命令，将命令加入等待队列
                 lock (WaitInputOrderMapLock)
                 {
-                    WaitInputOrderMap.Add(newOrder);
+                    OrderSignal Signal = new OrderSignal();
+                    Signal.FrontID = FRONT_ID;
+                    Signal.OrderRef = req.OrderRef;
+                    Signal.SessionID = SESSION_ID;
+                    WaitInputOrderMap.Add(Signal, newOrder);
                 }
             }
             else
@@ -722,10 +758,13 @@ namespace CTP
                     Signal.FrontID = FRONT_ID;
                     Signal.OrderRef = req.OrderRef;
                     Signal.SessionID = SESSION_ID;
+                    newOrder.Signal = Signal;
 
                     TradingOrderMap.Add(Signal, newOrder);
                 }
                 iResult = api.ReqOrderInsert(req, ++iRequestID);
+                Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderInsert" + "," + ORDER_REF.ToString() + ","
+                    + req.InstrumentID + "," + req.Direction.ToString() + "," + req.CombOffsetFlag_0.ToString());
                 //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderInsert" + "," + ORDER_REF.ToString() + "," + req.InstrumentID + "," + req.Direction.ToString()
                 //    + "," + req.CombOffsetFlag_0.ToString());
             }
@@ -775,8 +814,16 @@ namespace CTP
             Signal.SessionID = pInputOrderAction.SessionID;
             //Signal.ExchangeID = pInputOrderAction.ExchangeID;
             //Signal.OrderSysID = pInputOrderAction.OrderSysID;
+            DateTime logtime = DateTime.Now;
+            lock (TradingOrderMapLock)
+            {
+                if (TradingOrderMap.ContainsKey(Signal))
+                {
+                    TradingOrderMap[Signal].Cancel(pInputOrderAction, logtime);
+                }
+            }
             iResult = api.ReqOrderAction(pInputOrderAction, ++iRequestID);
-
+            Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction1" + "," + pInputOrderAction.OrderRef);
             ///价格
             //	TThostFtdcPriceType	LimitPrice;
             ///数量变化
@@ -792,8 +839,9 @@ namespace CTP
             iResult = api.ReqOrderAction(pInputOrderAction, ++iRequestID);
 
             DateTime logtime = DateTime.Now;
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + pInputOrderAction.OrderRef);
-     
+            Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderAction" + "," + pInputOrderAction.OrderRef);
+            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderAction" + "," + pInputOrderAction.OrderRef);
+
             return iResult;
             //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             //GUIRefresh.UpdateListBox2("--->>> 报单录入请求: " + ((iResult == 0) ? "成功" : "失败"));
@@ -835,7 +883,7 @@ namespace CTP
             ///数量变化
             //	TThostFtdcVolumeType	VolumeChange;
 
-            
+
             OrderSignal Signal = new OrderSignal();
             Signal.FrontID = pOrder.FrontID;
             Signal.OrderRef = pOrder.OrderRef;
@@ -843,9 +891,13 @@ namespace CTP
             DateTime logtime = DateTime.Now;
             lock (TradingOrderMapLock)
             {
-                TradingOrderMap[Signal].Cancel(req, logtime);
+                if (TradingOrderMap.ContainsKey(Signal))
+                {
+                    TradingOrderMap[Signal].Cancel(req, logtime);
+                }
             }
             iResult = api.ReqOrderAction(req, ++iRequestID);
+            Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction2" + "," + req.OrderRef);
             //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + req.OrderRef);
             //Console.WriteLine("--->>> 报单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
             //GUIRefresh.UpdateListBox2("--->>> 撤单操作请求: " + ((iResult == 0) ? "成功" : "失败"));
@@ -941,7 +993,7 @@ namespace CTP
                                     {
                                         TradingOrderMap[Signal].OrderField = pOrder;
                                         IsReSending = true;
-                                        ReInputOrderMap.Add(TradingOrderMap[Signal]);
+                                        ReInputOrderMap.Add(Signal, TradingOrderMap[Signal]);
                                     }
                                 }
                                 else
@@ -973,7 +1025,8 @@ namespace CTP
                     }
                 }
 
-                Traded(pOrder);
+                Trading(pOrder);
+                //Traded(pOrder);
             }
             else if (pOrder.OrderStatus == EnumOrderStatusType.PartTradedNotQueueing)
             {
