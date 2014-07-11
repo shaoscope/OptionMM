@@ -10,6 +10,14 @@ namespace OptionMM
     class Future : Position
     {
         /// <summary>
+        /// 默认构造函数
+        /// </summary>
+        public Future()
+        {
+
+        }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public Future(string instrumentID)

@@ -35,8 +35,6 @@ namespace OptionMM
             get { return MainForm.instance; }
         }
 
-        private Dictionary<string, string[]> configValues = new Dictionary<string, string[]>();
-
         /// <summary>
         /// 所有仓位信息
         /// </summary>
@@ -61,17 +59,17 @@ namespace OptionMM
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            //加载面板
-            InitFromXML("Option.xml");
+            #region 加载报价面板
+            Dictionary<string, string[]> MMConfigValues = ReadOptionXML("Option.xml");
             Future = new Future("IF1407");
-            foreach (string instrumentID in configValues.Keys)
+            foreach (string instrumentID in MMConfigValues.Keys)
             {
                 Strategy strategy = new Strategy();
                 strategy.Option.InstrumentID = instrumentID;
                 string[] strTemp = instrumentID.Split('-');
                 strategy.Option.StrikePrice = double.Parse(strTemp[2]);
                 strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
-                strategy.IsMarketMakingContract = configValues[instrumentID][1] == "1" ? true : false;
+                strategy.IsMarketMakingContract = MMConfigValues[instrumentID][1] == "1" ? true : false;
                 //加入仓位信息
                 foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
                 {
@@ -87,11 +85,27 @@ namespace OptionMM
                         }
                     }
                 }
-                strategy.Option.longPosition.PositionCost = double.Parse(configValues[instrumentID][3]);
-                strategy.Option.shortPosition.PositionCost = double.Parse(configValues[instrumentID][5]);
+                strategy.Option.longPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][3]);
+                strategy.Option.shortPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][5]);
                 strategy.Configuration();
                 this.optionPanel.AddStrategy(strategy);
             }
+            #endregion
+
+            #region 加载平价套利
+            Dictionary<string, string[]> ParityConfigValues = ReadParityXML("Parity.xml");
+            foreach (string instrumentID in ParityConfigValues.Keys)
+            {
+                string []configValues = ParityConfigValues[instrumentID];
+                Parity parity = new Parity(instrumentID, (EnumPosiDirectionType)Enum.Parse(typeof(EnumPosiDirectionType), configValues[0]), configValues[1],
+                    (EnumPosiDirectionType)Enum.Parse(typeof(EnumPosiDirectionType), configValues[2]), 0, Double.Parse(configValues[3]), Double.Parse(configValues[4]),
+                    Double.Parse(configValues[5]), Double.Parse(configValues[6]));
+                parity.Configuration();
+                this.parityPanel.AddParity(parity);
+            }
+
+            #endregion
+
             this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 5 * 1000);
             this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
             this.writeXmlTimer = new System.Threading.Timer(this.writerXmlCallBack, null, 10 * 1000, 10 * 1000);
@@ -106,7 +120,7 @@ namespace OptionMM
         {
             this.positionHedgeTimer.Dispose();
             this.recordVolatilityTimer.Dispose();
-            this.WriterXML("Option.xml");
+            this.WriterOptionXML("Option.xml");
         }
 
         /// <summary>
@@ -150,65 +164,63 @@ namespace OptionMM
         }
 
         /// <summary>
-        /// 读取XML并初始化面板
+        /// 读取报价配置文件
         /// </summary>
         /// <param name="strFile"></param>
-        private void InitFromXML(string strFile)
+        private Dictionary<string, string[]> ReadOptionXML(string strFile)
         {
-            
+            Dictionary<string, string[]> MMConfigValues = new Dictionary<string, string[]>();
             XmlTextReader xmlRder = null;
             string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
-
             try
             {
                 xmlRder = new XmlTextReader(strFullPathFile);
                 xmlRder.WhitespaceHandling = WhitespaceHandling.None;
 
-                if (xmlRder == null)
+                if (xmlRder != null)
                 {
-                    return;
-                }
-                while (xmlRder.Read())
-                {
-                    xmlRder.MoveToContent();
-
-                    if ((xmlRder.Name == "Option") && (xmlRder.HasAttributes))
+                    while (xmlRder.Read())
                     {
-                        string strID = null;
-                        string[] Property = new string[6];
-                        for (int i = 0; i < xmlRder.AttributeCount; i++)
+                        xmlRder.MoveToContent();
+
+                        if ((xmlRder.Name == "Option") && (xmlRder.HasAttributes))
                         {
-                            xmlRder.MoveToAttribute(i);
-                            if (xmlRder.Name == "InstrumentID")
+                            string strID = null;
+                            string[] Property = new string[6];
+                            for (int i = 0; i < xmlRder.AttributeCount; i++)
                             {
-                                strID = xmlRder.Value;
+                                xmlRder.MoveToAttribute(i);
+                                if (xmlRder.Name == "InstrumentID")
+                                {
+                                    strID = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "标的物")
+                                {
+                                    Property[0] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "做市合约")
+                                {
+                                    Property[1] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "多头仓位数")
+                                {
+                                    Property[2] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "多头持仓均价")
+                                {
+                                    Property[3] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "空头仓位数")
+                                {
+                                    Property[4] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "空头持仓均价")
+                                {
+                                    Property[5] = xmlRder.Value;
+                                }
                             }
-                            else if (xmlRder.Name == "标的物")
-                            {
-                                Property[0] = xmlRder.Value;
-                            }
-                            else if(xmlRder.Name == "做市合约")
-                            {
-                                Property[1] = xmlRder.Value;
-                            }
-                            else if(xmlRder.Name == "多头仓位数")
-                            {
-                                Property[2] = xmlRder.Value;
-                            }
-                            else if(xmlRder.Name == "多头持仓均价")
-                            {
-                                Property[3] = xmlRder.Value;
-                            }
-                            else if(xmlRder.Name == "空头仓位数")
-                            {
-                                Property[4] = xmlRder.Value;
-                            }
-                            else if(xmlRder.Name == "空头持仓均价")
-                            {
-                                Property[5] = xmlRder.Value;
-                            }
+                            MMConfigValues.Add(strID, Property);
                         }
-                        configValues.Add(strID, Property);
                     }
                 }
             }
@@ -218,8 +230,88 @@ namespace OptionMM
             finally
             {
                 if (xmlRder != null)
+                {
                     xmlRder.Close();
+                }
             }
+            return MMConfigValues;
+        }
+
+        /// <summary>
+        /// 读取平价套利配置文件
+        /// </summary>
+        /// <param name="strFile"></param>
+        private Dictionary<string, string[]> ReadParityXML(string strFile)
+        {
+            Dictionary<string, string[]> ParityConfigValues = new Dictionary<string, string[]>();
+            XmlTextReader xmlRder = null;
+            string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
+            try
+            {
+                xmlRder = new XmlTextReader(strFullPathFile);
+                xmlRder.WhitespaceHandling = WhitespaceHandling.None;
+                if (xmlRder != null)
+                {
+                    while (xmlRder.Read())
+                    {
+                        xmlRder.MoveToContent();
+
+                        if ((xmlRder.Name == "Parity") && (xmlRder.HasAttributes))
+                        {
+                            string strID = null;
+                            string[] Property = new string[7];
+                            for (int i = 0; i < xmlRder.AttributeCount; i++)
+                            {
+                                xmlRder.MoveToAttribute(i);
+                                if (xmlRder.Name == "LongInstrumentID")
+                                {
+                                    strID = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "CallDirection")
+                                {
+                                    Property[0] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "ShortInstrumentID")
+                                {
+                                    Property[1] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "PutDirection")
+                                {
+                                    Property[2] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "OpenThreshold")
+                                {
+                                    Property[3] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "CloseThreshold")
+                                {
+                                    Property[4] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "MaxOpenSets")
+                                {
+                                    Property[5] = xmlRder.Value;
+                                }
+                                else if (xmlRder.Name == "OpenedSets")
+                                {
+                                    Property[6] = xmlRder.Value;
+                                }
+                            }
+                            ParityConfigValues.Add(strID, Property);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+            finally
+            {
+                if (xmlRder != null)
+                {
+                    xmlRder.Close();
+                }
+            }
+            return ParityConfigValues;
         }
 
         /// <summary>
@@ -361,34 +453,34 @@ namespace OptionMM
         /// </summary>
         private void ScanParity()
         {
-            Dictionary<string, Strategy> strategyDictionary = new Dictionary<string,Strategy>();
-            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
-            {
-                Strategy strategy = (Strategy)dataRow.Tag;
-                strategyDictionary.Add(strategy.Option.InstrumentID, strategy);
-            }
-            foreach(Strategy strategyCall in strategyDictionary.Values)
-            {
-                if(strategyCall.Option.OptionType == OptionTypeEnum.call)
-                {
-                    string parityPutInstrumentID = strategyCall.Option.InstrumentID.Replace('C', 'P');
-                    Strategy strategyPut = strategyDictionary[parityPutInstrumentID];
-                    if (strategyCall.Option.LastMarket.BidPrice1 + strategyCall.Option.StrikePrice > strategyPut.Option.LastMarket.AskPrice1 + MainForm.Future.LastMarket.LastPrice)
-                    {
-                        //Long Put + Short Call
-                        double parityInterval = strategyCall.Option.LastMarket.BidPrice1 + strategyCall.Option.StrikePrice - strategyPut.Option.LastMarket.AskPrice1 - MainForm.Future.LastMarket.LastPrice;
-                        Parity parity = new Parity(strategyCall.Option.InstrumentID, EnumPosiDirectionType.Short, strategyPut.Option.InstrumentID, EnumPosiDirectionType.Long, parityInterval);
-                        this.BeginInvoke(new Action<Parity>(this.AddPrity), parity);
-                    }
-                    else if (strategyCall.Option.LastMarket.AskPrice1 + strategyCall.Option.StrikePrice < strategyPut.Option.LastMarket.BidPrice1 + MainForm.Future.LastMarket.LastPrice)
-                    {
-                        //Long Call + Short Put
-                        double parityInterval = strategyPut.Option.LastMarket.BidPrice1 + MainForm.Future.LastMarket.LastPrice - strategyCall.Option.LastMarket.AskPrice1 - strategyCall.Option.StrikePrice;
-                        Parity parity = new Parity(strategyCall.Option.InstrumentID, EnumPosiDirectionType.Long, strategyPut.Option.InstrumentID, EnumPosiDirectionType.Short, parityInterval);
-                        this.BeginInvoke(new Action<Parity>(this.AddPrity), parity);
-                    }
-                }
-            }
+            //Dictionary<string, Strategy> strategyDictionary = new Dictionary<string,Strategy>();
+            //foreach (DataGridViewRow dataRow in this.ParityPanel.dataTable.Rows)
+            //{
+            //    Strategy strategy = (Strategy)dataRow.Tag;
+            //    strategyDictionary.Add(strategy.Parity.InstrumentID, strategy);
+            //}
+            //foreach(Strategy strategyCall in strategyDictionary.Values)
+            //{
+            //    if(strategyCall.Parity.ParityType == ParityTypeEnum.call)
+            //    {
+            //        string parityPutInstrumentID = strategyCall.Parity.InstrumentID.Replace('C', 'P');
+            //        Strategy strategyPut = strategyDictionary[parityPutInstrumentID];
+            //        if (strategyCall.Parity.LastMarket.BidPrice1 + strategyCall.Parity.StrikePrice > strategyPut.Parity.LastMarket.AskPrice1 + MainForm.Future.LastMarket.LastPrice)
+            //        {
+            //            //Long Put + Short Call
+            //            double parityInterval = strategyCall.Parity.LastMarket.BidPrice1 + strategyCall.Parity.StrikePrice - strategyPut.Parity.LastMarket.AskPrice1 - MainForm.Future.LastMarket.LastPrice;
+            //            Parity parity = new Parity(strategyCall.Parity.InstrumentID, EnumPosiDirectionType.Short, strategyPut.Parity.InstrumentID, EnumPosiDirectionType.Long, parityInterval);
+            //            this.BeginInvoke(new Action<Parity>(this.AddPrity), parity);
+            //        }
+            //        else if (strategyCall.Parity.LastMarket.AskPrice1 + strategyCall.Parity.StrikePrice < strategyPut.Parity.LastMarket.BidPrice1 + MainForm.Future.LastMarket.LastPrice)
+            //        {
+            //            //Long Call + Short Put
+            //            double parityInterval = strategyPut.Parity.LastMarket.BidPrice1 + MainForm.Future.LastMarket.LastPrice - strategyCall.Parity.LastMarket.AskPrice1 - strategyCall.Parity.StrikePrice;
+            //            Parity parity = new Parity(strategyCall.Parity.InstrumentID, EnumPosiDirectionType.Long, strategyPut.Parity.InstrumentID, EnumPosiDirectionType.Short, parityInterval);
+            //            this.BeginInvoke(new Action<Parity>(this.AddPrity), parity);
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
@@ -401,11 +493,6 @@ namespace OptionMM
             this.coveredPanel.AddCovered(covered);
         }
 
-
-        private void AddPrity(Parity parity)
-        {
-            this.parityPanel.AddParity(parity);
-        }
         /// <summary>
         /// 寻找平价套利机会
         /// </summary>
@@ -430,13 +517,14 @@ namespace OptionMM
             this.recordVolatilityTimer.Dispose();
             TDManager.TD.Release();
             MDManager.MD.Release();
-            this.WriterXML("Option.xml");
+            this.WriterOptionXML("Option.xml");
+            this.WriteParityXML("Parity.xml");
         }
 
         /// <summary>
-        /// 将程序运行状态写入XML
+        /// 将报价状态写入XML
         /// </summary>
-        private void WriterXML(string strFile)
+        private void WriterOptionXML(string strFile)
         {
             lock (this)
             {
@@ -470,7 +558,46 @@ namespace OptionMM
 
                 }
             }
+        }
 
+        /// <summary>
+        /// 将平价套利策略状态写入XML
+        /// </summary>
+        /// <param name="strFile"></param>
+        private void WriteParityXML(string strFile)
+        {
+            lock (this)
+            {
+                string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
+                XmlDocument xmlDoc = new XmlDocument();
+                try
+                {
+                    xmlDoc.Load(strFullPathFile);
+                    XmlNodeList xnl = xmlDoc.SelectSingleNode("root").ChildNodes;
+                    int itemIndex = 0;
+                    foreach (DataGridViewRow dataRow in this.parityPanel.dataTable.Rows)
+                    {
+                        Parity parity = (Parity)dataRow.Tag;
+                        XmlElement xe = (XmlElement)xnl.Item(itemIndex++);
+                        if (xe.Attributes["LongInstrumentID"].Value == parity.LongOption.InstrumentID)
+                        {
+                            xe.SetAttribute("OpenThreshold", parity.OpenThreshold.ToString());
+                            xe.SetAttribute("CloseThreshold", parity.CloseThreshold.ToString());
+                            xe.SetAttribute("MaxOpenSets", parity.MaxOpenSets.ToString());
+                            xe.SetAttribute("OpenedSets", parity.OpenedSets.ToString());
+                        }
+                    }
+                    xmlDoc.Save(strFullPathFile);
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+
+                }
+            }
         }
 
 

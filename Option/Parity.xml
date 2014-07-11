@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <Parity LongInstrumentID="IO1407-C-1950" CallDirection="Long" ShortInstrumentID="IO1407-P-1950" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2000" CallDirection="Long" ShortInstrumentID="IO1407-P-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2050" CallDirection="Long" ShortInstrumentID="IO1407-P-2050" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2100" CallDirection="Long" ShortInstrumentID="IO1407-P-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2150" CallDirection="Long" ShortInstrumentID="IO1407-P-2150" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2200" CallDirection="Long" ShortInstrumentID="IO1407-P-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2250" CallDirection="Long" ShortInstrumentID="IO1407-P-2250" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2300" CallDirection="Long" ShortInstrumentID="IO1407-P-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-C-2350" CallDirection="Long" ShortInstrumentID="IO1407-P-2350" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+  <Parity LongInstrumentID="IO1407-P-1950" CallDirection="Long" ShortInstrumentID="IO1407-C-1950" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2000" CallDirection="Long" ShortInstrumentID="IO1407-C-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2050" CallDirection="Long" ShortInstrumentID="IO1407-C-2050" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2100" CallDirection="Long" ShortInstrumentID="IO1407-C-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2150" CallDirection="Long" ShortInstrumentID="IO1407-C-2150" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2200" CallDirection="Long" ShortInstrumentID="IO1407-C-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2250" CallDirection="Long" ShortInstrumentID="IO1407-C-2250" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2300" CallDirection="Long" ShortInstrumentID="IO1407-C-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1407-P-2350" CallDirection="Long" ShortInstrumentID="IO1407-C-2350" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+
+  <Parity LongInstrumentID="IO1408-C-1950" CallDirection="Long" ShortInstrumentID="IO1408-P-1950" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2000" CallDirection="Long" ShortInstrumentID="IO1408-P-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2050" CallDirection="Long" ShortInstrumentID="IO1408-P-2050" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2100" CallDirection="Long" ShortInstrumentID="IO1408-P-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2150" CallDirection="Long" ShortInstrumentID="IO1408-P-2150" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2200" CallDirection="Long" ShortInstrumentID="IO1408-P-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2250" CallDirection="Long" ShortInstrumentID="IO1408-P-2250" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2300" CallDirection="Long" ShortInstrumentID="IO1408-P-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-C-2350" CallDirection="Long" ShortInstrumentID="IO1408-P-2350" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+  <Parity LongInstrumentID="IO1408-P-1950" CallDirection="Long" ShortInstrumentID="IO1408-C-1950" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2000" CallDirection="Long" ShortInstrumentID="IO1408-C-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2050" CallDirection="Long" ShortInstrumentID="IO1408-C-2050" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2100" CallDirection="Long" ShortInstrumentID="IO1408-C-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2150" CallDirection="Long" ShortInstrumentID="IO1408-C-2150" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2200" CallDirection="Long" ShortInstrumentID="IO1408-C-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2250" CallDirection="Long" ShortInstrumentID="IO1408-C-2250" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2300" CallDirection="Long" ShortInstrumentID="IO1408-C-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1408-P-2350" CallDirection="Long" ShortInstrumentID="IO1408-C-2350" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+
+  <Parity LongInstrumentID="IO1409-C-1900" CallDirection="Long" ShortInstrumentID="IO1409-P-1900" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2000" CallDirection="Long" ShortInstrumentID="IO1409-P-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2050" CallDirection="Long" ShortInstrumentID="IO1409-P-2050" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2100" CallDirection="Long" ShortInstrumentID="IO1409-P-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2150" CallDirection="Long" ShortInstrumentID="IO1409-P-2150" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2200" CallDirection="Long" ShortInstrumentID="IO1409-P-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2250" CallDirection="Long" ShortInstrumentID="IO1409-P-2250" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2300" CallDirection="Long" ShortInstrumentID="IO1409-P-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2400" CallDirection="Long" ShortInstrumentID="IO1409-P-2400" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-C-2500" CallDirection="Long" ShortInstrumentID="IO1409-P-2500" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+  <Parity LongInstrumentID="IO1409-P-1900" CallDirection="Long" ShortInstrumentID="IO1409-C-1900" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2000" CallDirection="Long" ShortInstrumentID="IO1409-C-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2050" CallDirection="Long" ShortInstrumentID="IO1409-C-2050" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2100" CallDirection="Long" ShortInstrumentID="IO1409-C-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2150" CallDirection="Long" ShortInstrumentID="IO1409-C-2150" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2200" CallDirection="Long" ShortInstrumentID="IO1409-C-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2250" CallDirection="Long" ShortInstrumentID="IO1409-C-2250" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2300" CallDirection="Long" ShortInstrumentID="IO1409-C-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2400" CallDirection="Long" ShortInstrumentID="IO1409-C-2400" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1409-P-2500" CallDirection="Long" ShortInstrumentID="IO1409-C-2500" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+
+  <Parity LongInstrumentID="IO1412-C-1900" CallDirection="Long" ShortInstrumentID="IO1412-P-1900" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-C-2000" CallDirection="Long" ShortInstrumentID="IO1412-P-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-C-2100" CallDirection="Long" ShortInstrumentID="IO1412-P-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-C-2200" CallDirection="Long" ShortInstrumentID="IO1412-P-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-C-2300" CallDirection="Long" ShortInstrumentID="IO1412-P-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-C-2400" CallDirection="Long" ShortInstrumentID="IO1412-P-2400" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-C-2500" CallDirection="Long" ShortInstrumentID="IO1412-P-2500" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+  <Parity LongInstrumentID="IO1412-P-1900" CallDirection="Long" ShortInstrumentID="IO1412-C-1900" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-P-2000" CallDirection="Long" ShortInstrumentID="IO1412-C-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-P-2100" CallDirection="Long" ShortInstrumentID="IO1412-C-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-P-2200" CallDirection="Long" ShortInstrumentID="IO1412-C-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-P-2300" CallDirection="Long" ShortInstrumentID="IO1412-C-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-P-2400" CallDirection="Long" ShortInstrumentID="IO1412-C-2400" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1412-P-2500" CallDirection="Long" ShortInstrumentID="IO1412-C-2500" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+
+  <Parity LongInstrumentID="IO1503-C-1900" CallDirection="Long" ShortInstrumentID="IO1503-P-1900" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-C-2000" CallDirection="Long" ShortInstrumentID="IO1503-P-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-C-2100" CallDirection="Long" ShortInstrumentID="IO1503-P-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-C-2200" CallDirection="Long" ShortInstrumentID="IO1503-P-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-C-2300" CallDirection="Long" ShortInstrumentID="IO1503-P-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+  <Parity LongInstrumentID="IO1503-P-1900" CallDirection="Long" ShortInstrumentID="IO1503-C-1900" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-P-2000" CallDirection="Long" ShortInstrumentID="IO1503-C-2000" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-P-2100" CallDirection="Long" ShortInstrumentID="IO1503-C-2100" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-P-2200" CallDirection="Long" ShortInstrumentID="IO1503-C-2200" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+  <Parity LongInstrumentID="IO1503-P-2300" CallDirection="Long" ShortInstrumentID="IO1503-C-2300" PutDirection="Short" OpenThreshold="4" CloseThreshold="0" MaxOpenSets="50" OpenedSets="0" />
+
+</root>

@@ -36,7 +36,7 @@ namespace OptionMM
         }
 
         /// <summary>
-        /// 清空保单信息
+        /// 清空报单信息
         /// </summary>
         public void clearOrderInfo()
         {

@@ -65,6 +65,7 @@ namespace OptionMM
             //刷新面板定时器
             this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
         }
+
         private void TD_OnOrderRefReplace(string orderRefOld, string orderRefNew)
         {
             if (this.option.PlaceLongOptionOrderRef == orderRefOld)

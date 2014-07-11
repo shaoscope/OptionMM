@@ -58,11 +58,15 @@ namespace OptionMM
             parity.SetPanel(this);
             parity.CreateCells(this.dataTable);
             DataGridViewCellCollection cells = parity.Cells;
-            cells[0].Value = parity.CallInstrumentID;
+            cells[0].Value = parity.LongOption.InstrumentID;
             cells[1].Value = parity.CallDirection;
-            cells[2].Value = parity.PutInstrumentID;
+            cells[2].Value = parity.ShortOption.InstrumentID;
             cells[3].Value = parity.PutDirection;
             cells[4].Value = parity.ParityInterval;
+            cells[5].Value = parity.OpenThreshold;
+            cells[6].Value = parity.CloseThreshold;
+            cells[7].Value = parity.MaxOpenSets;
+            cells[8].Value = parity.OpenedSets;
             this.dataTable.Rows.Add(parity);
         }
 
@@ -75,7 +79,7 @@ namespace OptionMM
         {
             if (this.dataTable.SelectedRows.Count == 1)
             {
-                Parity covered = (Parity)this.dataTable.SelectedRows[0].Tag;
+                Parity parity = (Parity)this.dataTable.SelectedRows[0].Tag;
 
             }
         }
@@ -90,6 +94,69 @@ namespace OptionMM
             if(e.RowIndex >= 0)
             {
                 this.dataTable.Rows[e.RowIndex].Selected = true;
+            }
+        }
+
+        /// <summary>
+        /// 结束单元格编辑时的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void dataTable_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridViewRow row;
+            DataGridViewCell cell;
+            double dTemp;
+            switch (e.ColumnIndex)
+            {
+                case 5:
+                    row = this.dataTable.Rows[e.RowIndex];
+                    cell = row.Cells[5];
+                    if (double.TryParse(cell.Value as string, out dTemp))
+                    {
+                        ((Parity)row).OpenThreshold = dTemp;
+                    }
+                    else
+                    {
+                        cell.Value = ((Parity)row).OpenThreshold;
+                    }
+                    return;
+                case 6:
+                    row = this.dataTable.Rows[e.RowIndex];
+                    cell = row.Cells[6];
+                    if (double.TryParse(cell.Value as string, out dTemp))
+                    {
+                        ((Parity)row).CloseThreshold = dTemp;
+                    }
+                    else
+                    {
+                        cell.Value = ((Parity)row).OpenThreshold;
+                    }
+                    return;
+                case 7:
+                    row = this.dataTable.Rows[e.RowIndex];
+                    cell = row.Cells[7];
+                    if (double.TryParse(cell.Value as string, out dTemp))
+                    {
+                        ((Parity)row).MaxOpenSets = dTemp;
+                    }
+                    else
+                    {
+                        cell.Value = ((Parity)row).OpenThreshold;
+                    }
+                    return;
+                case 8:
+                    row = this.dataTable.Rows[e.RowIndex];
+                    cell = row.Cells[8];
+                    if (double.TryParse(cell.Value as string, out dTemp))
+                    {
+                        ((Parity)row).OpenedSets = dTemp;
+                    }
+                    else
+                    {
+                        cell.Value = ((Parity)row).OpenThreshold;
+                    }
+                    return;
             }
         }
     }
