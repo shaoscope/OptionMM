@@ -33,11 +33,11 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.investorID = new System.Windows.Forms.TextBox();
+            this.password = new System.Windows.Forms.TextBox();
+            this.brokerID = new System.Windows.Forms.TextBox();
+            this.MDFrontAddress = new System.Windows.Forms.TextBox();
+            this.TDFrontAddress = new System.Windows.Forms.TextBox();
             this.login_Button = new System.Windows.Forms.Button();
             this.exit_Button = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
@@ -89,48 +89,48 @@
             this.label5.TabIndex = 4;
             this.label5.Text = "TDADDR";
             // 
-            // textBox1
+            // investorID
             // 
-            this.textBox1.Location = new System.Drawing.Point(120, 42);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 21);
-            this.textBox1.TabIndex = 5;
-            this.textBox1.Text = "60002968";
+            this.investorID.Location = new System.Drawing.Point(120, 42);
+            this.investorID.Name = "investorID";
+            this.investorID.Size = new System.Drawing.Size(100, 21);
+            this.investorID.TabIndex = 5;
+            this.investorID.Text = "60002968";
             // 
-            // textBox2
+            // password
             // 
-            this.textBox2.Location = new System.Drawing.Point(120, 80);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 21);
-            this.textBox2.TabIndex = 6;
-            this.textBox2.Text = "657191";
+            this.password.Location = new System.Drawing.Point(120, 80);
+            this.password.Name = "password";
+            this.password.Size = new System.Drawing.Size(100, 21);
+            this.password.TabIndex = 6;
+            this.password.Text = "60002968";
             // 
-            // textBox3
+            // brokerID
             // 
-            this.textBox3.Enabled = false;
-            this.textBox3.Location = new System.Drawing.Point(120, 116);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 21);
-            this.textBox3.TabIndex = 7;
-            this.textBox3.Text = "1111";
+            this.brokerID.Enabled = false;
+            this.brokerID.Location = new System.Drawing.Point(120, 116);
+            this.brokerID.Name = "brokerID";
+            this.brokerID.Size = new System.Drawing.Size(100, 21);
+            this.brokerID.TabIndex = 7;
+            this.brokerID.Text = "66666";
             // 
-            // textBox4
+            // MDFrontAddress
             // 
-            this.textBox4.Enabled = false;
-            this.textBox4.Location = new System.Drawing.Point(120, 151);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(304, 21);
-            this.textBox4.TabIndex = 8;
-            this.textBox4.Text = "tcp://211.95.40.130:31213";
+            this.MDFrontAddress.Enabled = false;
+            this.MDFrontAddress.Location = new System.Drawing.Point(120, 151);
+            this.MDFrontAddress.Name = "MDFrontAddress";
+            this.MDFrontAddress.Size = new System.Drawing.Size(304, 21);
+            this.MDFrontAddress.TabIndex = 8;
+            this.MDFrontAddress.Text = "tcp://27.115.78.201:31213";
             // 
-            // textBox5
+            // TDFrontAddress
             // 
-            this.textBox5.Enabled = false;
-            this.textBox5.Location = new System.Drawing.Point(120, 184);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(304, 21);
-            this.textBox5.TabIndex = 9;
-            this.textBox5.Text = "tcp://211.95.40.130:31205";
+            this.TDFrontAddress.Enabled = false;
+            this.TDFrontAddress.Location = new System.Drawing.Point(120, 184);
+            this.TDFrontAddress.Name = "TDFrontAddress";
+            this.TDFrontAddress.Size = new System.Drawing.Size(304, 21);
+            this.TDFrontAddress.TabIndex = 9;
+            this.TDFrontAddress.Text = "tcp://27.115.78.201:31205";
             // 
             // login_Button
             // 
@@ -180,11 +180,11 @@
             this.Controls.Add(this.label6);
             this.Controls.Add(this.exit_Button);
             this.Controls.Add(this.login_Button);
-            this.Controls.Add(this.textBox5);
-            this.Controls.Add(this.textBox4);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.TDFrontAddress);
+            this.Controls.Add(this.MDFrontAddress);
+            this.Controls.Add(this.brokerID);
+            this.Controls.Add(this.password);
+            this.Controls.Add(this.investorID);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -207,11 +207,11 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.TextBox investorID;
+        private System.Windows.Forms.TextBox password;
+        private System.Windows.Forms.TextBox brokerID;
+        private System.Windows.Forms.TextBox MDFrontAddress;
+        private System.Windows.Forms.TextBox TDFrontAddress;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label loginStatusLabel;
         public System.Windows.Forms.Button login_Button;

@@ -12,7 +12,7 @@ namespace CTP
     public class MDAPI
     {   
         public bool bLogin = false;
-        public CTPMDAdapter api = null;
+        public CTPMDAdapter MD = null;
         string FRONT_ADDR = "tcp://asp-sim2-md1.financial-trading-platform.com:26213";  // 前置地址
         string BrokerID = "2030";   // 经纪公司代码
         string UserID = "888888";   // 投资者代码
@@ -29,30 +29,30 @@ namespace CTP
             BrokerID = brokerID;
             UserID = InvesterID;
             Password = password;
-            api = new CTPMDAdapter();
-            AddEvent();
+            MD = new CTPMDAdapter();
+            //AddEvent();
         }
 
         private void AddEvent()
         {
-            api.OnFrontConnected += new FrontConnected(OnFrontConnected);
-            api.OnFrontDisconnected += new FrontDisconnected(OnFrontDisconnected);
-            api.OnHeartBeatWarning += new HeartBeatWarning(OnHeartBeatWarning);
-            api.OnRspError += new RspError(OnRspError);
-            api.OnRspSubMarketData += new RspSubMarketData(OnRspSubMarketData);
-            api.OnRspUnSubMarketData += new RspUnSubMarketData(OnRspUnSubMarketData);
-            api.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
-            api.OnRspUserLogout += new RspUserLogout(OnRspUserLogout);
-            api.OnRtnDepthMarketData += new RtnDepthMarketData(OnRtnDepthMarketData);
-            api.OnRtnForQuoteRsp += new RtnForQuoteRsp(OnRtnForQuoteRsp);
+            MD.OnFrontConnected += new FrontConnected(OnFrontConnected);
+            MD.OnFrontDisconnected += new FrontDisconnected(OnFrontDisconnected);
+            MD.OnHeartBeatWarning += new HeartBeatWarning(OnHeartBeatWarning);
+            MD.OnRspError += new RspError(OnRspError);
+            MD.OnRspSubMarketData += new RspSubMarketData(OnRspSubMarketData);
+            MD.OnRspUnSubMarketData += new RspUnSubMarketData(OnRspUnSubMarketData);
+            MD.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
+            MD.OnRspUserLogout += new RspUserLogout(OnRspUserLogout);
+            MD.OnRtnDepthMarketData += new RtnDepthMarketData(OnRtnDepthMarketData);
+            MD.OnRtnForQuoteRsp += new RtnForQuoteRsp(OnRtnForQuoteRsp);
         }
 
         public void Connect()
         {
             try
             {
-                api.RegisterFront(FRONT_ADDR);
-                api.Init();
+                MD.RegisterFront(FRONT_ADDR);
+                MD.Init();
                 //api.Join(); // 阻塞直到关闭或者CTRL+C
                 //this.Release();
             }
@@ -68,27 +68,27 @@ namespace CTP
 
         public void Release()
         {
-            if (api != null)
+            if (MD != null)
             {
-                api.Release();
-                api = null;
+                MD.Release();
+                MD = null;
             }
         }
 
-        private int ReqUserLogin()
+        public int ReqUserLogin()
         {
             ThostFtdcReqUserLoginField req = new ThostFtdcReqUserLoginField();
             req.BrokerID = BrokerID;
             req.UserID = UserID;
             req.Password = Password;
-            int iResult = api.ReqUserLogin(req, ++iRequestID);
+            int iResult = MD.ReqUserLogin(req, ++iRequestID);
             return iResult;
         }
 
         public int SubscribeMarketData(string[] ppInstrumentID)
         {
             int iRet;
-            iRet = api.SubscribeMarketData(ppInstrumentID);
+            iRet = MD.SubscribeMarketData(ppInstrumentID);
             SubscribeForQuoteRsp(ppInstrumentID);
             return iRet;
         }
@@ -96,7 +96,7 @@ namespace CTP
         public int UnSubscribeMarketData(string[] ppInstrumentID)
         {
             int iRet;
-            iRet = api.UnSubscribeMarketData(ppInstrumentID);
+            iRet = MD.UnSubscribeMarketData(ppInstrumentID);
             UnSubscribeForQuoteRsp(ppInstrumentID);
             return iRet;
         }
@@ -104,14 +104,14 @@ namespace CTP
         private int SubscribeForQuoteRsp(string[] ppInstrumentID)
         {
             int iRet;
-            iRet = api.SubscribeForQuoteRsp(ppInstrumentID);
+            iRet = MD.SubscribeForQuoteRsp(ppInstrumentID);
             return iRet;
         }
 
         private int UnSubscribeForQuoteRsp(string[] ppInstrumentID)
         {
             int iRet;
-            iRet = api.UnSubscribeForQuoteRsp(ppInstrumentID);
+            iRet = MD.UnSubscribeForQuoteRsp(ppInstrumentID);
             return iRet;
         }
 

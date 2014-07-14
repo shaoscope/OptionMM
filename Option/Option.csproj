@@ -57,6 +57,12 @@
     </Compile>
     <Compile Include="FullPath.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="QuoteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuoteForm.Designer.cs">
+      <DependentUpon>QuoteForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TraderAPI.cs" />
     <Compile Include="Vertical.cs" />
     <Compile Include="Parity.cs" />
@@ -122,6 +128,9 @@
     <Compile Include="TDManager.cs" />
     <EmbeddedResource Include="CoveredPanel.resx">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuoteForm.resx">
+      <DependentUpon>QuoteForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VerticalPanel.resx">
       <DependentUpon>VerticalPanel.cs</DependentUpon>

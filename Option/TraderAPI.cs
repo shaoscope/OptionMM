@@ -178,7 +178,7 @@ namespace CTP
 
         public bool bCanReq = false; //投资者结算确认后的查询控制
         public bool g_logined;
-        public CTPTraderAdapter api = null;
+        public CTPTraderAdapter TD = null;
         string FRONT_ADDR = "tcp://asp-sim2-front1.financial-trading-platform.com:26205";  // 前置地址
         string BROKER_ID = "2030";      // 经纪公司代码
         string INVESTOR_ID = "888888";  // 投资者代码
@@ -236,38 +236,38 @@ namespace CTP
             BROKER_ID = brokerID;
             INVESTOR_ID = InvesterID;
             PASSWORD = password;
-            api = new CTPTraderAdapter();
-            AddEvent();
+            //AddEvent();
+            TD = new CTPTraderAdapter();
         }
 
         private void AddEvent()
         {
-            api.OnFrontConnected += new FrontConnected(OnFrontConnected);
-            api.OnFrontDisconnected += new FrontDisconnected(OnFrontDisconnected);
-            api.OnHeartBeatWarning += new HeartBeatWarning(OnHeartBeatWarning);
-            api.OnRspError += new RspError(OnRspError);
-            api.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
-            api.OnRspOrderAction += new RspOrderAction(OnRspOrderAction);
-            api.OnRspQryOrder += new RspQryOrder(OnRspQryOrder);
-            api.OnRspQryTrade += new RspQryTrade(OnRspQryTrade);
+            TD.OnFrontConnected += new FrontConnected(OnFrontConnected);
+            TD.OnFrontDisconnected += new FrontDisconnected(OnFrontDisconnected);
+            TD.OnHeartBeatWarning += new HeartBeatWarning(OnHeartBeatWarning);
+            TD.OnRspError += new RspError(OnRspError);
+            TD.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
+            TD.OnRspOrderAction += new RspOrderAction(OnRspOrderAction);
+            TD.OnRspQryOrder += new RspQryOrder(OnRspQryOrder);
+            TD.OnRspQryTrade += new RspQryTrade(OnRspQryTrade);
             //api.OnErrRtnOrderInsert += new ErrRtnOrderInsert(OnErrRtnOrderInsert);
-            api.OnRspOrderInsert += new RspOrderInsert(OnRspOrderInsert);
-            api.OnRspQryInstrument += new RspQryInstrument(OnRspQryInstrument);
-            api.OnRspQryInvestorPosition += new RspQryInvestorPosition(OnRspQryInvestorPosition);
-            api.OnRspQryTradingAccount += new RspQryTradingAccount(OnRspQryTradingAccount);
-            api.OnRspSettlementInfoConfirm += new RspSettlementInfoConfirm(OnRspSettlementInfoConfirm);
-            api.OnRtnOrder += new RtnOrder(OnRtnOrder);
-            api.OnRtnTrade += new RtnTrade(OnRtnTrade);
+            TD.OnRspOrderInsert += new RspOrderInsert(OnRspOrderInsert);
+            TD.OnRspQryInstrument += new RspQryInstrument(OnRspQryInstrument);
+            TD.OnRspQryInvestorPosition += new RspQryInvestorPosition(OnRspQryInvestorPosition);
+            TD.OnRspQryTradingAccount += new RspQryTradingAccount(OnRspQryTradingAccount);
+            TD.OnRspSettlementInfoConfirm += new RspSettlementInfoConfirm(OnRspSettlementInfoConfirm);
+            TD.OnRtnOrder += new RtnOrder(OnRtnOrder);
+            TD.OnRtnTrade += new RtnTrade(OnRtnTrade);
         }
 
         public void Connect()
         {
-            api.SubscribePublicTopic(EnumTeResumeType.THOST_TERT_QUICK);
-            api.SubscribePrivateTopic(EnumTeResumeType.THOST_TERT_QUICK);
+            TD.SubscribePublicTopic(EnumTeResumeType.THOST_TERT_QUICK);
+            TD.SubscribePrivateTopic(EnumTeResumeType.THOST_TERT_QUICK);
             try
             {
-                api.RegisterFront(FRONT_ADDR);
-                api.Init();
+                TD.RegisterFront(FRONT_ADDR);
+                TD.Init();
                 //OrderReSender.Start();
                 //this.OrderTimer = new System.Threading.Timer(this.OrderManagerCallBack, null, 1000, 1000);
                 OrderReSender = new Thread(new ThreadStart(OrderReSendCallBack));
@@ -500,7 +500,7 @@ namespace CTP
 
         public void Release()
         {
-            if (api != null)
+            if (TD != null)
             {
                 g_logined = false;
                 OrderReSendRun = false;
@@ -510,8 +510,8 @@ namespace CTP
                     OrderReSender.Abort();
                 }
 
-                api.Release();
-                api = null;
+                TD.Release();
+                TD = null;
             }
         }
 
@@ -526,7 +526,7 @@ namespace CTP
             req.BrokerID = BROKER_ID;
             req.UserID = INVESTOR_ID;
             req.Password = PASSWORD;
-            int iResult = api.ReqUserLogin(req, ++iRequestID);
+            int iResult = TD.ReqUserLogin(req, ++iRequestID);
         }
 
         void OnRspUserLogin(ThostFtdcRspUserLoginField pRspUserLogin, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
@@ -552,7 +552,7 @@ namespace CTP
             ThostFtdcSettlementInfoConfirmField req = new ThostFtdcSettlementInfoConfirmField();
             req.BrokerID = BROKER_ID;
             req.InvestorID = INVESTOR_ID;
-            int iResult = api.ReqSettlementInfoConfirm(req, ++iRequestID);
+            int iResult = TD.ReqSettlementInfoConfirm(req, ++iRequestID);
         }
 
         void OnRspSettlementInfoConfirm(ThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
@@ -568,12 +568,9 @@ namespace CTP
                 bCanReq = true;
         }
 
-        void ReqQryInstrument()
+        public void ReqQryInstrument()
         {
-            Thread.Sleep(1000);
-            ThostFtdcQryInstrumentField req = new ThostFtdcQryInstrumentField();
-            req.InstrumentID = INSTRUMENT_ID;
-            int iResult = api.ReqQryInstrument(req, ++iRequestID);
+            int iResult = TD.ReqQryInstrument(new ThostFtdcQryInstrumentField(), ++iRequestID);            
         }
 
         void OnRspQryInstrument(ThostFtdcInstrumentField pInstrument, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
@@ -598,7 +595,7 @@ namespace CTP
             ThostFtdcQryTradingAccountField req = new ThostFtdcQryTradingAccountField();
             req.BrokerID = BROKER_ID;
             req.InvestorID = INVESTOR_ID;
-            int iResult = api.ReqQryTradingAccount(req, ++iRequestID);
+            int iResult = TD.ReqQryTradingAccount(req, ++iRequestID);
         }
 
         void OnRspQryTradingAccount(ThostFtdcTradingAccountField pTradingAccount, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
@@ -616,18 +613,17 @@ namespace CTP
 
         public void ReqQryInvestorPosition()
         {
-            Thread.Sleep(1000);
-            while (!bCanReq)
-            {
-                Thread.Sleep(50);
-            }
-            bCanReq = false;
+            //while (!bCanReq)
+            //{
+            //    Thread.Sleep(50);
+            //}
+            //bCanReq = false;
             ThostFtdcQryInvestorPositionField req = new ThostFtdcQryInvestorPositionField();
             req.BrokerID = BROKER_ID;
             req.InvestorID = INVESTOR_ID;
             //req.InstrumentID = INSTRUMENT_ID;
             positionList.Clear();
-            int iResult = api.ReqQryInvestorPosition(req, ++iRequestID);
+            int iResult = TD.ReqQryInvestorPosition(req, ++iRequestID);
         }
 
         void OnRspQryInvestorPosition(ThostFtdcInvestorPositionField pInvestorPosition, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
@@ -652,7 +648,7 @@ namespace CTP
             ///投资者代码
             req.InvestorID = INVESTOR_ID;
             //Thread.Sleep(1000);
-            int iResult = api.ReqQryOrder(req, ++iRequestID);
+            int iResult = TD.ReqQryOrder(req, ++iRequestID);
         }
 
         void OnRspQryOrder(ThostFtdcOrderField pOrder, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
@@ -745,7 +741,7 @@ namespace CTP
             ///投资者代码
             req.InvestorID = INVESTOR_ID;
             //Thread.Sleep(1000);
-            int iResult = api.ReqQryTrade(req, ++iRequestID);
+            int iResult = TD.ReqQryTrade(req, ++iRequestID);
         }
 
         void OnRspQryTrade(ThostFtdcTradeField pTrade, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
@@ -768,7 +764,7 @@ namespace CTP
             DateTime logtime = DateTime.Now;
             lock (APITradeLock)
             {
-                api.ReqOrderInsert(pOrder.InputOrder, ++iRequestID);
+                TD.ReqOrderInsert(pOrder.InputOrder, ++iRequestID);
             }
 
             //Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + pOrder.InputOrder.OrderRef + ","
@@ -876,7 +872,7 @@ namespace CTP
                 }
                 lock (APITradeLock)
                 {
-                    iResult = api.ReqOrderInsert(req, ++iRequestID);
+                    iResult = TD.ReqOrderInsert(req, ++iRequestID);
                 }
                 //Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderInsert" + "," + ORDER_REF.ToString() + ","
                 //    + req.InstrumentID + "," + req.Direction.ToString() + "," + req.CombOffsetFlag_0.ToString());
@@ -955,7 +951,7 @@ namespace CTP
                 }
                 lock (APITradeLock)
                 {
-                    iResult = api.ReqOrderAction(pInputOrderAction, ++iRequestID);
+                    iResult = TD.ReqOrderAction(pInputOrderAction, ++iRequestID);
                 }
                 //Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction1" + "," + pInputOrderAction.OrderRef);
                 ///价格
@@ -985,7 +981,7 @@ namespace CTP
             }
             lock (APITradeLock)
             {
-                iResult = api.ReqOrderAction(pInputOrderAction, ++iRequestID);
+                iResult = TD.ReqOrderAction(pInputOrderAction, ++iRequestID);
             }
 
 
@@ -1057,7 +1053,7 @@ namespace CTP
                 }
                 lock (APITradeLock)
                 {
-                    iResult = api.ReqOrderAction(req, ++iRequestID);
+                    iResult = TD.ReqOrderAction(req, ++iRequestID);
                 }
                 //Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction2" + "," + Signal.OrderRef + "," +  req.OrderRef + "," + pOrder.InstrumentID);
                 //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReqOrderAction" + "," + req.OrderRef);
@@ -1088,7 +1084,7 @@ namespace CTP
         }
 
         ///报单通知
-        void OnRtnOrder(ThostFtdcOrderField pOrder)
+        public void OnRtnOrder(ThostFtdcOrderField pOrder)
         {
             DateTime logtime = DateTime.Now;
             //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "OnRtnOrder" + "," + pOrder.OrderRef + "," + pOrder.OrderStatus + "," + pOrder.StatusMsg);
@@ -1228,7 +1224,7 @@ namespace CTP
         /// 成交回报
         /// </summary>
         /// <param name="pTrade"></param>
-        void OnRtnTrade(ThostFtdcTradeField pTrade)
+        public void OnRtnTrade(ThostFtdcTradeField pTrade)
         {
             if (IsMyTrade(CurrentOrder, pTrade))
             {
