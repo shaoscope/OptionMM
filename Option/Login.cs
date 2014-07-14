@@ -121,6 +121,7 @@ namespace OptionMM
             this.SetMsg("正在查询投资者持仓……");
             try
             {
+                Thread.Sleep(1000);
                 this.td.ReqQryInvestorPosition();
             }
             catch (Exception exp)
@@ -177,6 +178,7 @@ namespace OptionMM
 
         private void MD_OnRspUserLogin(ThostFtdcRspUserLoginField pRspUserLogin, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
+            this.SetMsg("行情主机登陆成功！");
             this.DialogResult = DialogResult.OK;
         }
 

@@ -180,6 +180,7 @@
     <None Include="Resources\StopIcon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AppIcon.ico" />
     <Content Include="Option.xml">
       <SubType>Designer</SubType>
     </Content>
