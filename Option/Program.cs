@@ -16,12 +16,13 @@ namespace OptionMM
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Login login = new Login();
-            login.ShowDialog();
-            if(login.DialogResult == DialogResult.OK)
-            {
-                Application.Run(new MainForm());
-            }
+            Application.Run(new MainForm());
+            //Login login = new Login();
+            //login.ShowDialog();
+            //if(login.DialogResult == DialogResult.OK)
+            //{
+            //    Application.Run(new MainForm());
+            //}
         }
     }
 }

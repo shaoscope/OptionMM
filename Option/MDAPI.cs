@@ -13,76 +13,11 @@ namespace CTP
     {   
         public bool bLogin = false;
         public CTPMDAdapter MD = null;
-        string FRONT_ADDR = "tcp://asp-sim2-md1.financial-trading-platform.com:26213";  // 前置地址
-        string BrokerID = "2030";   // 经纪公司代码
-        string UserID = "888888";   // 投资者代码
-        string Password = "888888"; // 用户密码
-        // 大连,上海代码为小写
-        // 郑州,中金所代码为大写
-        // 郑州品种年份为一位数
-        //string[] ppInstrumentID = { "ag1301", "cu1301", "ru1201", "TA301", "SR301", "y1305", "IF1212" };	// 行情订阅列表
         int iRequestID = 0;
 
-        public MDAPI(string mdaddr, string brokerID, string InvesterID, string password)
+        public MDAPI()
         {
-            FRONT_ADDR = mdaddr;
-            BrokerID = brokerID;
-            UserID = InvesterID;
-            Password = password;
             MD = new CTPMDAdapter();
-            //AddEvent();
-        }
-
-        private void AddEvent()
-        {
-            MD.OnFrontConnected += new FrontConnected(OnFrontConnected);
-            MD.OnFrontDisconnected += new FrontDisconnected(OnFrontDisconnected);
-            MD.OnHeartBeatWarning += new HeartBeatWarning(OnHeartBeatWarning);
-            MD.OnRspError += new RspError(OnRspError);
-            MD.OnRspSubMarketData += new RspSubMarketData(OnRspSubMarketData);
-            MD.OnRspUnSubMarketData += new RspUnSubMarketData(OnRspUnSubMarketData);
-            MD.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
-            MD.OnRspUserLogout += new RspUserLogout(OnRspUserLogout);
-            MD.OnRtnDepthMarketData += new RtnDepthMarketData(OnRtnDepthMarketData);
-            MD.OnRtnForQuoteRsp += new RtnForQuoteRsp(OnRtnForQuoteRsp);
-        }
-
-        public void Connect()
-        {
-            try
-            {
-                MD.RegisterFront(FRONT_ADDR);
-                MD.Init();
-                //api.Join(); // 阻塞直到关闭或者CTRL+C
-                //this.Release();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            finally
-            {
-                //api.Release();
-            }
-        }
-
-        public void Release()
-        {
-            if (MD != null)
-            {
-                MD.Release();
-                MD = null;
-            }
-        }
-
-        public int ReqUserLogin()
-        {
-            ThostFtdcReqUserLoginField req = new ThostFtdcReqUserLoginField();
-            req.BrokerID = BrokerID;
-            req.UserID = UserID;
-            req.Password = Password;
-            int iResult = MD.ReqUserLogin(req, ++iRequestID);
-            return iResult;
         }
 
         public int SubscribeMarketData(string[] ppInstrumentID)
@@ -151,11 +86,6 @@ namespace CTP
         void OnFrontDisconnected(int nReason)
         {
 
-        }
-
-        void OnFrontConnected()
-        {
-            ReqUserLogin();
         }
 
         private bool IsErrorRspInfo(ThostFtdcRspInfoField pRspInfo)

@@ -12,6 +12,7 @@ using System.Xml;
 using System.Reflection;
 using System.IO;
 using System.Threading.Tasks;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace OptionMM
 {
@@ -24,7 +25,9 @@ namespace OptionMM
         }
 
 
-        //唯一实例
+        /// <summary>
+        /// 唯一实例
+        /// </summary>
         private static MainForm instance;
 
         /// <summary>
@@ -53,63 +56,150 @@ namespace OptionMM
         public static Future Future;
 
         /// <summary>
+        /// 行情接口
+        /// </summary>
+        public CTPMDAdapter marketer { get; private set; }
+
+        /// <summary>
+        /// 交易接口
+        /// </summary>
+        public CTPTraderAdapter trader { get; private set; }
+
+        /// <summary>
+        /// 所有合约列表
+        /// </summary>
+        public List<ThostFtdcInstrumentField> InstrumentsList { get; private set; }
+
+        /// <summary>
+        /// 投资者持仓
+        /// </summary>
+        public List<ThostFtdcInvestorPositionField> InvestorPositionList { get; private set; }
+
+        /// <summary>
+        /// 报价窗口
+        /// </summary>
+        public QuoteForm QuoteForm { get; private set; }
+
+        /// <summary>
+        /// 行情管理器
+        /// </summary>
+        public MarketManager MarketManeger { get; private set; }
+
+        /// <summary>
         /// 启动报价任务
         /// </summary>
         private Task startUpMMTask;
 
-        private void MainForm_Load(object sender, EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-            #region 加载报价面板
-            Dictionary<string, string[]> MMConfigValues = ReadOptionXML("Option.xml");
-            Future = new Future("IF1407");
-            foreach (string instrumentID in MMConfigValues.Keys)
+            base.OnLoad(e); 
+            LoginForm loginForm = new LoginForm();
+            if (loginForm.ShowDialog() == DialogResult.Cancel)
             {
-                Strategy strategy = new Strategy();
-                strategy.Option.InstrumentID = instrumentID;
-                string[] strTemp = instrumentID.Split('-');
-                strategy.Option.StrikePrice = double.Parse(strTemp[2]);
-                strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
-                strategy.IsMarketMakingContract = MMConfigValues[instrumentID][1] == "1" ? true : false;
-                //加入仓位信息
-                foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
+                this.Close();
+                return;
+            }
+            this.trader = loginForm.trader;
+            this.marketer = loginForm.marketer;
+            //订阅行情
+            this.InstrumentsList = loginForm.instrumentsList;
+            MarketManeger = new MarketManager(this.marketer);
+            foreach (ThostFtdcInstrumentField instrument in InstrumentsList)
+            {
+                if(instrument.InstrumentID.StartsWith("IF")||instrument.InstrumentID.StartsWith("IO"))
                 {
-                    if (position != null)
+                    MarketManeger.AddActiveContract(new ActiveContract(instrument));
+
+                }
+            }
+            this.InvestorPositionList = loginForm.investorPositionList;
+
+            this.marketer.OnRtnDepthMarketData += marketer_OnRtnDepthMarketData;
+
+            #region 加载报价面板
+            QuoteForm = new QuoteForm();
+            foreach (ActiveContract activeContract in MarketManeger.ActiveContractDictionary.Values)
+            {
+                if (activeContract.Contract.InstrumentID.Contains("C"))
+                {
+                    string callID = activeContract.Contract.InstrumentID;
+                    string putID = callID.Replace("C", "P");
+                    ActiveContract call;
+                    ActiveContract put;
+                    ActiveContract underlying;
+                    if (MarketManeger.ActiveContractDictionary.TryGetValue(callID, out call) &&
+                        MarketManeger.ActiveContractDictionary.TryGetValue(putID, out put) &&
+                        MarketManeger.ActiveContractDictionary.TryGetValue("IF1407", out underlying))
                     {
-                        if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
-                        {
-                            strategy.Option.longPosition = position;
-                        }
-                        else if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
-                        {
-                            strategy.Option.shortPosition = position;
-                        }
+                        Quote quote = new Quote(call, put, underlying);
+                        QuoteForm.quotePanel.AddQuote(quote);
                     }
                 }
-                strategy.Option.longPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][3]);
-                strategy.Option.shortPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][5]);
-                strategy.Configuration();
-                this.optionPanel.AddStrategy(strategy);
             }
+            QuoteForm.Hide();
+
+            //Dictionary<string, string[]> MMConfigValues = ReadOptionXML("Option.xml");
+            //Future = new Future("IF1407");
+            //foreach (string instrumentID in MMConfigValues.Keys)
+            //{
+            //    Strategy strategy = new Strategy();
+            //    strategy.Option.InstrumentID = instrumentID;
+            //    string[] strTemp = instrumentID.Split('-');
+            //    strategy.Option.StrikePrice = double.Parse(strTemp[2]);
+            //    strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
+            //    strategy.IsMarketMakingContract = MMConfigValues[instrumentID][1] == "1" ? true : false;
+            //    //加入仓位信息
+            //    foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
+            //    {
+            //        if (position != null)
+            //        {
+            //            if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
+            //            {
+            //                strategy.Option.longPosition = position;
+            //            }
+            //            else if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
+            //            {
+            //                strategy.Option.shortPosition = position;
+            //            }
+            //        }
+            //    }
+            //    strategy.Option.longPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][3]);
+            //    strategy.Option.shortPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][5]);
+            //    strategy.Configuration();
+            //    this.optionPanel.AddStrategy(strategy);
+            //}
             #endregion
 
             #region 加载平价套利
-            Dictionary<string, string[]> ParityConfigValues = ReadParityXML("Parity.xml");
-            foreach (string instrumentID in ParityConfigValues.Keys)
-            {
-                string []configValues = ParityConfigValues[instrumentID];
-                Parity parity = new Parity(instrumentID, (EnumPosiDirectionType)Enum.Parse(typeof(EnumPosiDirectionType), configValues[0]), configValues[1],
-                    (EnumPosiDirectionType)Enum.Parse(typeof(EnumPosiDirectionType), configValues[2]), 0, Double.Parse(configValues[3]), Double.Parse(configValues[4]),
-                    Double.Parse(configValues[5]), Double.Parse(configValues[6]));
-                parity.Configuration();
-                this.parityPanel.AddParity(parity);
-            }
+            //Dictionary<string, string[]> ParityConfigValues = ReadParityXML("Parity.xml");
+            //foreach (string instrumentID in ParityConfigValues.Keys)
+            //{
+            //    string[] configValues = ParityConfigValues[instrumentID];
+            //    Parity parity = new Parity(instrumentID, (EnumPosiDirectionType)Enum.Parse(typeof(EnumPosiDirectionType), configValues[0]), configValues[1],
+            //        (EnumPosiDirectionType)Enum.Parse(typeof(EnumPosiDirectionType), configValues[2]), 0, Double.Parse(configValues[3]), Double.Parse(configValues[4]),
+            //        Double.Parse(configValues[5]), Double.Parse(configValues[6]));
+            //    parity.Configuration();
+            //    this.parityPanel.AddParity(parity);
+            //}
 
             #endregion
 
-            this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 5 * 1000);
-            this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
-            this.writeXmlTimer = new System.Threading.Timer(this.writerXmlCallBack, null, 10 * 1000, 10 * 1000);
+            //this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 5 * 1000);
+            //this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
+            //this.writeXmlTimer = new System.Threading.Timer(this.writerXmlCallBack, null, 10 * 1000, 10 * 1000);
+        }
 
+        /// <summary>
+        /// 行情到达时的处理
+        /// </summary>
+        /// <param name="MarketData"></param>
+        void marketer_OnRtnDepthMarketData(ThostFtdcDepthMarketDataField MarketData)
+        {
+            ActiveContract activeContract;
+            if (MarketManeger.ActiveContractDictionary.TryGetValue(MarketData.InstrumentID, out activeContract))
+            {
+                activeContract.UpdateMarket(MarketData);
+            }
         }
 
         /// <summary>
@@ -129,16 +219,16 @@ namespace OptionMM
         /// <param name="state"></param>
         private void recordVolatilityCallBack(object state)
         {
-            StreamWriter fileWriter = new StreamWriter("C://Users//user//Desktop//VolatilityRecord//" + 
-                System.DateTime.Now.Month + "-" + System.DateTime.Now.Day + "-" + System.DateTime.Now.Hour + "-" + 
-                System.DateTime.Now.Minute + ".csv");
-            foreach (DataGridViewRow dataRow in MainForm.instance.optionPanel.dataTable.Rows)
-            {
-                Strategy strategy = (Strategy)dataRow.Tag;
-                fileWriter.WriteLine(strategy.ToString());
-            }
-            fileWriter.Flush();
-            fileWriter.Close();
+            //StreamWriter fileWriter = new StreamWriter("C://Users//user//Desktop//VolatilityRecord//" + 
+            //    System.DateTime.Now.Month + "-" + System.DateTime.Now.Day + "-" + System.DateTime.Now.Hour + "-" + 
+            //    System.DateTime.Now.Minute + ".csv");
+            //foreach (DataGridViewRow dataRow in MainForm.instance.optionPanel.dataTable.Rows)
+            //{
+            //    Strategy strategy = (Strategy)dataRow.Tag;
+            //    fileWriter.WriteLine(strategy.ToString());
+            //}
+            //fileWriter.Flush();
+            //fileWriter.Close();
         }
 
         
@@ -149,9 +239,9 @@ namespace OptionMM
         /// <param name="state"></param>
         private void positionHedgeCallBack(object state)
         {
-            Future.DeltaHedge(this.optionPanel.dataTable);
-            this.BeginInvoke(new Action<Future>(this.RefreshHedgeVolumeLabel), Future);
-            Future.AutoHedge();
+            //Future.DeltaHedge(this.optionPanel.dataTable);
+            //this.BeginInvoke(new Action<Future>(this.RefreshHedgeVolumeLabel), Future);
+            //Future.AutoHedge();
         }
 
         /// <summary>
@@ -160,7 +250,9 @@ namespace OptionMM
         /// <param name="future"></param>
         private void RefreshHedgeVolumeLabel(Future future)
         {
-            this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)future.HedgeVolume + "-(" + future.longPosition.Position + "-" + future.shortPosition.Position + ")=" + ((int)future.HedgeVolume - (future.longPosition.Position - future.shortPosition.Position));
+            //this.hedgeIFVolumeLabel.Text = "对冲IF1406(手): " + (int)future.HedgeVolume + "-(" + 
+            //future.longPosition.Position + "-" + future.shortPosition.Position + ")=" + ((int)future.HedgeVolume - 
+            //    (future.longPosition.Position - future.shortPosition.Position));
         }
 
         /// <summary>
@@ -326,23 +418,23 @@ namespace OptionMM
         /// <param name="e"></param>
         private void startAllButton_Click(object sender, EventArgs e)
         {
-            if (!areAllRunning)
-            {
-                startUpMMTask = new Task(startUpMM);
-                startUpMMTask.Start();
-                startUpMMTask.ContinueWith(StartUpMMFinished);
+            //if (!areAllRunning)
+            //{
+            //    startUpMMTask = new Task(startUpMM);
+            //    startUpMMTask.Start();
+            //    startUpMMTask.ContinueWith(StartUpMMFinished);
                 
-            }
-            else
-            {
-                foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
-                {
-                    Strategy strategy = (Strategy)dataRow.Tag;
-                    strategy.Stop();
-                }
-                areAllRunning = false;
-                this.startAllButton.Text = "全部启动";
-            }
+            //}
+            //else
+            //{
+            //    foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            //    {
+            //        Strategy strategy = (Strategy)dataRow.Tag;
+            //        strategy.Stop();
+            //    }
+            //    areAllRunning = false;
+            //    this.startAllButton.Text = "全部启动";
+            //}
         }
 
         /// <summary>
@@ -351,8 +443,8 @@ namespace OptionMM
         /// <param name="task"></param>
         private void StartUpMMFinished(Task task)
         {
-            areAllRunning = true;
-            this.BeginInvoke(new Action(()=>this.startAllButton.Text = "全部停止"));
+            //areAllRunning = true;
+            //this.BeginInvoke(new Action(()=>this.startAllButton.Text = "全部停止"));
         }
 
         /// <summary>
@@ -360,11 +452,11 @@ namespace OptionMM
         /// </summary>
         private void startUpMM()
         {
-            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
-            {
-                Strategy strategy = (Strategy)dataRow.Tag;
-                strategy.Start();
-            }
+            //foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            //{
+            //    Strategy strategy = (Strategy)dataRow.Tag;
+            //    strategy.Start();
+            //}
         }
 
         /// <summary>
@@ -385,10 +477,10 @@ namespace OptionMM
         /// <param name="e"></param>
         private void coveredButton_Click(object sender, EventArgs e)
         {
-            this.coveredPanel.dataTable.Rows.Clear();
-            scanCoveredTask = new Task(ScanCovered);
-            scanCoveredTask.Start();
-            scanCoveredTask.ContinueWith(ScanArbitrageFinished);
+            //this.coveredPanel.dataTable.Rows.Clear();
+            //scanCoveredTask = new Task(ScanCovered);
+            //scanCoveredTask.Start();
+            //scanCoveredTask.ContinueWith(ScanArbitrageFinished);
         }
 
         /// <summary>
@@ -401,27 +493,27 @@ namespace OptionMM
         /// </summary>
         private void ScanCovered()
         {
-            //下限套利
-            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
-            {
-                Strategy strategy = (Strategy)dataRow.Tag;
-                if (strategy.Option.OptionType == OptionTypeEnum.call && MainForm.Future.LastMarket.LastPrice > strategy.Option.StrikePrice &&
-                    strategy.Option.LastMarket.AskPrice1 < MainForm.Future.LastMarket.LastPrice - strategy.Option.StrikePrice)
-                {
-                    //Long Call + Short IF
-                    double coveredInterval = MainForm.Future.LastMarket.LastPrice - strategy.Option.StrikePrice - strategy.Option.LastMarket.AskPrice1;
-                    Covered covered = new Covered(strategy.Option.InstrumentID, 0, coveredInterval, 0);
-                    this.BeginInvoke(new Action<Covered>(this.AddCovered), covered);
-                }
-                else if (strategy.Option.OptionType == OptionTypeEnum.put && strategy.Option.StrikePrice > MainForm.Future.LastMarket.LastPrice &&
-                    strategy.Option.LastMarket.AskPrice1 < strategy.Option.StrikePrice - MainForm.Future.LastMarket.LastPrice)
-                {
-                    //Long Put + Long IF
-                    double coveredInterval = strategy.Option.StrikePrice - MainForm.Future.LastMarket.LastPrice - strategy.Option.LastMarket.AskPrice1;
-                    Covered covered = new Covered(strategy.Option.InstrumentID, 0, coveredInterval, 0);
-                    this.BeginInvoke(new Action<Covered>(this.AddCovered), covered);
-                }
-            }
+            ////下限套利
+            //foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            //{
+            //    Strategy strategy = (Strategy)dataRow.Tag;
+            //    if (strategy.Option.OptionType == OptionTypeEnum.call && MainForm.Future.LastMarket.LastPrice > strategy.Option.StrikePrice &&
+            //        strategy.Option.LastMarket.AskPrice1 < MainForm.Future.LastMarket.LastPrice - strategy.Option.StrikePrice)
+            //    {
+            //        //Long Call + Short IF
+            //        double coveredInterval = MainForm.Future.LastMarket.LastPrice - strategy.Option.StrikePrice - strategy.Option.LastMarket.AskPrice1;
+            //        Covered covered = new Covered(strategy.Option.InstrumentID, 0, coveredInterval, 0);
+            //        this.BeginInvoke(new Action<Covered>(this.AddCovered), covered);
+            //    }
+            //    else if (strategy.Option.OptionType == OptionTypeEnum.put && strategy.Option.StrikePrice > MainForm.Future.LastMarket.LastPrice &&
+            //        strategy.Option.LastMarket.AskPrice1 < strategy.Option.StrikePrice - MainForm.Future.LastMarket.LastPrice)
+            //    {
+            //        //Long Put + Long IF
+            //        double coveredInterval = strategy.Option.StrikePrice - MainForm.Future.LastMarket.LastPrice - strategy.Option.LastMarket.AskPrice1;
+            //        Covered covered = new Covered(strategy.Option.InstrumentID, 0, coveredInterval, 0);
+            //        this.BeginInvoke(new Action<Covered>(this.AddCovered), covered);
+            //    }
+            //}
         }
 
         /// <summary>
@@ -490,7 +582,7 @@ namespace OptionMM
         private void AddCovered(Covered covered)
         {
 
-            this.coveredPanel.AddCovered(covered);
+            //this.coveredPanel.AddCovered(covered);
         }
 
         /// <summary>
@@ -500,25 +592,10 @@ namespace OptionMM
         /// <param name="e"></param>
         private void parityButton_Click(object sender, EventArgs e)
         {
-            this.parityPanel.dataTable.Rows.Clear();
-            scanParityTask = new Task(ScanParity);
-            scanParityTask.Start();
-            scanParityTask.ContinueWith(ScanArbitrageFinished);
-        }
-
-        /// <summary>
-        /// 窗口正在关闭时执行的方法
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            this.positionHedgeTimer.Dispose();
-            this.recordVolatilityTimer.Dispose();
-            TDManager.TD.Release();
-            MDManager.MD.Release();
-            this.WriterOptionXML("Option.xml");
-            this.WriteParityXML("Parity.xml");
+            //this.parityPanel.dataTable.Rows.Clear();
+            //scanParityTask = new Task(ScanParity);
+            //scanParityTask.Start();
+            //scanParityTask.ContinueWith(ScanArbitrageFinished);
         }
 
         /// <summary>
@@ -526,38 +603,38 @@ namespace OptionMM
         /// </summary>
         private void WriterOptionXML(string strFile)
         {
-            lock (this)
-            {
-                string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
-                XmlDocument xmlDoc = new XmlDocument();
-                try
-                {
-                    xmlDoc.Load(strFullPathFile);
-                    XmlNodeList xnl = xmlDoc.SelectSingleNode("root").ChildNodes;
-                    int itemIndex = 0;
-                    foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
-                    {
-                        Strategy strategy = (Strategy)dataRow.Tag;
-                        XmlElement xe = (XmlElement)xnl.Item(itemIndex++);
-                        if (xe.Attributes["InstrumentID"].Value == strategy.Option.InstrumentID)
-                        {
-                            xe.SetAttribute("多头仓位数", strategy.Option.longPosition.Position.ToString());
-                            xe.SetAttribute("多头持仓均价", strategy.Option.longPosition.PositionCost.ToString());
-                            xe.SetAttribute("空头仓位数", strategy.Option.shortPosition.Position.ToString());
-                            xe.SetAttribute("空头持仓均价", strategy.Option.shortPosition.PositionCost.ToString());
-                        }
-                    }
-                    xmlDoc.Save(strFullPathFile);
-                }
-                catch
-                {
+            //lock (this)
+            //{
+            //    string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
+            //    XmlDocument xmlDoc = new XmlDocument();
+            //    try
+            //    {
+            //        xmlDoc.Load(strFullPathFile);
+            //        XmlNodeList xnl = xmlDoc.SelectSingleNode("root").ChildNodes;
+            //        int itemIndex = 0;
+            //        foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            //        {
+            //            Strategy strategy = (Strategy)dataRow.Tag;
+            //            XmlElement xe = (XmlElement)xnl.Item(itemIndex++);
+            //            if (xe.Attributes["InstrumentID"].Value == strategy.Option.InstrumentID)
+            //            {
+            //                xe.SetAttribute("多头仓位数", strategy.Option.longPosition.Position.ToString());
+            //                xe.SetAttribute("多头持仓均价", strategy.Option.longPosition.PositionCost.ToString());
+            //                xe.SetAttribute("空头仓位数", strategy.Option.shortPosition.Position.ToString());
+            //                xe.SetAttribute("空头持仓均价", strategy.Option.shortPosition.PositionCost.ToString());
+            //            }
+            //        }
+            //        xmlDoc.Save(strFullPathFile);
+            //    }
+            //    catch
+            //    {
 
-                }
-                finally
-                {
+            //    }
+            //    finally
+            //    {
 
-                }
-            }
+            //    }
+            //}
         }
 
         /// <summary>
@@ -566,38 +643,38 @@ namespace OptionMM
         /// <param name="strFile"></param>
         private void WriteParityXML(string strFile)
         {
-            lock (this)
-            {
-                string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
-                XmlDocument xmlDoc = new XmlDocument();
-                try
-                {
-                    xmlDoc.Load(strFullPathFile);
-                    XmlNodeList xnl = xmlDoc.SelectSingleNode("root").ChildNodes;
-                    int itemIndex = 0;
-                    foreach (DataGridViewRow dataRow in this.parityPanel.dataTable.Rows)
-                    {
-                        Parity parity = (Parity)dataRow.Tag;
-                        XmlElement xe = (XmlElement)xnl.Item(itemIndex++);
-                        if (xe.Attributes["LongInstrumentID"].Value == parity.LongOption.InstrumentID)
-                        {
-                            xe.SetAttribute("OpenThreshold", parity.OpenThreshold.ToString());
-                            xe.SetAttribute("CloseThreshold", parity.CloseThreshold.ToString());
-                            xe.SetAttribute("MaxOpenSets", parity.MaxOpenSets.ToString());
-                            xe.SetAttribute("OpenedSets", parity.OpenedSets.ToString());
-                        }
-                    }
-                    xmlDoc.Save(strFullPathFile);
-                }
-                catch
-                {
+            //lock (this)
+            //{
+            //    string strFullPathFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace(@"file:\", "") + @"\" + strFile;
+            //    XmlDocument xmlDoc = new XmlDocument();
+            //    try
+            //    {
+            //        xmlDoc.Load(strFullPathFile);
+            //        XmlNodeList xnl = xmlDoc.SelectSingleNode("root").ChildNodes;
+            //        int itemIndex = 0;
+            //        foreach (DataGridViewRow dataRow in this.parityPanel.dataTable.Rows)
+            //        {
+            //            Parity parity = (Parity)dataRow.Tag;
+            //            XmlElement xe = (XmlElement)xnl.Item(itemIndex++);
+            //            if (xe.Attributes["LongInstrumentID"].Value == parity.LongOption.InstrumentID)
+            //            {
+            //                xe.SetAttribute("OpenThreshold", parity.OpenThreshold.ToString());
+            //                xe.SetAttribute("CloseThreshold", parity.CloseThreshold.ToString());
+            //                xe.SetAttribute("MaxOpenSets", parity.MaxOpenSets.ToString());
+            //                xe.SetAttribute("OpenedSets", parity.OpenedSets.ToString());
+            //            }
+            //        }
+            //        xmlDoc.Save(strFullPathFile);
+            //    }
+            //    catch
+            //    {
 
-                }
-                finally
-                {
+            //    }
+            //    finally
+            //    {
 
-                }
-            }
+            //    }
+            //}
         }
 
 
@@ -608,10 +685,10 @@ namespace OptionMM
 
         private void verticalButton_Click(object sender, EventArgs e)
         {
-            this.verticalPanel.dataTable.Rows.Clear();
-            scanVerticalTask = new Task(ScanVertical);
-            scanVerticalTask.Start();
-            scanVerticalTask.ContinueWith(ScanArbitrageFinished);
+            //this.verticalPanel.dataTable.Rows.Clear();
+            //scanVerticalTask = new Task(ScanVertical);
+            //scanVerticalTask.Start();
+            //scanVerticalTask.ContinueWith(ScanArbitrageFinished);
         }
 
         /// <summary>
@@ -619,49 +696,67 @@ namespace OptionMM
         /// </summary>
         private void ScanVertical()
         {
-            List<Strategy> strategyList = new List<Strategy>();
-            foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
-            {
-                Strategy strategy = (Strategy)dataRow.Tag;
-                if (strategy.Option.InstrumentID.Contains("IF1407"))
-                {
-                    strategyList.Add(strategy);
-                }
-            }
-            for (int i = 0; i < strategyList.Count - 1; i ++ )
-            {
-                Strategy strategyLower = strategyList[i];
-                for(int j = i+1; j < strategyList.Count; j++)
-                {
-                    Strategy strategyUpper = strategyList[j];
-                    if (strategyLower.Option.OptionType == strategyUpper.Option.OptionType && strategyUpper.Option.OptionType == OptionTypeEnum.call)
-                    {
-                        if (strategyUpper.Option.StrikePrice - strategyLower.Option.StrikePrice < strategyLower.Option.LastMarket.AskPrice1 - strategyUpper.Option.LastMarket.BidPrice1)
-                        {
-                            double verticalInterval = strategyLower.Option.LastMarket.AskPrice1 - strategyUpper.Option.LastMarket.BidPrice1 -
-                                strategyUpper.Option.StrikePrice + strategyLower.Option.StrikePrice;
-                            Vertical vertical = new Vertical(strategyUpper.Option.InstrumentID, EnumPosiDirectionType.Long, strategyLower.Option.InstrumentID, EnumPosiDirectionType.Short, verticalInterval);
-                            this.BeginInvoke(new Action<Vertical>(this.AddVertical), vertical);
-                        }
-                    }
-                    else if (strategyLower.Option.OptionType == strategyUpper.Option.OptionType && strategyUpper.Option.OptionType == OptionTypeEnum.put)
-                    {
-                        if (strategyUpper.Option.StrikePrice - strategyLower.Option.StrikePrice < strategyUpper.Option.LastMarket.BidPrice1 - strategyLower.Option.LastMarket.AskPrice1)
-                        {
-                            double verticalInterval = strategyUpper.Option.LastMarket.BidPrice1 - strategyLower.Option.LastMarket.AskPrice1 -
-                                strategyUpper.Option.StrikePrice + strategyLower.Option.StrikePrice;
-                            Vertical vertical = new Vertical(strategyUpper.Option.InstrumentID, EnumPosiDirectionType.Short, strategyLower.Option.InstrumentID, EnumPosiDirectionType.Long, verticalInterval);
-                            this.BeginInvoke(new Action<Vertical>(this.AddVertical), vertical);
-                        }
-                    }
-                }
-            }
+            //List<Strategy> strategyList = new List<Strategy>();
+            //foreach (DataGridViewRow dataRow in this.optionPanel.dataTable.Rows)
+            //{
+            //    Strategy strategy = (Strategy)dataRow.Tag;
+            //    if (strategy.Option.InstrumentID.Contains("IF1407"))
+            //    {
+            //        strategyList.Add(strategy);
+            //    }
+            //}
+            //for (int i = 0; i < strategyList.Count - 1; i ++ )
+            //{
+            //    Strategy strategyLower = strategyList[i];
+            //    for(int j = i+1; j < strategyList.Count; j++)
+            //    {
+            //        Strategy strategyUpper = strategyList[j];
+            //        if (strategyLower.Option.OptionType == strategyUpper.Option.OptionType && strategyUpper.Option.OptionType == OptionTypeEnum.call)
+            //        {
+            //            if (strategyUpper.Option.StrikePrice - strategyLower.Option.StrikePrice < strategyLower.Option.LastMarket.AskPrice1 - strategyUpper.Option.LastMarket.BidPrice1)
+            //            {
+            //                double verticalInterval = strategyLower.Option.LastMarket.AskPrice1 - strategyUpper.Option.LastMarket.BidPrice1 -
+            //                    strategyUpper.Option.StrikePrice + strategyLower.Option.StrikePrice;
+            //                Vertical vertical = new Vertical(strategyUpper.Option.InstrumentID, EnumPosiDirectionType.Long, strategyLower.Option.InstrumentID, EnumPosiDirectionType.Short, verticalInterval);
+            //                this.BeginInvoke(new Action<Vertical>(this.AddVertical), vertical);
+            //            }
+            //        }
+            //        else if (strategyLower.Option.OptionType == strategyUpper.Option.OptionType && strategyUpper.Option.OptionType == OptionTypeEnum.put)
+            //        {
+            //            if (strategyUpper.Option.StrikePrice - strategyLower.Option.StrikePrice < strategyUpper.Option.LastMarket.BidPrice1 - strategyLower.Option.LastMarket.AskPrice1)
+            //            {
+            //                double verticalInterval = strategyUpper.Option.LastMarket.BidPrice1 - strategyLower.Option.LastMarket.AskPrice1 -
+            //                    strategyUpper.Option.StrikePrice + strategyLower.Option.StrikePrice;
+            //                Vertical vertical = new Vertical(strategyUpper.Option.InstrumentID, EnumPosiDirectionType.Short, strategyLower.Option.InstrumentID, EnumPosiDirectionType.Long, verticalInterval);
+            //                this.BeginInvoke(new Action<Vertical>(this.AddVertical), vertical);
+            //            }
+            //        }
+            //    }
+            //}
         }
 
 
         private void AddVertical(Vertical vertical)
         {
-            this.verticalPanel.AddVertical(vertical);
+            //this.verticalPanel.AddVertical(vertical);
+        }
+
+        /// <summary>
+        /// 显示或者隐藏报价窗口
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void quoteFormToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
+            {
+                QuoteForm.MdiParent = this;
+                QuoteForm.Show();
+            }
+            else
+            {
+                QuoteForm.Show(dockPanel);
+            }
         }
 
     }//class

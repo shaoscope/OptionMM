@@ -10,7 +10,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace OptionMM
 {
-    public partial class QuoteForm : DockContent
+    internal partial class QuoteForm : DockContent
     {
         public QuoteForm()
         {

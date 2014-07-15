@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveContract.cs" />
     <Compile Include="Covered.cs" />
     <Compile Include="CoveredPanel.cs">
       <SubType>UserControl</SubType>
@@ -57,11 +58,19 @@
     </Compile>
     <Compile Include="FullPath.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="MarketManager.cs" />
+    <Compile Include="Quote.cs" />
     <Compile Include="QuoteForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="QuoteForm.Designer.cs">
       <DependentUpon>QuoteForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuotePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="QuotePanel.Designer.cs">
+      <DependentUpon>QuotePanel.cs</DependentUpon>
     </Compile>
     <Compile Include="TraderAPI.cs" />
     <Compile Include="Vertical.cs" />
@@ -103,11 +112,11 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Login.cs">
+    <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Login.Designer.cs">
-      <DependentUpon>Login.cs</DependentUpon>
+    <Compile Include="LoginForm.Designer.cs">
+      <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MDAPI.cs" />
     <Compile Include="MDManager.cs" />
@@ -132,6 +141,9 @@
     <EmbeddedResource Include="QuoteForm.resx">
       <DependentUpon>QuoteForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="QuotePanel.resx">
+      <DependentUpon>QuotePanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VerticalPanel.resx">
       <DependentUpon>VerticalPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -144,8 +156,8 @@
     <EmbeddedResource Include="OptionPanel.resx">
       <DependentUpon>OptionPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Login.resx">
-      <DependentUpon>Login.cs</DependentUpon>
+    <EmbeddedResource Include="LoginForm.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

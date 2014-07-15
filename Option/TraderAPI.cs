@@ -50,7 +50,6 @@ namespace CTP
 
     public class TraderAPI
     {
-        //private System.Threading.Timer OrderTimer;
         private Thread OrderReSender = null;
 
         public event OrderRefReplaceHandle OnOrderRefReplace;
@@ -179,17 +178,8 @@ namespace CTP
         public bool bCanReq = false; //投资者结算确认后的查询控制
         public bool g_logined;
         public CTPTraderAdapter TD = null;
-        string FRONT_ADDR = "tcp://asp-sim2-front1.financial-trading-platform.com:26205";  // 前置地址
-        string BROKER_ID = "2030";      // 经纪公司代码
-        string INVESTOR_ID = "888888";  // 投资者代码
-        string PASSWORD = "888888";     // 用户密码, 888888账户的密码被人改了，没法用了
-        string INSTRUMENT_ID = "m1305";
-        //EnumDirectionType DIRECTION = EnumDirectionType.Sell;
         int iRequestID = 0;
         int MaxOrderExcuteCount = 50;
-
-        //public int TodayCancel = 0;
-        //public int TodayInsertOrder = 0;
 
         // 会话参数
         public int FRONT_ID;	//前置编号
@@ -230,63 +220,10 @@ namespace CTP
 
         public List<ThostFtdcInvestorPositionField> positionList = new List<ThostFtdcInvestorPositionField>();
 
-        public TraderAPI(string addr, string brokerID, string InvesterID, string password)
+        public TraderAPI()
         {
-            FRONT_ADDR = addr;
-            BROKER_ID = brokerID;
-            INVESTOR_ID = InvesterID;
-            PASSWORD = password;
-            //AddEvent();
-            TD = new CTPTraderAdapter();
-        }
-
-        private void AddEvent()
-        {
-            TD.OnFrontConnected += new FrontConnected(OnFrontConnected);
-            TD.OnFrontDisconnected += new FrontDisconnected(OnFrontDisconnected);
-            TD.OnHeartBeatWarning += new HeartBeatWarning(OnHeartBeatWarning);
-            TD.OnRspError += new RspError(OnRspError);
-            TD.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
-            TD.OnRspOrderAction += new RspOrderAction(OnRspOrderAction);
-            TD.OnRspQryOrder += new RspQryOrder(OnRspQryOrder);
-            TD.OnRspQryTrade += new RspQryTrade(OnRspQryTrade);
-            //api.OnErrRtnOrderInsert += new ErrRtnOrderInsert(OnErrRtnOrderInsert);
-            TD.OnRspOrderInsert += new RspOrderInsert(OnRspOrderInsert);
-            TD.OnRspQryInstrument += new RspQryInstrument(OnRspQryInstrument);
-            TD.OnRspQryInvestorPosition += new RspQryInvestorPosition(OnRspQryInvestorPosition);
-            TD.OnRspQryTradingAccount += new RspQryTradingAccount(OnRspQryTradingAccount);
-            TD.OnRspSettlementInfoConfirm += new RspSettlementInfoConfirm(OnRspSettlementInfoConfirm);
-            TD.OnRtnOrder += new RtnOrder(OnRtnOrder);
-            TD.OnRtnTrade += new RtnTrade(OnRtnTrade);
-        }
-
-        public void Connect()
-        {
-            TD.SubscribePublicTopic(EnumTeResumeType.THOST_TERT_QUICK);
-            TD.SubscribePrivateTopic(EnumTeResumeType.THOST_TERT_QUICK);
-            try
-            {
-                TD.RegisterFront(FRONT_ADDR);
-                TD.Init();
-                //OrderReSender.Start();
-                //this.OrderTimer = new System.Threading.Timer(this.OrderManagerCallBack, null, 1000, 1000);
-                OrderReSender = new Thread(new ThreadStart(OrderReSendCallBack));
-                OrderReSender.Start();
-                //ReqQryOrder();
-                //Thread.Sleep(1000);
-                //ReqQryTrade();
-                //api.Join(); // 阻塞直到关闭或者CTRL+C
-                //Release();
-            }
-            catch (Exception e)
-            {
-                //Console.WriteLine(e.Message);
-                //GUIRefresh.UpdateMessageBox(e.Message);
-            }
-            finally
-            {
-                //Release();
-            }
+            OrderReSender = new Thread(new ThreadStart(OrderReSendCallBack));
+            OrderReSender.Start();
         }
 
         List<OrderSignal> InputList = new List<OrderSignal>();
@@ -498,279 +435,17 @@ namespace CTP
             OrderReSendRunning = false;
         }
 
-        public void Release()
-        {
-            if (TD != null)
-            {
-                g_logined = false;
-                OrderReSendRun = false;
-                Thread.Sleep(50);
-                if (OrderReSendRunning)
-                {
-                    OrderReSender.Abort();
-                }
-
-                TD.Release();
-                TD = null;
-            }
-        }
-
-        void OnFrontConnected()
-        {
-            ReqUserLogin();
-        }
-
-        public void ReqUserLogin()
-        {
-            ThostFtdcReqUserLoginField req = new ThostFtdcReqUserLoginField();
-            req.BrokerID = BROKER_ID;
-            req.UserID = INVESTOR_ID;
-            req.Password = PASSWORD;
-            int iResult = TD.ReqUserLogin(req, ++iRequestID);
-        }
-
-        void OnRspUserLogin(ThostFtdcRspUserLoginField pRspUserLogin, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-            if (bIsLast && !IsErrorRspInfo(pRspInfo))
-            {
-                // 保存会话参数
-                FRONT_ID = pRspUserLogin.FrontID;
-                SESSION_ID = pRspUserLogin.SessionID;
-                int iNextOrderRef = 0;
-                if (!string.IsNullOrEmpty(pRspUserLogin.MaxOrderRef))
-                    iNextOrderRef = Convert.ToInt32(pRspUserLogin.MaxOrderRef);
-                //iNextOrderRef++;
-                ORDER_REF = iNextOrderRef;
-                ///投资者结算结果确认
-                ReqSettlementInfoConfirm();
-            }
-        }
-
-        void ReqSettlementInfoConfirm()
-        {
-            Thread.Sleep(1000);
-            ThostFtdcSettlementInfoConfirmField req = new ThostFtdcSettlementInfoConfirmField();
-            req.BrokerID = BROKER_ID;
-            req.InvestorID = INVESTOR_ID;
-            int iResult = TD.ReqSettlementInfoConfirm(req, ++iRequestID);
-        }
-
-        void OnRspSettlementInfoConfirm(ThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-            if (bIsLast && !IsErrorRspInfo(pRspInfo))
-            {
-                ///请求查询合约
-                //ReqQryInstrument();
-
-                g_logined = true;
-            }
-            if (bIsLast)
-                bCanReq = true;
-        }
-
-        public void ReqQryInstrument()
-        {
-            int iResult = TD.ReqQryInstrument(new ThostFtdcQryInstrumentField(), ++iRequestID);            
-        }
-
-        void OnRspQryInstrument(ThostFtdcInstrumentField pInstrument, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-            if (pInstrument != null && bIsLast && !IsErrorRspInfo(pRspInfo))
-            {
-                //请求查询资金
-                //ReqQryTradingAccount();
-            }
-            if (bIsLast)
-                bCanReq = true;
-        }
-
-        public void ReqQryTradingAccount()
-        {
-            //Thread.Sleep(1000);
-            while (!bCanReq)
-            {
-                Thread.Sleep(50);
-            }
-            bCanReq = false;
-            ThostFtdcQryTradingAccountField req = new ThostFtdcQryTradingAccountField();
-            req.BrokerID = BROKER_ID;
-            req.InvestorID = INVESTOR_ID;
-            int iResult = TD.ReqQryTradingAccount(req, ++iRequestID);
-        }
-
-        void OnRspQryTradingAccount(ThostFtdcTradingAccountField pTradingAccount, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-            if (bIsLast && !IsErrorRspInfo(pRspInfo))
-            {
-                //请求查询投资者持仓
-                //ReqQryInvestorPosition();
-            }
-            if (bIsLast)
-            {
-                bCanReq = true;
-            }
-        }
-
-        public void ReqQryInvestorPosition()
-        {
-            //while (!bCanReq)
-            //{
-            //    Thread.Sleep(50);
-            //}
-            //bCanReq = false;
-            ThostFtdcQryInvestorPositionField req = new ThostFtdcQryInvestorPositionField();
-            req.BrokerID = BROKER_ID;
-            req.InvestorID = INVESTOR_ID;
-            //req.InstrumentID = INSTRUMENT_ID;
-            positionList.Clear();
-            int iResult = TD.ReqQryInvestorPosition(req, ++iRequestID);
-        }
-
-        void OnRspQryInvestorPosition(ThostFtdcInvestorPositionField pInvestorPosition, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-            positionList.Add(pInvestorPosition);
-            if (bIsLast)
-            {
-                bCanReq = true;
-            }
-        }
-
-        public void ReqQryOrder()
-        {
-            //Thread.Sleep(1000);
-            while (!bCanReq)
-            {
-                Thread.Sleep(50);
-            }
-            bCanReq = false;
-            ThostFtdcQryOrderField req = new ThostFtdcQryOrderField();
-            req.BrokerID = BROKER_ID;
-            ///投资者代码
-            req.InvestorID = INVESTOR_ID;
-            //Thread.Sleep(1000);
-            int iResult = TD.ReqQryOrder(req, ++iRequestID);
-        }
-
-        void OnRspQryOrder(ThostFtdcOrderField pOrder, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-            //返回登录前的报单
-            if (!IsErrorRspInfo(pRspInfo))
-            {
-                StackTrace trace = new StackTrace();
-                Type StragetyType = trace.GetFrame(0).GetMethod().ReflectedType;
-                ThostFtdcInputOrderField req = new ThostFtdcInputOrderField();
-                req.BrokerID = pOrder.BrokerID;
-                ///投资者代码
-                req.InvestorID = pOrder.InvestorID;
-                ///合约代码
-                req.InstrumentID = pOrder.InstrumentID;
-                ///报单引用
-                req.OrderRef = pOrder.OrderRef;
-                ///用户代码
-                //	TThostFtdcUserIDType	UserID;
-                ///报单价格条件: 限价
-                req.OrderPriceType = pOrder.OrderPriceType;
-                ///买卖方向: 
-                req.Direction = pOrder.Direction;
-                ///组合开平标志: 开仓
-                req.CombOffsetFlag_0 = pOrder.CombOffsetFlag_0;
-                ///组合投机套保标志
-                req.CombHedgeFlag_0 = pOrder.CombHedgeFlag_0;
-                ///价格
-                req.LimitPrice = pOrder.LimitPrice;
-                ///数量: 1
-                req.VolumeTotalOriginal = pOrder.VolumeTotalOriginal;
-                ///有效期类型: 当日有效
-                req.TimeCondition = pOrder.TimeCondition;
-                ///GTD日期
-                //	TThostFtdcDateType	GTDDate;
-                ///成交量类型: 任何数量
-                req.VolumeCondition = pOrder.VolumeCondition;
-                ///最小成交量: 1
-                req.MinVolume = pOrder.MinVolume;
-                ///触发条件: 立即
-                req.ContingentCondition = pOrder.ContingentCondition;
-                ///止损价
-                //	TThostFtdcPriceType	StopPrice;
-                ///强平原因: 非强平
-                req.ForceCloseReason = pOrder.ForceCloseReason;
-                ///自动挂起标志: 否
-                req.IsAutoSuspend = pOrder.IsAutoSuspend;
-                ///业务单元
-                //	TThostFtdcBusinessUnitType	BusinessUnit;
-                ///请求编号
-                //	TThostFtdcRequestIDType	RequestID;
-                ///用户强评标志: 否
-                req.UserForceClose = pOrder.UserForceClose;
-                OrderSignal Signal = new OrderSignal();
-                Signal.OrderRef = req.OrderRef;
-                Signal.FrontID = pOrder.FrontID;
-                Signal.SessionID = pOrder.SessionID;
-                //Signal.ExchangeID = pOrder.ExchangeID;
-                //Signal.OrderSysID = pOrder.OrderSysID;
-                //if (pOrder.OrderStatus == EnumOrderStatusType.Canceled)
-                //{
-                //    TodayFinishedOrderMap.Add(Signal, pOrder);
-                //}
-                //else if (pOrder.OrderStatus == EnumOrderStatusType.AllTraded)
-                //{
-                //    TodayFinishedOrderMap.Add(Signal, pOrder);
-                //}
-                //else
-                //{
-                //    TodayTradingOrderMap.Add(Signal, pOrder);
-                //}
-            }
-            if (bIsLast)
-            {
-                bCanReq = true;
-                //ReqQryTrade();
-            }
-        }
-
-        void ReqQryTrade()
-        {
-            //Thread.Sleep(1000);
-            while (!bCanReq)
-            {
-                Thread.Sleep(50);
-            }
-            bCanReq = false;
-            ThostFtdcQryTradeField req = new ThostFtdcQryTradeField();
-            req.BrokerID = BROKER_ID;
-            ///投资者代码
-            req.InvestorID = INVESTOR_ID;
-            //Thread.Sleep(1000);
-            int iResult = TD.ReqQryTrade(req, ++iRequestID);
-        }
-
-        void OnRspQryTrade(ThostFtdcTradeField pTrade, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-            if (!IsErrorRspInfo(pRspInfo) && pTrade != null)
-            {
-            }
-            if (bIsLast)
-            {
-                bCanReq = true;
-            }
-        }
-
         /// <summary>
         /// 重发
         /// </summary>
         /// <param name="req"></param>
-        private void ReReqOrderInsert(Order pOrder)//ThostFtdcInputOrderField req)
+        private void ReReqOrderInsert(Order pOrder)
         {
             DateTime logtime = DateTime.Now;
             lock (APITradeLock)
             {
                 TD.ReqOrderInsert(pOrder.InputOrder, ++iRequestID);
             }
-
-            //Logger.AddToLoggerFile("TradeAPI.txt", logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + pOrder.InputOrder.OrderRef + ","
-            //       + pOrder.InputOrder.InstrumentID + "," + pOrder.InputOrder.Direction.ToString() + "," + pOrder.InputOrder.CombOffsetFlag_0.ToString());
-            //GUI.GUIRefresh.UpdateListbox1(logtime.ToString("yyyy-MM-dd HH:mm:ss.fff") + "," + "ReReqOrderInsert" + "," + pOrder.InputOrder.OrderRef + "," + pOrder.InputOrder.InstrumentID + "," + pOrder.InputOrder.Direction.ToString()
-            //        + "," + pOrder.InputOrder.CombOffsetFlag_0.ToString());
         }
 
         private ThostFtdcInputOrderField GetNewInputOrderField(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
@@ -779,12 +454,11 @@ namespace CTP
             {
                 ThostFtdcInputOrderField req = new ThostFtdcInputOrderField();
                 ///经纪公司代码
-                req.BrokerID = BROKER_ID;
+                //req.BrokerID = BROKER_ID;
                 ///投资者代码
-                req.InvestorID = INVESTOR_ID;
+                //req.InvestorID = INVESTOR_ID;
                 ///合约代码
                 req.InstrumentID = instrumentID;
-
                 ///用户代码
                 //	TThostFtdcUserIDType	UserID;
                 ///报单价格条件: 限价
@@ -793,7 +467,6 @@ namespace CTP
                 req.Direction = DIRECTION;
                 ///组合开平标志: 开仓
                 req.CombOffsetFlag_0 = Offset;
-
                 ///组合投机套保标志
                 req.CombHedgeFlag_0 = CTP.EnumHedgeFlagType.Speculation;
                 ///价格
@@ -824,7 +497,6 @@ namespace CTP
                 req.UserForceClose = 0;
                 ORDER_REF++;
                 req.OrderRef = ORDER_REF.ToString();
-
                 return req;
             }
         }
@@ -1366,9 +1038,5 @@ namespace CTP
         {
             return ReqOrderAction(pInputOrderAction);
         }
-        //public int CancelOrder(ThostFtdcInputOrderField pInputOrderAction)
-        //{
-        //    return this.ReqOrderAction(pInputOrderAction);
-        //}
     }
 }

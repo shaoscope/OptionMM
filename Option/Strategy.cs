@@ -328,7 +328,7 @@ namespace OptionMM
         /// <param name="pForQuoteRsp"></param>
         private void UpdateForQupteLabel(ThostFtdcForQuoteRspField pForQuoteRsp)
         {
-            MainForm.Instance.forQuoteInfoLabel.Text = "询价单：" + pForQuoteRsp.InstrumentID + "-" + pForQuoteRsp.ForQuoteTime;
+            //MainForm.Instance.forQuoteInfoLabel.Text = "询价单：" + pForQuoteRsp.InstrumentID + "-" + pForQuoteRsp.ForQuoteTime;
         }
 
         /// <summary>
