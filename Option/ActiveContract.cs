@@ -8,6 +8,7 @@ namespace OptionMM
 {
     class ActiveContract
     {
+
         /// <summary>
         /// 行情更新时该事件被触发
         /// </summary>
@@ -17,6 +18,16 @@ namespace OptionMM
         /// 合约信息
         /// </summary>
         public ThostFtdcInstrumentField Contract { get; private set; }
+
+        /// <summary>
+        /// 合约多头持仓信息
+        /// </summary>
+        public ThostFtdcInvestorPositionField LongPosition { get; set; }
+
+        /// <summary>
+        /// 合约空头持仓信息
+        /// </summary>
+        public ThostFtdcInvestorPositionField ShortPosition { get; set; }
 
         /// <summary>
         /// 上一刻行情
@@ -36,6 +47,8 @@ namespace OptionMM
         public ActiveContract(ThostFtdcInstrumentField contract)
         {
             this.Contract = contract;
+            LongPosition = new ThostFtdcInvestorPositionField();
+            ShortPosition = new ThostFtdcInvestorPositionField();
         }
 
         /// <summary>

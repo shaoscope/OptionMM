@@ -103,40 +103,36 @@ namespace OptionMM
             this.marketer = loginForm.marketer;
             //订阅行情
             this.InstrumentsList = loginForm.instrumentsList;
+            this.InvestorPositionList = loginForm.investorPositionList;
             MarketManeger = new MarketManager(this.marketer);
             foreach (ThostFtdcInstrumentField instrument in InstrumentsList)
             {
                 if(instrument.InstrumentID.StartsWith("IF")||instrument.InstrumentID.StartsWith("IO"))
                 {
-                    MarketManeger.AddActiveContract(new ActiveContract(instrument));
-
+                    ActiveContract activeContract = new ActiveContract(instrument);
+                    foreach(ThostFtdcInvestorPositionField position in this.InvestorPositionList)
+                    {
+                        if(position.InstrumentID == instrument.InstrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
+                        {
+                            activeContract.LongPosition = position;
+                        }
+                        else if(position.InstrumentID == instrument.InstrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
+                        {
+                            activeContract.ShortPosition = position;
+                        }
+                    }
+                    MarketManeger.AddActiveContract(activeContract);
                 }
             }
-            this.InvestorPositionList = loginForm.investorPositionList;
 
             this.marketer.OnRtnDepthMarketData += marketer_OnRtnDepthMarketData;
 
             #region 加载报价面板
-            QuoteForm = new QuoteForm();
-            foreach (ActiveContract activeContract in MarketManeger.ActiveContractDictionary.Values)
-            {
-                if (activeContract.Contract.InstrumentID.Contains("C"))
-                {
-                    string callID = activeContract.Contract.InstrumentID;
-                    string putID = callID.Replace("C", "P");
-                    ActiveContract call;
-                    ActiveContract put;
-                    ActiveContract underlying;
-                    if (MarketManeger.ActiveContractDictionary.TryGetValue(callID, out call) &&
-                        MarketManeger.ActiveContractDictionary.TryGetValue(putID, out put) &&
-                        MarketManeger.ActiveContractDictionary.TryGetValue("IF1407", out underlying))
-                    {
-                        Quote quote = new Quote(call, put, underlying);
-                        QuoteForm.quotePanel.AddQuote(quote);
-                    }
-                }
-            }
-            QuoteForm.Hide();
+            
+            //this.quoteFormToolStripMenuItem.PerformClick();
+            #endregion
+
+
 
             //Dictionary<string, string[]> MMConfigValues = ReadOptionXML("Option.xml");
             //Future = new Future("IF1407");
@@ -168,7 +164,6 @@ namespace OptionMM
             //    strategy.Configuration();
             //    this.optionPanel.AddStrategy(strategy);
             //}
-            #endregion
 
             #region 加载平价套利
             //Dictionary<string, string[]> ParityConfigValues = ReadParityXML("Parity.xml");
@@ -748,6 +743,25 @@ namespace OptionMM
         /// <param name="e"></param>
         private void quoteFormToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            QuoteForm = new QuoteForm();
+            foreach (ActiveContract activeContract in MarketManeger.ActiveContractDictionary.Values)
+            {
+                if (activeContract.Contract.InstrumentID.Contains("C"))
+                {
+                    string callID = activeContract.Contract.InstrumentID;
+                    string putID = callID.Replace("C", "P");
+                    ActiveContract call;
+                    ActiveContract put;
+                    ActiveContract underlying;
+                    if (MarketManeger.ActiveContractDictionary.TryGetValue(callID, out call) &&
+                        MarketManeger.ActiveContractDictionary.TryGetValue(putID, out put) &&
+                        MarketManeger.ActiveContractDictionary.TryGetValue("IF1407", out underlying))
+                    {
+                        Quote quote = new Quote(call, put, underlying);
+                        QuoteForm.quotePanel.AddQuote(quote);
+                    }
+                }
+            }
             if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
             {
                 QuoteForm.MdiParent = this;

@@ -50,30 +50,28 @@ namespace OptionMM
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.dataTable = new System.Windows.Forms.DataGridView();
-            this.cInstrumentID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cInstrumentName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cLastPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cDeta = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cBidPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cBidVolume = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cAskPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cAskVolume = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cVolume = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cUpperLimitPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cLowerLimitPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cOpenPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cPreSettlementPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cHighestPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cLowestPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cCurrentVolume = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cRate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cPreClosePrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cTurnover = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cExchange = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cUpdateTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataTable = new OptionMM.DoubleBufferedDataGridView();
+            this.cCallLongOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallTodayLongOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallBidQuote = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallBidPrice1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallTheoricalPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallAskPrice1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallAskQuote = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallTodayShortOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cCallVolatility = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cStrikePrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutVolatility = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutLongOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutTodayLongOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutBidQuote = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutBidPrice1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutTheoricalPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutAskPrice1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutAskQuote = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutTodayShortOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cPutOpenInterest = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -86,28 +84,27 @@ namespace OptionMM
             this.dataTable.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.dataTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.cInstrumentID,
-            this.cInstrumentName,
-            this.cLastPrice,
-            this.cDeta,
-            this.cBidPrice,
-            this.cBidVolume,
-            this.cAskPrice,
-            this.cAskVolume,
-            this.cVolume,
-            this.cOpenInterest,
-            this.cUpperLimitPrice,
-            this.cLowerLimitPrice,
-            this.cOpenPrice,
-            this.cPreSettlementPrice,
-            this.cHighestPrice,
-            this.cLowestPrice,
-            this.cCurrentVolume,
-            this.cRate,
-            this.cPreClosePrice,
-            this.cTurnover,
-            this.cExchange,
-            this.cUpdateTime});
+            this.cCallLongOpenInterest,
+            this.cCallTodayLongOpenInterest,
+            this.cCallBidQuote,
+            this.cCallBidPrice1,
+            this.cCallTheoricalPrice,
+            this.cCallAskPrice1,
+            this.cCallAskQuote,
+            this.cCallTodayShortOpenInterest,
+            this.cCallOpenInterest,
+            this.cCallVolatility,
+            this.cStrikePrice,
+            this.cPutVolatility,
+            this.cPutLongOpenInterest,
+            this.cPutTodayLongOpenInterest,
+            this.cPutBidQuote,
+            this.cPutBidPrice1,
+            this.cPutTheoricalPrice,
+            this.cPutAskPrice1,
+            this.cPutAskQuote,
+            this.cPutTodayShortOpenInterest,
+            this.cPutOpenInterest});
             this.dataTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataTable.Location = new System.Drawing.Point(0, 0);
             this.dataTable.MultiSelect = false;
@@ -116,227 +113,239 @@ namespace OptionMM
             this.dataTable.RowHeadersVisible = false;
             this.dataTable.RowTemplate.Height = 23;
             this.dataTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataTable.Size = new System.Drawing.Size(1200, 100);
+            this.dataTable.Size = new System.Drawing.Size(1003, 100);
             this.dataTable.TabIndex = 0;
             // 
-            // cInstrumentID
+            // cCallLongOpenInterest
             // 
+            this.cCallLongOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cInstrumentID.DefaultCellStyle = dataGridViewCellStyle1;
-            this.cInstrumentID.HeaderText = "合约代码";
-            this.cInstrumentID.Name = "cInstrumentID";
-            this.cInstrumentID.ReadOnly = true;
-            this.cInstrumentID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cInstrumentID.Width = 90;
+            this.cCallLongOpenInterest.DefaultCellStyle = dataGridViewCellStyle1;
+            this.cCallLongOpenInterest.HeaderText = "总多仓量";
+            this.cCallLongOpenInterest.Name = "cCallLongOpenInterest";
+            this.cCallLongOpenInterest.ReadOnly = true;
+            this.cCallLongOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallLongOpenInterest.Width = 59;
             // 
-            // cInstrumentName
+            // cCallTodayLongOpenInterest
             // 
+            this.cCallTodayLongOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cInstrumentName.DefaultCellStyle = dataGridViewCellStyle2;
-            this.cInstrumentName.HeaderText = "合约名称";
-            this.cInstrumentName.Name = "cInstrumentName";
-            this.cInstrumentName.ReadOnly = true;
-            this.cInstrumentName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallTodayLongOpenInterest.DefaultCellStyle = dataGridViewCellStyle2;
+            this.cCallTodayLongOpenInterest.HeaderText = "今多仓量";
+            this.cCallTodayLongOpenInterest.Name = "cCallTodayLongOpenInterest";
+            this.cCallTodayLongOpenInterest.ReadOnly = true;
+            this.cCallTodayLongOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallTodayLongOpenInterest.Width = 59;
             // 
-            // cLastPrice
+            // cCallBidQuote
             // 
+            this.cCallBidQuote.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cLastPrice.DefaultCellStyle = dataGridViewCellStyle3;
-            this.cLastPrice.HeaderText = "最新价";
-            this.cLastPrice.Name = "cLastPrice";
-            this.cLastPrice.ReadOnly = true;
-            this.cLastPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cLastPrice.Width = 75;
+            this.cCallBidQuote.DefaultCellStyle = dataGridViewCellStyle3;
+            this.cCallBidQuote.HeaderText = "Bid in";
+            this.cCallBidQuote.Name = "cCallBidQuote";
+            this.cCallBidQuote.ReadOnly = true;
+            this.cCallBidQuote.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallBidQuote.Width = 47;
             // 
-            // cDeta
+            // cCallBidPrice1
             // 
+            this.cCallBidPrice1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cDeta.DefaultCellStyle = dataGridViewCellStyle4;
-            this.cDeta.HeaderText = "涨跌";
-            this.cDeta.Name = "cDeta";
-            this.cDeta.ReadOnly = true;
-            this.cDeta.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cDeta.Width = 60;
+            this.cCallBidPrice1.DefaultCellStyle = dataGridViewCellStyle4;
+            this.cCallBidPrice1.HeaderText = "Bid";
+            this.cCallBidPrice1.Name = "cCallBidPrice1";
+            this.cCallBidPrice1.ReadOnly = true;
+            this.cCallBidPrice1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallBidPrice1.Width = 29;
             // 
-            // cBidPrice
+            // cCallTheoricalPrice
             // 
+            this.cCallTheoricalPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cBidPrice.DefaultCellStyle = dataGridViewCellStyle5;
-            this.cBidPrice.HeaderText = "买价";
-            this.cBidPrice.Name = "cBidPrice";
-            this.cBidPrice.ReadOnly = true;
-            this.cBidPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cBidPrice.Width = 75;
+            this.cCallTheoricalPrice.DefaultCellStyle = dataGridViewCellStyle5;
+            this.cCallTheoricalPrice.HeaderText = "Theor.";
+            this.cCallTheoricalPrice.Name = "cCallTheoricalPrice";
+            this.cCallTheoricalPrice.ReadOnly = true;
+            this.cCallTheoricalPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallTheoricalPrice.Width = 47;
             // 
-            // cBidVolume
+            // cCallAskPrice1
             // 
+            this.cCallAskPrice1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cBidVolume.DefaultCellStyle = dataGridViewCellStyle6;
-            this.cBidVolume.HeaderText = "买量";
-            this.cBidVolume.Name = "cBidVolume";
-            this.cBidVolume.ReadOnly = true;
-            this.cBidVolume.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cBidVolume.Width = 50;
+            this.cCallAskPrice1.DefaultCellStyle = dataGridViewCellStyle6;
+            this.cCallAskPrice1.HeaderText = "Ask";
+            this.cCallAskPrice1.Name = "cCallAskPrice1";
+            this.cCallAskPrice1.ReadOnly = true;
+            this.cCallAskPrice1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallAskPrice1.Width = 29;
             // 
-            // cAskPrice
+            // cCallAskQuote
             // 
+            this.cCallAskQuote.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cAskPrice.DefaultCellStyle = dataGridViewCellStyle7;
-            this.cAskPrice.HeaderText = "卖价";
-            this.cAskPrice.Name = "cAskPrice";
-            this.cAskPrice.ReadOnly = true;
-            this.cAskPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cAskPrice.Width = 75;
+            this.cCallAskQuote.DefaultCellStyle = dataGridViewCellStyle7;
+            this.cCallAskQuote.HeaderText = "Ask in";
+            this.cCallAskQuote.Name = "cCallAskQuote";
+            this.cCallAskQuote.ReadOnly = true;
+            this.cCallAskQuote.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallAskQuote.Width = 47;
             // 
-            // cAskVolume
+            // cCallTodayShortOpenInterest
             // 
+            this.cCallTodayShortOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cAskVolume.DefaultCellStyle = dataGridViewCellStyle8;
-            this.cAskVolume.HeaderText = "卖量";
-            this.cAskVolume.Name = "cAskVolume";
-            this.cAskVolume.ReadOnly = true;
-            this.cAskVolume.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cAskVolume.Width = 50;
+            this.cCallTodayShortOpenInterest.DefaultCellStyle = dataGridViewCellStyle8;
+            this.cCallTodayShortOpenInterest.HeaderText = "今空仓量";
+            this.cCallTodayShortOpenInterest.Name = "cCallTodayShortOpenInterest";
+            this.cCallTodayShortOpenInterest.ReadOnly = true;
+            this.cCallTodayShortOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallTodayShortOpenInterest.Width = 59;
             // 
-            // cVolume
+            // cCallOpenInterest
             // 
+            this.cCallOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cVolume.DefaultCellStyle = dataGridViewCellStyle9;
-            this.cVolume.HeaderText = "成交量";
-            this.cVolume.Name = "cVolume";
-            this.cVolume.ReadOnly = true;
-            this.cVolume.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cVolume.Width = 70;
+            this.cCallOpenInterest.DefaultCellStyle = dataGridViewCellStyle9;
+            this.cCallOpenInterest.HeaderText = "总空仓量";
+            this.cCallOpenInterest.Name = "cCallOpenInterest";
+            this.cCallOpenInterest.ReadOnly = true;
+            this.cCallOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallOpenInterest.Width = 59;
             // 
-            // cOpenInterest
+            // cCallVolatility
             // 
+            this.cCallVolatility.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cOpenInterest.DefaultCellStyle = dataGridViewCellStyle10;
-            this.cOpenInterest.HeaderText = "持仓量";
-            this.cOpenInterest.Name = "cOpenInterest";
-            this.cOpenInterest.ReadOnly = true;
-            this.cOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cOpenInterest.Width = 70;
+            this.cCallVolatility.DefaultCellStyle = dataGridViewCellStyle10;
+            this.cCallVolatility.HeaderText = "Act.Vol";
+            this.cCallVolatility.Name = "cCallVolatility";
+            this.cCallVolatility.ReadOnly = true;
+            this.cCallVolatility.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cCallVolatility.Width = 53;
             // 
-            // cUpperLimitPrice
+            // cStrikePrice
             // 
+            this.cStrikePrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cUpperLimitPrice.DefaultCellStyle = dataGridViewCellStyle11;
-            this.cUpperLimitPrice.HeaderText = "涨停价";
-            this.cUpperLimitPrice.Name = "cUpperLimitPrice";
-            this.cUpperLimitPrice.ReadOnly = true;
-            this.cUpperLimitPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cUpperLimitPrice.Width = 75;
+            this.cStrikePrice.DefaultCellStyle = dataGridViewCellStyle11;
+            this.cStrikePrice.HeaderText = "St";
+            this.cStrikePrice.Name = "cStrikePrice";
+            this.cStrikePrice.ReadOnly = true;
+            this.cStrikePrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
+            this.cStrikePrice.Width = 42;
             // 
-            // cLowerLimitPrice
+            // cPutVolatility
             // 
+            this.cPutVolatility.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cLowerLimitPrice.DefaultCellStyle = dataGridViewCellStyle12;
-            this.cLowerLimitPrice.HeaderText = "跌停价";
-            this.cLowerLimitPrice.Name = "cLowerLimitPrice";
-            this.cLowerLimitPrice.ReadOnly = true;
-            this.cLowerLimitPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cLowerLimitPrice.Width = 75;
+            this.cPutVolatility.DefaultCellStyle = dataGridViewCellStyle12;
+            this.cPutVolatility.HeaderText = "Act.Vol";
+            this.cPutVolatility.Name = "cPutVolatility";
+            this.cPutVolatility.ReadOnly = true;
+            this.cPutVolatility.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutVolatility.Width = 53;
             // 
-            // cOpenPrice
+            // cPutLongOpenInterest
             // 
+            this.cPutLongOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cOpenPrice.DefaultCellStyle = dataGridViewCellStyle13;
-            this.cOpenPrice.HeaderText = "今开盘";
-            this.cOpenPrice.Name = "cOpenPrice";
-            this.cOpenPrice.ReadOnly = true;
-            this.cOpenPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cOpenPrice.Width = 75;
+            this.cPutLongOpenInterest.DefaultCellStyle = dataGridViewCellStyle13;
+            this.cPutLongOpenInterest.HeaderText = "总多仓量";
+            this.cPutLongOpenInterest.Name = "cPutLongOpenInterest";
+            this.cPutLongOpenInterest.ReadOnly = true;
+            this.cPutLongOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutLongOpenInterest.Width = 59;
             // 
-            // cPreSettlementPrice
+            // cPutTodayLongOpenInterest
             // 
+            this.cPutTodayLongOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cPreSettlementPrice.DefaultCellStyle = dataGridViewCellStyle14;
-            this.cPreSettlementPrice.HeaderText = "昨结算";
-            this.cPreSettlementPrice.Name = "cPreSettlementPrice";
-            this.cPreSettlementPrice.ReadOnly = true;
-            this.cPreSettlementPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cPreSettlementPrice.Width = 75;
+            this.cPutTodayLongOpenInterest.DefaultCellStyle = dataGridViewCellStyle14;
+            this.cPutTodayLongOpenInterest.HeaderText = "今多仓量";
+            this.cPutTodayLongOpenInterest.Name = "cPutTodayLongOpenInterest";
+            this.cPutTodayLongOpenInterest.ReadOnly = true;
+            this.cPutTodayLongOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutTodayLongOpenInterest.Width = 59;
             // 
-            // cHighestPrice
+            // cPutBidQuote
             // 
+            this.cPutBidQuote.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cHighestPrice.DefaultCellStyle = dataGridViewCellStyle15;
-            this.cHighestPrice.HeaderText = "最高价";
-            this.cHighestPrice.Name = "cHighestPrice";
-            this.cHighestPrice.ReadOnly = true;
-            this.cHighestPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cHighestPrice.Width = 75;
+            this.cPutBidQuote.DefaultCellStyle = dataGridViewCellStyle15;
+            this.cPutBidQuote.HeaderText = "Bid in";
+            this.cPutBidQuote.Name = "cPutBidQuote";
+            this.cPutBidQuote.ReadOnly = true;
+            this.cPutBidQuote.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutBidQuote.Width = 47;
             // 
-            // cLowestPrice
+            // cPutBidPrice1
             // 
+            this.cPutBidPrice1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cLowestPrice.DefaultCellStyle = dataGridViewCellStyle16;
-            this.cLowestPrice.HeaderText = "最低价";
-            this.cLowestPrice.Name = "cLowestPrice";
-            this.cLowestPrice.ReadOnly = true;
-            this.cLowestPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cLowestPrice.Width = 75;
+            this.cPutBidPrice1.DefaultCellStyle = dataGridViewCellStyle16;
+            this.cPutBidPrice1.HeaderText = "Bid";
+            this.cPutBidPrice1.Name = "cPutBidPrice1";
+            this.cPutBidPrice1.ReadOnly = true;
+            this.cPutBidPrice1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutBidPrice1.Width = 29;
             // 
-            // cCurrentVolume
+            // cPutTheoricalPrice
             // 
+            this.cPutTheoricalPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cCurrentVolume.DefaultCellStyle = dataGridViewCellStyle17;
-            this.cCurrentVolume.HeaderText = "现量";
-            this.cCurrentVolume.Name = "cCurrentVolume";
-            this.cCurrentVolume.ReadOnly = true;
-            this.cCurrentVolume.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cCurrentVolume.Width = 60;
+            this.cPutTheoricalPrice.DefaultCellStyle = dataGridViewCellStyle17;
+            this.cPutTheoricalPrice.HeaderText = "Theor.";
+            this.cPutTheoricalPrice.Name = "cPutTheoricalPrice";
+            this.cPutTheoricalPrice.ReadOnly = true;
+            this.cPutTheoricalPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutTheoricalPrice.Width = 47;
             // 
-            // cRate
+            // cPutAskPrice1
             // 
+            this.cPutAskPrice1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cRate.DefaultCellStyle = dataGridViewCellStyle18;
-            this.cRate.HeaderText = "涨跌幅";
-            this.cRate.Name = "cRate";
-            this.cRate.ReadOnly = true;
-            this.cRate.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cRate.Width = 70;
+            this.cPutAskPrice1.DefaultCellStyle = dataGridViewCellStyle18;
+            this.cPutAskPrice1.HeaderText = "Ask";
+            this.cPutAskPrice1.Name = "cPutAskPrice1";
+            this.cPutAskPrice1.ReadOnly = true;
+            this.cPutAskPrice1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutAskPrice1.Width = 29;
             // 
-            // cPreClosePrice
+            // cPutAskQuote
             // 
+            this.cPutAskQuote.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cPreClosePrice.DefaultCellStyle = dataGridViewCellStyle19;
-            this.cPreClosePrice.HeaderText = "昨收盘";
-            this.cPreClosePrice.Name = "cPreClosePrice";
-            this.cPreClosePrice.ReadOnly = true;
-            this.cPreClosePrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cPreClosePrice.Width = 75;
+            this.cPutAskQuote.DefaultCellStyle = dataGridViewCellStyle19;
+            this.cPutAskQuote.HeaderText = "Ask in";
+            this.cPutAskQuote.Name = "cPutAskQuote";
+            this.cPutAskQuote.ReadOnly = true;
+            this.cPutAskQuote.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutAskQuote.Width = 47;
             // 
-            // cTurnover
+            // cPutTodayShortOpenInterest
             // 
+            this.cPutTodayShortOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cTurnover.DefaultCellStyle = dataGridViewCellStyle20;
-            this.cTurnover.HeaderText = "成交额";
-            this.cTurnover.Name = "cTurnover";
-            this.cTurnover.ReadOnly = true;
-            this.cTurnover.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cTurnover.Width = 105;
+            this.cPutTodayShortOpenInterest.DefaultCellStyle = dataGridViewCellStyle20;
+            this.cPutTodayShortOpenInterest.HeaderText = "今空仓量";
+            this.cPutTodayShortOpenInterest.Name = "cPutTodayShortOpenInterest";
+            this.cPutTodayShortOpenInterest.ReadOnly = true;
+            this.cPutTodayShortOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutTodayShortOpenInterest.Width = 59;
             // 
-            // cExchange
+            // cPutOpenInterest
             // 
+            this.cPutOpenInterest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cExchange.DefaultCellStyle = dataGridViewCellStyle21;
-            this.cExchange.HeaderText = "交易所";
-            this.cExchange.Name = "cExchange";
-            this.cExchange.ReadOnly = true;
-            this.cExchange.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cExchange.Width = 65;
-            // 
-            // cUpdateTime
-            // 
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.cUpdateTime.DefaultCellStyle = dataGridViewCellStyle22;
-            this.cUpdateTime.HeaderText = "更新时间";
-            this.cUpdateTime.Name = "cUpdateTime";
-            this.cUpdateTime.ReadOnly = true;
-            this.cUpdateTime.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.cUpdateTime.Width = 80;
+            this.cPutOpenInterest.DefaultCellStyle = dataGridViewCellStyle21;
+            this.cPutOpenInterest.HeaderText = "总空仓量";
+            this.cPutOpenInterest.Name = "cPutOpenInterest";
+            this.cPutOpenInterest.ReadOnly = true;
+            this.cPutOpenInterest.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.cPutOpenInterest.Width = 59;
             // 
             // QuotePanel
             // 
@@ -344,7 +353,7 @@ namespace OptionMM
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.dataTable);
             this.Name = "QuotePanel";
-            this.Size = new System.Drawing.Size(1200, 100);
+            this.Size = new System.Drawing.Size(1003, 100);
             ((System.ComponentModel.ISupportInitialize)(this.dataTable)).EndInit();
             this.ResumeLayout(false);
 
@@ -352,28 +361,27 @@ namespace OptionMM
 
         #endregion
 
-        private DataGridView dataTable;
-        private DataGridViewTextBoxColumn cInstrumentID;
-        private DataGridViewTextBoxColumn cInstrumentName;
-        private DataGridViewTextBoxColumn cLastPrice;
-        private DataGridViewTextBoxColumn cDeta;
-        private DataGridViewTextBoxColumn cBidPrice;
-        private DataGridViewTextBoxColumn cBidVolume;
-        private DataGridViewTextBoxColumn cAskPrice;
-        private DataGridViewTextBoxColumn cAskVolume;
-        private DataGridViewTextBoxColumn cVolume;
-        private DataGridViewTextBoxColumn cOpenInterest;
-        private DataGridViewTextBoxColumn cUpperLimitPrice;
-        private DataGridViewTextBoxColumn cLowerLimitPrice;
-        private DataGridViewTextBoxColumn cOpenPrice;
-        private DataGridViewTextBoxColumn cPreSettlementPrice;
-        private DataGridViewTextBoxColumn cHighestPrice;
-        private DataGridViewTextBoxColumn cLowestPrice;
-        private DataGridViewTextBoxColumn cCurrentVolume;
-        private DataGridViewTextBoxColumn cRate;
-        private DataGridViewTextBoxColumn cPreClosePrice;
-        private DataGridViewTextBoxColumn cTurnover;
-        private DataGridViewTextBoxColumn cExchange;
-        private DataGridViewTextBoxColumn cUpdateTime;
+        private DoubleBufferedDataGridView dataTable;
+        private DataGridViewTextBoxColumn cCallLongOpenInterest;
+        private DataGridViewTextBoxColumn cCallTodayLongOpenInterest;
+        private DataGridViewTextBoxColumn cCallBidQuote;
+        private DataGridViewTextBoxColumn cCallBidPrice1;
+        private DataGridViewTextBoxColumn cCallTheoricalPrice;
+        private DataGridViewTextBoxColumn cCallAskPrice1;
+        private DataGridViewTextBoxColumn cCallAskQuote;
+        private DataGridViewTextBoxColumn cCallTodayShortOpenInterest;
+        private DataGridViewTextBoxColumn cCallOpenInterest;
+        private DataGridViewTextBoxColumn cCallVolatility;
+        private DataGridViewTextBoxColumn cStrikePrice;
+        private DataGridViewTextBoxColumn cPutVolatility;
+        private DataGridViewTextBoxColumn cPutLongOpenInterest;
+        private DataGridViewTextBoxColumn cPutTodayLongOpenInterest;
+        private DataGridViewTextBoxColumn cPutBidQuote;
+        private DataGridViewTextBoxColumn cPutBidPrice1;
+        private DataGridViewTextBoxColumn cPutTheoricalPrice;
+        private DataGridViewTextBoxColumn cPutAskPrice1;
+        private DataGridViewTextBoxColumn cPutAskQuote;
+        private DataGridViewTextBoxColumn cPutTodayShortOpenInterest;
+        private DataGridViewTextBoxColumn cPutOpenInterest;
     }
 }

@@ -56,6 +56,9 @@
     <Compile Include="CoveredPanel.designer.cs">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="DoubleBufferedDataGridView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FullPath.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MarketManager.cs" />
