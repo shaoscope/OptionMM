@@ -18,13 +18,7 @@ namespace OptionMM
         public event OrderHandle OnTraded;
         public event PositionHandle onReqPosition;
 
-        #region
-
-        /// <summary>
-        /// 报单回调
-        /// </summary>
-        /// <param name="orderrefold"></param>
-        /// <param name="orderrefnew"></param>
+        #region 报单回调
         public void OrderRefReplace(string orderrefold, string orderrefnew)
         {
             if (OnOrderRefReplace != null)
@@ -175,9 +169,6 @@ namespace OptionMM
         int iQuoteRef = 0;
         Dictionary<string, string> QuoteSignalMap = new Dictionary<string, string>();
 
-        /// <summary>
-        /// 连接登陆
-        /// </summary>
         #region
         private void AddEvent()
         {
@@ -563,11 +554,6 @@ namespace OptionMM
             }
         }
 
-        /// <summary>
-        /// Private
-        /// </summary>
-        /// <param name="pRspInfo"></param>
-        /// <returns></returns>
         #region
         private bool IsErrorRspInfo(ThostFtdcRspInfoField pRspInfo)
         {
@@ -819,11 +805,6 @@ namespace OptionMM
         }
         #endregion
 
-
-
-        /// <summary>
-        /// Public
-        /// </summary>
         #region
         public void Release()
         {
@@ -1177,10 +1158,7 @@ namespace OptionMM
         }
         #endregion
 
-        /// <summary>
-        /// 报单、报价、行权、询价回调
-        /// </summary>
-        #region
+        #region 报单、报价、行权、询价回调
         void OnRspOrderInsert(ThostFtdcInputOrderField pInputOrder, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             //交易系统已接收报单

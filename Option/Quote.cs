@@ -46,6 +46,11 @@ namespace OptionMM
         public bool IsQuoting { get; private set; }
 
         /// <summary>
+        /// 有成交时该事件被触发
+        /// </summary>
+        public event EventHandler OnTrade;
+
+        /// <summary>
         /// 构造一个新实例
         /// </summary>
         /// <param name="Panel">所属行情面板</param>
