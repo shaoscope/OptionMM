@@ -115,6 +115,8 @@ namespace OptionMM
             this.dataTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataTable.Size = new System.Drawing.Size(1003, 100);
             this.dataTable.TabIndex = 0;
+            this.dataTable.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataTable_CellMouseDoubleClick);
+            this.dataTable.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataTable_CellMouseDown);
             // 
             // cCallLongOpenInterest
             // 

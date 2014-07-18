@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using CTP;
+using System.ComponentModel;
 
 namespace OptionMM
 {
@@ -36,7 +37,13 @@ namespace OptionMM
         /// <summary>
         /// 报价界面刷新定时器
         /// </summary>
-        private System.Threading.Timer QuoteRefreshTimer;
+        private System.Threading.Timer QuotePanelRefreshTimer;
+
+        /// <summary>
+        /// 合约是否在报价
+        /// </summary>
+        [DefaultValue(false)]
+        public bool IsQuoting { get; private set; }
 
         /// <summary>
         /// 构造一个新实例
@@ -45,23 +52,60 @@ namespace OptionMM
         /// <param name="activeContract">合约</param>
         public Quote(ActiveContract call, ActiveContract put, ActiveContract underlying)
         {
+            this.Tag = this;
             this.call = call;
             this.call.MarketUpdated += call_MarketUpdated;
-            //this.call_MarketUpdated(this, EventArgs.Empty);
+            this.call.ForQuoteArrived += call_ForQuoteArrived;
             this.put = put;
             this.put.MarketUpdated += put_MarketUpdated;
-            //this.put_MarketUpdated(this, EventArgs.Empty);
+            this.put.ForQuoteArrived += put_ForQuoteArrived;
             this.underlying = underlying;
             this.underlying.MarketUpdated += underlying_MarketUpdated;
-            //this.underlying_MarketUpdated(this, EventArgs.Empty);
-            this.QuoteRefreshTimer = new System.Threading.Timer(this.QuoteRefreshCallback, null, 1000, 1000);
+            this.QuotePanelRefreshTimer = new System.Threading.Timer(this.QuotePanelRefreshCallback, null, 1000, 1000);
+        }
+
+        /// <summary>
+        /// 启动报价
+        /// </summary>
+        public void Start()
+        {
+            this.IsQuoting = true;
+            MainForm.Instance.TraderManager.PlaceQuote(this.call.Contract.InstrumentID, EnumOffsetFlagType.Open, 10, this.call.MarketData.UpperLimitPrice, EnumOffsetFlagType.Open, 10, this.call.MarketData.LowerLimitPrice);
+        }
+
+        /// <summary>
+        /// 暂停报价
+        /// </summary>
+        public void Stop()
+        {
+            this.IsQuoting = false;
+        }
+
+        /// <summary>
+        /// Call询价单到达时方法被调用
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void put_ForQuoteArrived(object sender, EventArgs e)
+        {
+            
+        }
+
+        /// <summary>
+        /// Put询价单到达时方法被调用
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void call_ForQuoteArrived(object sender, EventArgs e)
+        {
+            
         }
 
         /// <summary>
         /// 报价面板更新回调
         /// </summary>
         /// <param name="state"></param>
-        private void QuoteRefreshCallback(object state)
+        private void QuotePanelRefreshCallback(object state)
         {
             try
             {
@@ -69,11 +113,11 @@ namespace OptionMM
                 {
                     if (Panel.InvokeRequired)
                     {
-                        Panel.BeginInvoke(new MethodInvoker(this.RefreshQuote));
+                        Panel.BeginInvoke(new MethodInvoker(this.RefreshQuotePanel));
                     }
                     else
                     {
-                        this.RefreshQuote();
+                        this.RefreshQuotePanel();
                     }
                 }
             }
@@ -86,7 +130,7 @@ namespace OptionMM
         /// <summary>
         /// 刷新行
         /// </summary>
-        private void RefreshQuote()
+        private void RefreshQuotePanel()
         {
             if(call.MarketData == null || call.PreMarketData == null || put.MarketData == null || put.PreMarketData == null)
             {
@@ -114,7 +158,7 @@ namespace OptionMM
             //this.Cells[18].Value = "";
             //this.Cells[19].Value = quote.put.ShortPosition.TodayPosition;
             //this.Cells[20].Value = quote.put.ShortPosition.Position; 
-        } 
+        }
 
         /// <summary>
         /// 设置对冲明细应该显示的面板
@@ -167,25 +211,29 @@ namespace OptionMM
         static void setPriceCell(DataGridViewCell cell, double price, double prePrice, double preSettle)
         {
             if (price > preSettle)
-                cell.Style.SelectionForeColor =
-                cell.Style.ForeColor = Color.Red;
+            {
+                cell.Style.SelectionForeColor = cell.Style.ForeColor = Color.Red;
+            }
             else if (price == preSettle)
-                cell.Style.SelectionForeColor =
-                cell.Style.ForeColor = Color.DarkOrange;
+            {
+                cell.Style.SelectionForeColor = cell.Style.ForeColor = Color.DarkOrange;
+            }
             else
-                cell.Style.SelectionForeColor =
-                cell.Style.ForeColor = Color.Green;
-
+            {
+                cell.Style.SelectionForeColor = cell.Style.ForeColor = Color.Green;
+            }
             if (price > prePrice)
-                cell.Style.SelectionBackColor =
-                cell.Style.BackColor = Color.LightPink;
+            {
+                cell.Style.SelectionBackColor = cell.Style.BackColor = Color.LightPink;
+            }
             else if (price == prePrice)
-                cell.Style.SelectionBackColor =
-                cell.Style.BackColor = Color.Empty;
+            {
+                cell.Style.SelectionBackColor = cell.Style.BackColor = Color.Empty;
+            }
             else
-                cell.Style.SelectionBackColor =
-                cell.Style.BackColor = Color.LightGreen;
-
+            {
+                cell.Style.SelectionBackColor = cell.Style.BackColor = Color.LightGreen;
+            }
             cell.Value = price;
         }
 

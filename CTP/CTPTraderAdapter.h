@@ -34,6 +34,11 @@ namespace CTP {
 		/// </summary>
 		/// <param name="pszFlowPath">存贮订阅信息文件的目录，默认为当前目录</param>
 		CTPTraderAdapter(String^ pszFlowPath);
+	public:
+		int FrontID;
+		int SessionID;
+		String ^BrokerID;
+		String ^InvestorID;
 	private:
 		~CTPTraderAdapter(void);
 		CThostFtdcTraderApi* m_pApi;

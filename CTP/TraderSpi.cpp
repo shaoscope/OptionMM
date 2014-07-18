@@ -553,6 +553,10 @@ namespace Native
 	///登录请求响应
 	void CTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
 		m_pAdapter->OnRspUserLogin(MNConv<ThostFtdcRspUserLoginField^, CThostFtdcRspUserLoginField>::N2M(pRspUserLogin), RspInfoField(pRspInfo), nRequestID, bIsLast);
+		m_pAdapter->FrontID = pRspUserLogin->FrontID;
+		m_pAdapter->SessionID = pRspUserLogin->SessionID;
+		m_pAdapter->BrokerID = gcnew String(pRspUserLogin->BrokerID);
+		m_pAdapter->InvestorID = gcnew String(pRspUserLogin->UserID);
 	};
 
 	///登出请求响应

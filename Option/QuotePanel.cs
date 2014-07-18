@@ -86,5 +86,39 @@ namespace OptionMM
             this.dataTable.Sort(this.dataTable.Columns[10], ListSortDirection.Ascending);
         }
 
-    }
-}
+        /// <summary>
+        /// 单元格被双击的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void dataTable_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (this.dataTable.SelectedRows.Count == 1)
+            {
+                Quote quote = (Quote)this.dataTable.SelectedRows[0].Tag;
+                if (quote.IsQuoting)
+                {
+                    quote.Stop();
+                }
+                else
+                {
+                    quote.Start();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 鼠标单击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void dataTable_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                this.dataTable.Rows[e.RowIndex].Selected = true;
+            }
+        }
+
+    }//class
+}//namespace

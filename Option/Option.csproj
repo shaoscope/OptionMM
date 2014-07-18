@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveContract.cs" />
+    <Compile Include="BilateralQuotation.cs" />
     <Compile Include="Covered.cs" />
     <Compile Include="CoveredPanel.cs">
       <SubType>UserControl</SubType>
@@ -56,12 +57,16 @@
     <Compile Include="CoveredPanel.designer.cs">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DoubleBufferedDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FullPath.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MarketManager.cs" />
+    <Compile Include="Order.cs" />
     <Compile Include="Quote.cs" />
     <Compile Include="QuoteForm.cs">
       <SubType>Form</SubType>
@@ -75,7 +80,11 @@
     <Compile Include="QuotePanel.Designer.cs">
       <DependentUpon>QuotePanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="TraderAPI.cs" />
+    <Compile Include="SettlementInfoConfirmDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettlementInfoConfirmDialog.Designer.cs" />
+    <Compile Include="TradeManager.cs" />
     <Compile Include="Vertical.cs" />
     <Compile Include="Parity.cs" />
     <Compile Include="VerticalPanel.cs">
@@ -121,8 +130,6 @@
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MDAPI.cs" />
-    <Compile Include="MDManager.cs" />
     <Compile Include="OptionPricingModel.cs" />
     <Compile Include="OptionPricingModelParams.cs" />
     <Compile Include="OptionValue.cs" />
@@ -137,7 +144,6 @@
     <Compile Include="StaticFunction.cs" />
     <Compile Include="Greeks.cs" />
     <Compile Include="Strategy.cs" />
-    <Compile Include="TDManager.cs" />
     <EmbeddedResource Include="CoveredPanel.resx">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -147,6 +153,7 @@
     <EmbeddedResource Include="QuotePanel.resx">
       <DependentUpon>QuotePanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SettlementInfoConfirmDialog.resx" />
     <EmbeddedResource Include="VerticalPanel.resx">
       <DependentUpon>VerticalPanel.cs</DependentUpon>
     </EmbeddedResource>

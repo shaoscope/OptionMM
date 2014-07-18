@@ -37,10 +37,10 @@ namespace OptionMM
                     }
                 }
             }
-            MDManager.MD.SubscribeMarketData(new string[] { InstrumentID });
-            MDManager.MD.OnTick += MD_OnTick;
-            TDManager.TD.OnCanceled += TD_OnCanceled;
-            TDManager.TD.OnTrading += TD_OnTrading;
+            //MDManager.MD.SubscribeMarketData(new string[] { InstrumentID });
+            //MDManager.MD.OnTick += MD_OnTick;
+            //TDManager.TD.OnCanceled += TD_OnCanceled;
+            //TDManager.TD.OnTrading += TD_OnTrading;
         }
 
         /// <summary>
@@ -244,17 +244,17 @@ namespace OptionMM
                 {
                     if (this.shortPosition.Position > adjustVolume)
                     {
-                        TDManager.TD.BuyToCover(this.instrumentID, adjustVolume, this.lastMarket.AskPrice1);
+                        //TDManager.TD.BuyToCover(this.instrumentID, adjustVolume, this.lastMarket.AskPrice1);
                     }
                     else
                     {
-                        TDManager.TD.BuyToCover(this.instrumentID, this.shortPosition.Position, this.lastMarket.AskPrice1);
-                        TDManager.TD.Buy(this.instrumentID, adjustVolume - this.shortPosition.Position, this.lastMarket.AskPrice1);
+                        //TDManager.TD.BuyToCover(this.instrumentID, this.shortPosition.Position, this.lastMarket.AskPrice1);
+                        //TDManager.TD.Buy(this.instrumentID, adjustVolume - this.shortPosition.Position, this.lastMarket.AskPrice1);
                     }
                 }
                 else
                 {
-                    TDManager.TD.Buy(instrumentID, adjustVolume, this.lastMarket.AskPrice1);
+                    //TDManager.TD.Buy(instrumentID, adjustVolume, this.lastMarket.AskPrice1);
                 }
             }
             else if (adjustVolume <= -8)
@@ -265,17 +265,17 @@ namespace OptionMM
                 {
                     if(this.longPosition.Position > adjustVolume)
                     {
-                        TDManager.TD.Sell(this.instrumentID, adjustVolume, this.lastMarket.BidPrice1);
+                        //TDManager.TD.Sell(this.instrumentID, adjustVolume, this.lastMarket.BidPrice1);
                     }
                     else
                     {
-                        TDManager.TD.Sell(this.instrumentID, this.longPosition.Position, this.lastMarket.BidPrice1);
-                        TDManager.TD.SellShort(this.instrumentID, adjustVolume - this.longPosition.Position, this.lastMarket.BidPrice1);
+                        //TDManager.TD.Sell(this.instrumentID, this.longPosition.Position, this.lastMarket.BidPrice1);
+                        //TDManager.TD.SellShort(this.instrumentID, adjustVolume - this.longPosition.Position, this.lastMarket.BidPrice1);
                     }
                 }
                 else
                 {
-                    TDManager.TD.SellShort(instrumentID, adjustVolume, this.lastMarket.BidPrice1);
+                    //TDManager.TD.SellShort(instrumentID, adjustVolume, this.lastMarket.BidPrice1);
                 }
             }
 

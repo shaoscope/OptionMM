@@ -15,6 +15,11 @@ namespace OptionMM
         public event EventHandler MarketUpdated;
 
         /// <summary>
+        /// 询价单到达时被触发
+        /// </summary>
+        public event EventHandler ForQuoteArrived;
+
+        /// <summary>
         /// 合约信息
         /// </summary>
         public ThostFtdcInstrumentField Contract { get; private set; }
@@ -61,6 +66,17 @@ namespace OptionMM
             if (this.MarketUpdated != null)
             {
                 this.MarketUpdated(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// 新询价单
+        /// </summary>
+        public void NewForQuote(ThostFtdcForQuoteRspField forQuoteField)
+        {
+            if(this.ForQuoteArrived != null)
+            {
+                this.ForQuoteArrived(this, EventArgs.Empty);
             }
         }
 

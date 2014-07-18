@@ -88,10 +88,13 @@ namespace OptionMM
             marketer.OnRspUserLogin += marketer_OnRspUserLogin;
             trader.OnFrontConnected += trader_OnFrontConnected;
             trader.OnRspUserLogin += trader_OnRspUserLogin;
-            trader.OnRspQryInstrument += trader_OnRspQryInstrument;
-            trader.OnRspQryInvestorPosition += trader_OnRspQryInvestorPosition;
             trader.OnRspQryTradingAccount += trader_OnRspQryTradingAccount;
-            //trader.OnRtnOrder +=  TDManager.TD.OnRtnOrder;
+            trader.OnRspQryInvestorPosition += trader_OnRspQryInvestorPosition;
+            trader.OnRspQryInstrument += trader_OnRspQryInstrument;
+            trader.OnRspQrySettlementInfo += trader_OnRspQrySettlementInfo;
+            trader.OnRspQrySettlementInfoConfirm += trader_OnRspQrySettlementInfoConfirm;
+            trader.OnRspSettlementInfoConfirm += trader_OnRspSettlementInfoConfirm;
+            //trader.OnRtnOrder += TDManager.TD.OnRtnOrder;
             //trader.OnRtnTrade += TDManager.TD.OnRtnTrade;
             trader.SubscribePublicTopic(EnumTeResumeType.THOST_TERT_QUICK);
             trader.SubscribePrivateTopic(EnumTeResumeType.THOST_TERT_QUICK);
@@ -118,17 +121,103 @@ namespace OptionMM
 
         void trader_OnRspUserLogin(ThostFtdcRspUserLoginField pRspUserLogin, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
+            this.SetMsg("正在查询结算结果确认信息……");
+            try
+            {
+                this.trader.ReqQrySettlementInfoConfirm(new ThostFtdcQrySettlementInfoConfirmField(), 0);
+            }
+            catch (Exception exp)
+            {
+                this.SetMsg("结算结果确认信息查询失败，" + exp.Message);
+            }
+        }
+
+        void trader_OnRspQrySettlementInfoConfirm(ThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+            DateTime dt = DateTime.ParseExact(pSettlementInfoConfirm.ConfirmDate, "yyyyMMdd", System.Globalization.CultureInfo.CurrentCulture);
+            if (dt.ToShortDateString() != DateTime.Today.ToShortDateString())
+            {
+                this.SetMsg("正在查询结算结果……");
+                try
+                {
+                    ThostFtdcQrySettlementInfoField field = new ThostFtdcQrySettlementInfoField();
+                    field.TradingDay = DateTime.Now.AddDays(-1).ToShortDateString();
+                    this.trader.ReqQrySettlementInfo(field, 0);
+                }
+                catch (Exception exp)
+                {
+                    this.SetMsg("结算结果查询失败，" + exp.Message);
+                }
+            }
+            else
+            {
+                this.DoQryTradingAccount();
+            }
+        }
+        void trader_OnRspQrySettlementInfo(ThostFtdcSettlementInfoField pSettlementInfo, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+            this.BeginInvoke(new Action<ThostFtdcSettlementInfoField>(processRspQrySettlementInfo), pSettlementInfo);
+        }
+
+        /// <summary>
+        /// 处理投资者结算结果响应
+        /// </summary>
+        void processRspQrySettlementInfo(ThostFtdcSettlementInfoField pSettlementInfo)
+        {
+            SettlementInfoConfirmDialog dialog = new SettlementInfoConfirmDialog();
+            if (pSettlementInfo.Content != null)
+            {
+                dialog.Content = pSettlementInfo.Content;
+            }
+            if (dialog.ShowDialog(this) == DialogResult.OK)
+            {
+                this.SetMsg("正在确认结算结果……");
+                try
+                {
+                    
+                    ThostFtdcSettlementInfoConfirmField field = new ThostFtdcSettlementInfoConfirmField();
+                    field.ConfirmDate = DateTime.Now.ToShortDateString();
+                    field.ConfirmTime = DateTime.Now.ToShortTimeString();
+                    this.trader.ReqSettlementInfoConfirm(field, 0);
+                }
+                catch (Exception exp)
+                {
+                    this.SetMsg("结算结果确认失败，" + exp.Message);
+                }
+            }
+            else
+            {
+                this.SetMsg("用户取消了操作！");
+            }
+        }
+        void trader_OnRspSettlementInfoConfirm(ThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+            if (pRspInfo.ErrorID != 0)
+            {
+                this.SetMsg("结算结果确认失败，" + pRspInfo.ErrorMsg);
+            }
+            else
+            {
+                this.DoQryTradingAccount();
+            }
+        }
+
+        /// <summary>
+        /// 查询资金账户
+        /// </summary>
+        void DoQryTradingAccount()
+        {
             this.SetMsg("正在查询资金账户……");
             try
             {
-                trader.ReqQryTradingAccount(new ThostFtdcQryTradingAccountField(), 0);
+                Thread.Sleep(1000);
+                this.trader.ReqQryTradingAccount(new ThostFtdcQryTradingAccountField(), 0);
             }
             catch (Exception exp)
             {
                 this.SetMsg("资金账户查询失败，" + exp.Message);
             }
         }
-
         void trader_OnRspQryTradingAccount(ThostFtdcTradingAccountField pTradingAccount, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             this.SetMsg("正在查询投资者持仓……");

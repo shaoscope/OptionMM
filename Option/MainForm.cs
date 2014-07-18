@@ -86,6 +86,11 @@ namespace OptionMM
         public MarketManager MarketManeger { get; private set; }
 
         /// <summary>
+        /// 报价管理器
+        /// </summary>
+        public TradeManager TraderManager { get; private set; }
+
+        /// <summary>
         /// 启动报价任务
         /// </summary>
         private Task startUpMMTask;
@@ -101,7 +106,8 @@ namespace OptionMM
             }
             this.trader = loginForm.trader;
             this.marketer = loginForm.marketer;
-            //订阅行情
+
+            #region 订阅行情
             this.InstrumentsList = loginForm.instrumentsList;
             this.InvestorPositionList = loginForm.investorPositionList;
             MarketManeger = new MarketManager(this.marketer);
@@ -126,13 +132,12 @@ namespace OptionMM
             }
 
             this.marketer.OnRtnDepthMarketData += marketer_OnRtnDepthMarketData;
-
-            #region 加载报价面板
-            
-            //this.quoteFormToolStripMenuItem.PerformClick();
+            this.marketer.OnRtnForQuoteRsp += marketer_OnRtnForQuoteRsp;
             #endregion
 
-
+            TraderManager = new TradeManager(trader);
+            trader.OnRtnOrder += TraderManager.OnRtnOrder;
+            trader.OnRtnTrade += TraderManager.OnRtnTrade;
 
             //Dictionary<string, string[]> MMConfigValues = ReadOptionXML("Option.xml");
             //Future = new Future("IF1407");
@@ -182,6 +187,19 @@ namespace OptionMM
             //this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 5 * 1000);
             //this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
             //this.writeXmlTimer = new System.Threading.Timer(this.writerXmlCallBack, null, 10 * 1000, 10 * 1000);
+        }
+
+        /// <summary>
+        /// 询价到达时的处理
+        /// </summary>
+        /// <param name="forQuoteField"></param>
+        void marketer_OnRtnForQuoteRsp(ThostFtdcForQuoteRspField forQuoteField)
+        {
+            ActiveContract activeContract;
+            if (MarketManeger.ActiveContractDictionary.TryGetValue(forQuoteField.InstrumentID, out activeContract))
+            {
+                activeContract.NewForQuote(forQuoteField);
+            }
         }
 
         /// <summary>

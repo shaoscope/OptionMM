@@ -181,13 +181,13 @@ namespace OptionMM
         /// </summary>
         public void Configuration()
         {
-            MDManager.MD.SubscribeMarketData(new string[] { this.longOption.InstrumentID, this.shortOption.InstrumentID });
-            MDManager.MD.OnTick += MD_OnTick;
-            TDManager.TD.OnCanceled += TD_OnCanceled;
-            TDManager.TD.OnTraded += TD_OnTraded;
-            TDManager.TD.OnTrading += TD_OnTrading;
-            TDManager.TD.OnCancelAction += TD_OnCancelAction;
-            TDManager.TD.OnOrderRefReplace += TD_OnOrderRefReplace;
+            //MDManager.MD.SubscribeMarketData(new string[] { this.longOption.InstrumentID, this.shortOption.InstrumentID });
+            //MDManager.MD.OnTick += MD_OnTick;
+            //TDManager.TD.OnCanceled += TD_OnCanceled;
+            //TDManager.TD.OnTraded += TD_OnTraded;
+            //TDManager.TD.OnTrading += TD_OnTrading;
+            //TDManager.TD.OnCancelAction += TD_OnCancelAction;
+            //TDManager.TD.OnOrderRefReplace += TD_OnOrderRefReplace;
             //刷新面板定时器
             this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
         }

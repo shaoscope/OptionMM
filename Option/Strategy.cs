@@ -54,14 +54,14 @@ namespace OptionMM
         /// </summary>
         public void Configuration()
         {
-            MDManager.MD.SubscribeMarketData(new string[] { this.option.InstrumentID });
-            MDManager.MD.OnTick += MD_OnTick;
-            MDManager.MD.OnForQuote += MD_OnForQuote;
-            TDManager.TD.OnCanceled += TD_OnCanceled;
-            TDManager.TD.OnTraded += TD_OnTraded;
-            TDManager.TD.OnTrading += TD_OnTrading;
-            TDManager.TD.OnCancelAction += TD_OnCancelAction;
-            TDManager.TD.OnOrderRefReplace += TD_OnOrderRefReplace;
+            //MDManager.MD.SubscribeMarketData(new string[] { this.option.InstrumentID });
+            //MDManager.MD.OnTick += MD_OnTick;
+            //MDManager.MD.OnForQuote += MD_OnForQuote;
+            //TDManager.TD.OnCanceled += TD_OnCanceled;
+            //TDManager.TD.OnTraded += TD_OnTraded;
+            //TDManager.TD.OnTrading += TD_OnTrading;
+            //TDManager.TD.OnCancelAction += TD_OnCancelAction;
+            //TDManager.TD.OnOrderRefReplace += TD_OnOrderRefReplace;
             //刷新面板定时器
             this.panelRefreshTimer = new System.Threading.Timer(this.panelRefreshCallback, null, 1000, 1000);
         }
@@ -89,7 +89,7 @@ namespace OptionMM
                 int cancelOrderResult = -1;
                 do
                 {
-                    cancelOrderResult = TDManager.TD.CancelOrder(pInputOrderAction);
+                    //cancelOrderResult = TDManager.TD.CancelOrder(pInputOrderAction);
                 }
                 while (cancelOrderResult != 0);
             }
@@ -831,7 +831,7 @@ namespace OptionMM
                 int cancelOrderResult = -1;
                 do
                 {
-                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.LongOptionOrder);
+                    //cancelOrderResult = TDManager.TD.CancelOrder(this.option.LongOptionOrder);
                 }
                 while (cancelOrderResult != 0);
             }
@@ -840,7 +840,7 @@ namespace OptionMM
                 int cancelOrderResult = -1;
                 do
                 {
-                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.ShortOptionOrder);
+                    //cancelOrderResult = TDManager.TD.CancelOrder(this.option.ShortOptionOrder);
                 }
                 while (cancelOrderResult != 0);
             }
@@ -849,7 +849,7 @@ namespace OptionMM
                 int cancelOrderResult = -1;
                 do
                 {
-                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseLongOptionOrder);
+                    //cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseLongOptionOrder);
                 }
                 while (cancelOrderResult != 0);
             }
@@ -858,7 +858,7 @@ namespace OptionMM
                 int cancelOrderResult = -1;
                 do
                 {
-                    cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseShortOptionOrder);
+                    //cancelOrderResult = TDManager.TD.CancelOrder(this.option.CloseShortOptionOrder);
                 }
                 while (cancelOrderResult != 0);
             }
@@ -909,8 +909,8 @@ namespace OptionMM
             #region 直接开仓
             if (bidQuote >= 0.1)
             {
-                this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
-                this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
+                //this.option.PlaceLongOptionOrderRef = TDManager.TD.Buy(this.option.InstrumentID, placeOrderVolume, bidQuote);
+                //this.option.PlaceShortOptionOrderRef = TDManager.TD.SellShort(this.option.InstrumentID, placeOrderVolume, askQuote);
             }
             #endregion
         }
