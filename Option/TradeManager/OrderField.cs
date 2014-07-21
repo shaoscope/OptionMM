@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using System.Threading;
+using System.Reflection;
 using CTP;
 
 namespace OptionMM
@@ -11,7 +14,7 @@ namespace OptionMM
     public delegate void PositionHandle(ThostFtdcInvestorPositionField position);
     public delegate void OrderRefReplaceHandle(string orderrefold, string orderrefnew);
 
-    public class Order
+    public class OrderField
     {
         public ThostFtdcInputOrderField InputOrder;
         public ThostFtdcInputQuoteField InputQuote;
@@ -22,15 +25,15 @@ namespace OptionMM
         public string OrderRef;
         //重发前标志
         public List<string> OrigialOrderRef = new List<string>();   //OrigialSignal
-        public ThostFtdcOrderField OrderField;
+        public ThostFtdcOrderField Order;
 
-        public Order(ThostFtdcInputOrderField pInput, DateTime pTime)
+        public OrderField(ThostFtdcInputOrderField pInput, DateTime pTime)
         {
             InputOrder = pInput;
             InputTime = pTime;
         }
 
-        public Order(ThostFtdcInputQuoteField pInput, DateTime pTime)
+        public OrderField(ThostFtdcInputQuoteField pInput, DateTime pTime)
         {
             InputQuote = pInput;
             InputTime = pTime;

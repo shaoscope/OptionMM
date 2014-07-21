@@ -49,7 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveContract.cs" />
-    <Compile Include="BilateralQuotation.cs" />
     <Compile Include="Covered.cs" />
     <Compile Include="CoveredPanel.cs">
       <SubType>UserControl</SubType>
@@ -65,9 +64,10 @@
     </Compile>
     <Compile Include="FullPath.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="MarketManager.cs" />
-    <Compile Include="Order.cs" />
+    <Compile Include="MarketManager\MarketManager.cs" />
+    <Compile Include="TradeManager\OrderField.cs" />
     <Compile Include="Quote.cs" />
+    <Compile Include="TradeManager\QuoteField.cs" />
     <Compile Include="QuoteForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -80,11 +80,13 @@
     <Compile Include="QuotePanel.Designer.cs">
       <DependentUpon>QuotePanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="TradeManager\SendOrderManager.cs" />
+    <Compile Include="TradeManager\SendQuoteManager.cs" />
     <Compile Include="SettlementInfoConfirmDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SettlementInfoConfirmDialog.Designer.cs" />
-    <Compile Include="TradeManager.cs" />
+    <Compile Include="TradeManager\TradeManager.cs" />
     <Compile Include="Vertical.cs" />
     <Compile Include="Parity.cs" />
     <Compile Include="VerticalPanel.cs">

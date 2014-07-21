@@ -66,7 +66,18 @@ namespace OptionMM
             this.put.ForQuoteArrived += put_ForQuoteArrived;
             this.underlying = underlying;
             this.underlying.MarketUpdated += underlying_MarketUpdated;
+            this.OnTrade += Quote_OnTrade;
             this.QuotePanelRefreshTimer = new System.Threading.Timer(this.QuotePanelRefreshCallback, null, 1000, 1000);
+        }
+
+        /// <summary>
+        /// 报价有成交时方法被调用
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Quote_OnTrade(object sender, EventArgs e)
+        {
+            
         }
 
         /// <summary>

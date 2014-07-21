@@ -134,24 +134,31 @@ namespace OptionMM
 
         void trader_OnRspQrySettlementInfoConfirm(ThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
-            DateTime dt = DateTime.ParseExact(pSettlementInfoConfirm.ConfirmDate, "yyyyMMdd", System.Globalization.CultureInfo.CurrentCulture);
-            if (dt.ToShortDateString() != DateTime.Today.ToShortDateString())
+            if (pSettlementInfoConfirm != null)
             {
-                this.SetMsg("正在查询结算结果……");
-                try
+                DateTime dt = DateTime.ParseExact(pSettlementInfoConfirm.ConfirmDate, "yyyyMMdd", System.Globalization.CultureInfo.CurrentCulture);
+                if (dt.ToShortDateString() != DateTime.Today.ToShortDateString())
                 {
-                    ThostFtdcQrySettlementInfoField field = new ThostFtdcQrySettlementInfoField();
-                    field.TradingDay = DateTime.Now.AddDays(-1).ToShortDateString();
-                    this.trader.ReqQrySettlementInfo(field, 0);
+                    this.SetMsg("正在查询结算结果……");
+                    try
+                    {
+                        ThostFtdcQrySettlementInfoField field = new ThostFtdcQrySettlementInfoField();
+                        field.TradingDay = DateTime.Now.AddDays(-1).ToShortDateString();
+                        this.trader.ReqQrySettlementInfo(field, 0);
+                    }
+                    catch (Exception exp)
+                    {
+                        this.SetMsg("结算结果查询失败，" + exp.Message);
+                    }
                 }
-                catch (Exception exp)
+                else
                 {
-                    this.SetMsg("结算结果查询失败，" + exp.Message);
+                    this.DoQryTradingAccount();
                 }
             }
             else
             {
-                this.DoQryTradingAccount();
+                //exit_Button.PerformClick();
             }
         }
         void trader_OnRspQrySettlementInfo(ThostFtdcSettlementInfoField pSettlementInfo, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
