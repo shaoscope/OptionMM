@@ -65,6 +65,7 @@
     <Compile Include="FullPath.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MarketManager\MarketManager.cs" />
+    <Compile Include="MatrixEquation.cs" />
     <Compile Include="TradeManager\OrderField.cs" />
     <Compile Include="Quote.cs" />
     <Compile Include="TradeManager\QuoteField.cs" />

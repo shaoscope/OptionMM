@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using CTP;
 using System.Threading;
+using System.Globalization;
 
 namespace OptionMM
 {
@@ -33,6 +34,7 @@ namespace OptionMM
         string BrokerID;
         string InvestorID;
         string Password;
+        int requestID = 0;
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -111,7 +113,7 @@ namespace OptionMM
                 req.BrokerID = BrokerID;
                 req.UserID = InvestorID;
                 req.Password = Password;
-                trader.ReqUserLogin(req, 0);
+                trader.ReqUserLogin(req, requestID++);
             }
             catch (Exception exp)
             {
@@ -124,7 +126,7 @@ namespace OptionMM
             this.SetMsg("正在查询结算结果确认信息……");
             try
             {
-                this.trader.ReqQrySettlementInfoConfirm(new ThostFtdcQrySettlementInfoConfirmField(), 0);
+                this.trader.ReqQrySettlementInfoConfirm(new ThostFtdcQrySettlementInfoConfirmField(), requestID++);
             }
             catch (Exception exp)
             {
@@ -134,33 +136,46 @@ namespace OptionMM
 
         void trader_OnRspQrySettlementInfoConfirm(ThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
-            if (pSettlementInfoConfirm != null)
+            if (pSettlementInfoConfirm == null)
             {
-                DateTime dt = DateTime.ParseExact(pSettlementInfoConfirm.ConfirmDate, "yyyyMMdd", System.Globalization.CultureInfo.CurrentCulture);
-                if (dt.ToShortDateString() != DateTime.Today.ToShortDateString())
+                this.SetMsg("正在查询结算结果……");
+                try
                 {
-                    this.SetMsg("正在查询结算结果……");
-                    try
-                    {
-                        ThostFtdcQrySettlementInfoField field = new ThostFtdcQrySettlementInfoField();
-                        field.TradingDay = DateTime.Now.AddDays(-1).ToShortDateString();
-                        this.trader.ReqQrySettlementInfo(field, 0);
-                    }
-                    catch (Exception exp)
-                    {
-                        this.SetMsg("结算结果查询失败，" + exp.Message);
-                    }
+                    ThostFtdcQrySettlementInfoField field = new ThostFtdcQrySettlementInfoField();
+                    field.TradingDay = DateTime.Now.AddDays(-1).ToShortDateString();
+                    this.trader.ReqQrySettlementInfo(field, requestID++);
                 }
-                else
+                catch (Exception exp)
                 {
-                    this.DoQryTradingAccount();
+                    this.SetMsg("结算结果查询失败，" + exp.Message);
                 }
             }
             else
             {
-                //exit_Button.PerformClick();
+                this.DoQryTradingAccount();
             }
+
+            //DateTime dt = DateTime.ParseExact(pSettlementInfoConfirm.ConfirmDate, "yyyyMMdd", CultureInfo.CurrentCulture);
+            //if (dt.ToShortDateString() != DateTime.Today.ToShortDateString())
+            //{
+            //    this.SetMsg("正在查询结算结果……");
+            //    try
+            //    {
+            //        ThostFtdcQrySettlementInfoField field = new ThostFtdcQrySettlementInfoField();
+            //        field.TradingDay = DateTime.Now.AddDays(-1).ToShortDateString();
+            //        this.trader.ReqQrySettlementInfo(field, requestID++);
+            //    }
+            //    catch (Exception exp)
+            //    {
+            //        this.SetMsg("结算结果查询失败，" + exp.Message);
+            //    }
+            //}
+            //else
+            //{
+            //    this.DoQryTradingAccount();
+            //}
         }
+
         void trader_OnRspQrySettlementInfo(ThostFtdcSettlementInfoField pSettlementInfo, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             this.BeginInvoke(new Action<ThostFtdcSettlementInfoField>(processRspQrySettlementInfo), pSettlementInfo);
@@ -185,7 +200,7 @@ namespace OptionMM
                     ThostFtdcSettlementInfoConfirmField field = new ThostFtdcSettlementInfoConfirmField();
                     field.ConfirmDate = DateTime.Now.ToShortDateString();
                     field.ConfirmTime = DateTime.Now.ToShortTimeString();
-                    this.trader.ReqSettlementInfoConfirm(field, 0);
+                    this.trader.ReqSettlementInfoConfirm(field, requestID++);
                 }
                 catch (Exception exp)
                 {
@@ -218,7 +233,7 @@ namespace OptionMM
             try
             {
                 Thread.Sleep(1000);
-                this.trader.ReqQryTradingAccount(new ThostFtdcQryTradingAccountField(), 0);
+                this.trader.ReqQryTradingAccount(new ThostFtdcQryTradingAccountField(), requestID++);
             }
             catch (Exception exp)
             {
@@ -231,7 +246,7 @@ namespace OptionMM
             try
             {
                 Thread.Sleep(1000);
-                trader.ReqQryInvestorPosition(new ThostFtdcQryInvestorPositionField(), 0);
+                trader.ReqQryInvestorPosition(new ThostFtdcQryInvestorPositionField(), requestID++);
             }
             catch (Exception exp)
             {
@@ -250,7 +265,7 @@ namespace OptionMM
             try
             {
                 Thread.Sleep(1000);
-                trader.ReqQryInstrument(new ThostFtdcQryInstrumentField(), 0);
+                trader.ReqQryInstrument(new ThostFtdcQryInstrumentField(), requestID++);
             }
             catch (Exception exp)
             {
@@ -278,7 +293,7 @@ namespace OptionMM
                 req.BrokerID = BrokerID;
                 req.UserID = InvestorID;
                 req.Password = Password;
-                marketer.ReqUserLogin(req, 0);
+                marketer.ReqUserLogin(req, requestID++);
             }
             catch (Exception exp)
             {
