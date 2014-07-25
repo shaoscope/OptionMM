@@ -180,7 +180,7 @@ namespace OptionMM
                     { 
                         max = gauss[i, j]; 
                         k = i; 
-                    } 
+                    }
                 }                  
                 //判断j行否为最大值行 若不是将j行调换为最大值行                 
                 if (k != j)

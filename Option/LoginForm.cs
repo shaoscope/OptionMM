@@ -187,7 +187,7 @@ namespace OptionMM
         void processRspQrySettlementInfo(ThostFtdcSettlementInfoField pSettlementInfo)
         {
             SettlementInfoConfirmDialog dialog = new SettlementInfoConfirmDialog();
-            if (pSettlementInfo.Content != null)
+            if (pSettlementInfo != null && pSettlementInfo.Content != null)
             {
                 dialog.Content = pSettlementInfo.Content;
             }
