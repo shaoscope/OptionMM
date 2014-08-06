@@ -81,6 +81,11 @@ namespace OptionMM
         public QuoteForm QuoteForm { get; private set; }
 
         /// <summary>
+        /// 波动率窗口
+        /// </summary>
+        public VolatilityForm VolatilityForm { get; private set; }
+
+        /// <summary>
         /// 行情管理器
         /// </summary>
         public MarketManager MarketManeger { get; private set; }
@@ -136,8 +141,8 @@ namespace OptionMM
             #endregion
 
             TraderManager = new TradeManager(trader);
-            trader.OnRtnOrder += TraderManager.OnRtnOrder;
-            trader.OnRtnTrade += TraderManager.OnRtnTrade;
+            //trader.OnRtnOrder += TraderManager.OnRtnOrder;
+            //trader.OnRtnTrade += TraderManager.OnRtnTrade;
 
             //Dictionary<string, string[]> MMConfigValues = ReadOptionXML("Option.xml");
             //Future = new Future("IF1407");
@@ -773,7 +778,7 @@ namespace OptionMM
                     ActiveContract underlying;
                     if (MarketManeger.ActiveContractDictionary.TryGetValue(callID, out call) &&
                         MarketManeger.ActiveContractDictionary.TryGetValue(putID, out put) &&
-                        MarketManeger.ActiveContractDictionary.TryGetValue("IF1407", out underlying))
+                        MarketManeger.ActiveContractDictionary.TryGetValue("IF1408", out underlying))
                     {
                         Quote quote = new Quote(call, put, underlying);
                         QuoteForm.quotePanel.AddQuote(quote);
@@ -788,6 +793,27 @@ namespace OptionMM
             else
             {
                 QuoteForm.Show(dockPanel);
+            }
+        }
+
+        /// <summary>
+        /// 打开波动率窗口
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void 波动率ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            VolatilityForm = new VolatilityForm();
+
+
+            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
+            {
+                VolatilityForm.MdiParent = this;
+                VolatilityForm.Show();
+            }
+            else
+            {
+                VolatilityForm.Show(dockPanel);
             }
         }
 

@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,9 +67,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="MarketManager\MarketManager.cs" />
     <Compile Include="MatrixEquation.cs" />
-    <Compile Include="TradeManager\OrderField.cs" />
     <Compile Include="Quote.cs" />
-    <Compile Include="TradeManager\QuoteField.cs" />
     <Compile Include="QuoteForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -81,8 +80,6 @@
     <Compile Include="QuotePanel.Designer.cs">
       <DependentUpon>QuotePanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="TradeManager\SendOrderManager.cs" />
-    <Compile Include="TradeManager\SendQuoteManager.cs" />
     <Compile Include="SettlementInfoConfirmDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -147,6 +144,12 @@
     <Compile Include="StaticFunction.cs" />
     <Compile Include="Greeks.cs" />
     <Compile Include="Strategy.cs" />
+    <Compile Include="VolatilityForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VolatilityForm.Designer.cs">
+      <DependentUpon>VolatilityForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="CoveredPanel.resx">
       <DependentUpon>CoveredPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -187,6 +190,9 @@
     </Compile>
     <EmbeddedResource Include="RiskManagementForm.resx">
       <DependentUpon>RiskManagementForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VolatilityForm.resx">
+      <DependentUpon>VolatilityForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">

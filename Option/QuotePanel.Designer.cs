@@ -113,7 +113,7 @@ namespace OptionMM
             this.dataTable.RowHeadersVisible = false;
             this.dataTable.RowTemplate.Height = 23;
             this.dataTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataTable.Size = new System.Drawing.Size(1003, 100);
+            this.dataTable.Size = new System.Drawing.Size(1116, 100);
             this.dataTable.TabIndex = 0;
             this.dataTable.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataTable_CellMouseDoubleClick);
             this.dataTable.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataTable_CellMouseDown);
@@ -355,7 +355,7 @@ namespace OptionMM
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.dataTable);
             this.Name = "QuotePanel";
-            this.Size = new System.Drawing.Size(1003, 100);
+            this.Size = new System.Drawing.Size(1116, 100);
             ((System.ComponentModel.ISupportInitialize)(this.dataTable)).EndInit();
             this.ResumeLayout(false);
 
@@ -363,7 +363,6 @@ namespace OptionMM
 
         #endregion
 
-        private DoubleBufferedDataGridView dataTable;
         private DataGridViewTextBoxColumn cCallLongOpenInterest;
         private DataGridViewTextBoxColumn cCallTodayLongOpenInterest;
         private DataGridViewTextBoxColumn cCallBidQuote;
@@ -385,5 +384,6 @@ namespace OptionMM
         private DataGridViewTextBoxColumn cPutAskQuote;
         private DataGridViewTextBoxColumn cPutTodayShortOpenInterest;
         private DataGridViewTextBoxColumn cPutOpenInterest;
+        public DoubleBufferedDataGridView dataTable;
     }
 }

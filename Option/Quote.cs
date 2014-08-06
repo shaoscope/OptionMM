@@ -68,6 +68,8 @@ namespace OptionMM
             this.underlying.MarketUpdated += underlying_MarketUpdated;
             this.OnTrade += Quote_OnTrade;
             this.QuotePanelRefreshTimer = new System.Threading.Timer(this.QuotePanelRefreshCallback, null, 1000, 1000);
+            this.call_MarketUpdated(this, EventArgs.Empty);
+            this.put_MarketUpdated(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -152,28 +154,12 @@ namespace OptionMM
             {
                 return;
             }
-            //this.Cells[0].Value = quote.call.LongPosition.Position;
-            //this.Cells[1].Value = quote.call.LongPosition.TodayPosition;
-            //this.Cells[2].Value = "";
             setPriceCell(this.Cells[3], call.MarketData.BidPrice1, call.PreMarketData.LastPrice, call.MarketData.PreClosePrice);
-            //this.Cells[4].Value = "";
             setPriceCell(this.Cells[5], call.MarketData.AskPrice1, call.PreMarketData.LastPrice, call.MarketData.PreClosePrice);
-            //this.Cells[6].Value = "";
-            //this.Cells[7].Value = quote.call.ShortPosition.TodayPosition;
-            //this.Cells[8].Value = quote.call.ShortPosition.Position;
-            //this.Cells[9].Value = "";
-            //string[] temp = quote.call.Contract.InstrumentID.Split('-');
-            //this.Cells[10].Value = temp[0] + " " + temp[2];
-            //this.Cells[11].Value = "";
-            //this.Cells[12].Value = quote.put.LongPosition.Position;
-            //this.Cells[13].Value = quote.put.LongPosition.TodayPosition;
-            //this.Cells[14].Value = "";
+            this.Cells[9].Value = call.ImpliedVolatility;
+            this.Cells[11].Value = put.ImpliedVolatility;
             setPriceCell(this.Cells[15], put.MarketData.BidPrice1, put.PreMarketData.LastPrice, put.MarketData.PreClosePrice);
-            //this.Cells[16].Value = "";
             setPriceCell(this.Cells[17], put.MarketData.AskPrice1, put.PreMarketData.LastPrice, put.MarketData.PreClosePrice);
-            //this.Cells[18].Value = "";
-            //this.Cells[19].Value = quote.put.ShortPosition.TodayPosition;
-            //this.Cells[20].Value = quote.put.ShortPosition.Position; 
         }
 
         /// <summary>
@@ -190,13 +176,17 @@ namespace OptionMM
         /// </summary>
         void call_MarketUpdated(object sender, EventArgs e)
         {
-            ThostFtdcDepthMarketDataField marketData = call.MarketData;
-            if (marketData != null)
+            if (call.MarketData != null && underlying.MarketData != null)
             {
-                ThostFtdcDepthMarketDataField preMarketData = call.PreMarketData ?? marketData;
-                //计算期权相关值
-
-                
+                //计算期权理论价格
+                OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.call.OptionType,
+                    this.underlying.MarketData.LastPrice, this.call.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility,
+                    StaticFunction.GetDaysToMaturity(this.call.Contract.InstrumentID));
+                this.call.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
+                //计算隐含波动率
+                this.call.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.underlying.MarketData.LastPrice, 
+                    this.call.StrikePrice, StaticFunction.GetDaysToMaturity(this.call.Contract.InstrumentID), 
+                    GlobalValues.InterestRate, this.call.MarketData.LastPrice, this.call.OptionType);
 
             }
         }
@@ -208,11 +198,18 @@ namespace OptionMM
         /// <param name="e"></param>
         void put_MarketUpdated(object sender, EventArgs e)
         {
-            ThostFtdcDepthMarketDataField marketData = put.MarketData;
-            if (marketData != null)
+            //计算期权相关值
+            if (put.MarketData != null && underlying.MarketData != null)
             {
-                ThostFtdcDepthMarketDataField preMarketData = put.PreMarketData ?? marketData;
-                //计算期权相关值
+                //计算期权理论价格
+                OptionPricingModelParams optionPricingModelParams = new OptionPricingModelParams(this.put.OptionType,
+                    this.underlying.MarketData.LastPrice, this.put.StrikePrice, GlobalValues.InterestRate, GlobalValues.Volatility,
+                    StaticFunction.GetDaysToMaturity(this.put.Contract.InstrumentID));
+                this.put.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
+                //计算隐含波动率
+                this.put.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.underlying.MarketData.LastPrice, 
+                    this.put.StrikePrice, StaticFunction.GetDaysToMaturity(this.put.Contract.InstrumentID), 
+                    GlobalValues.InterestRate, this.put.MarketData.LastPrice, this.put.OptionType);
 
             }
         }
@@ -250,7 +247,7 @@ namespace OptionMM
             {
                 cell.Style.SelectionBackColor = cell.Style.BackColor = Color.LightGreen;
             }
-            cell.Value = price;
+            cell.Value = price > 99999 ? double.NaN : price;
         }
 
         /// <summary>
@@ -264,8 +261,6 @@ namespace OptionMM
             if (marketData != null)
             {
                 ThostFtdcDepthMarketDataField preMarketData = underlying.PreMarketData ?? marketData;
-
-
             }
         }
 

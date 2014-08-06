@@ -87,6 +87,7 @@
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
+            this.波动率ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusBar.SuspendLayout();
             this.SuspendLayout();
@@ -352,7 +353,8 @@
             // 
             this.menuItemWindow.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemNewWindow,
-            this.quoteFormToolStripMenuItem});
+            this.quoteFormToolStripMenuItem,
+            this.波动率ToolStripMenuItem});
             this.menuItemWindow.MergeIndex = 2;
             this.menuItemWindow.Name = "menuItemWindow";
             this.menuItemWindow.Size = new System.Drawing.Size(67, 21);
@@ -368,7 +370,7 @@
             // 
             this.quoteFormToolStripMenuItem.Name = "quoteFormToolStripMenuItem";
             this.quoteFormToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.quoteFormToolStripMenuItem.Text = "&Quote Form";
+            this.quoteFormToolStripMenuItem.Text = "报价";
             this.quoteFormToolStripMenuItem.Click += new System.EventHandler(this.quoteFormToolStripMenuItem_Click);
             // 
             // menuItemHelp
@@ -462,6 +464,13 @@
             this.dockPanel.Skin = dockPanelSkin1;
             this.dockPanel.TabIndex = 11;
             // 
+            // 波动率ToolStripMenuItem
+            // 
+            this.波动率ToolStripMenuItem.Name = "波动率ToolStripMenuItem";
+            this.波动率ToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.波动率ToolStripMenuItem.Text = "波动率";
+            this.波动率ToolStripMenuItem.Click += new System.EventHandler(this.波动率ToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -528,6 +537,7 @@
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.ToolStripMenuItem quoteFormToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 波动率ToolStripMenuItem;
 
 
     }

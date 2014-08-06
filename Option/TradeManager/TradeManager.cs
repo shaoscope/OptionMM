@@ -24,7 +24,7 @@ namespace OptionMM
         public TradeManager(CTPTraderAdapter trader)
         {
             this.trader = trader;
-            //AddEvent();
+            AddEvent();
         }
 
         /// <summary>
@@ -32,131 +32,45 @@ namespace OptionMM
         /// </summary>
         private void AddEvent()
         {
-            //trader.OnFrontConnected += new FrontConnected(OnFrontConnected);
-            //trader.OnFrontDisconnected += new FrontDisconnected(OnFrontDisconnected);
-            //trader.OnHeartBeatWarning += new HeartBeatWarning(OnHeartBeatWarning);
             trader.OnRspError += new RspError(OnRspError);
-            //api.OnRspUserLogin += new RspUserLogin(OnRspUserLogin);
             trader.OnRspOrderAction += new RspOrderAction(OnRspOrderAction);
-            //trader.OnRspQryOrder += new RspQryOrder(OnRspQryOrder);
-            //trader.OnRspQryTrade += new RspQryTrade(OnRspQryTrade);
             trader.OnErrRtnOrderInsert += new ErrRtnOrderInsert(OnErrRtnOrderInsert);
             trader.OnRspOrderInsert += new RspOrderInsert(OnRspOrderInsert);
-            //trader.OnRspQryInstrument += new RspQryInstrument(OnRspQryInstrument);
-            //trader.OnRspQryInvestorPosition += new RspQryInvestorPosition(OnRspQryInvestorPosition);
-            //trader.OnRspQryTradingAccount += new RspQryTradingAccount(OnRspQryTradingAccount);
-            //trader.OnRspSettlementInfoConfirm += new RspSettlementInfoConfirm(OnRspSettlementInfoConfirm);
-            //api.OnRtnOrder += new RtnOrder(OnRtnOrder);
-            //api.OnRtnTrade += new RtnTrade(OnRtnTrade);
+            trader.OnRtnOrder += new RtnOrder(OnRtnOrder);
+            trader.OnRtnTrade += new RtnTrade(OnRtnTrade);
             trader.OnErrRtnOrderAction += new ErrRtnOrderAction(OnErrRtnOrderAction);
 
             trader.OnRspForQuoteInsert += new RspForQuoteInsert(OnRspForQuoteInsert);     //询价录入请求响应
+            trader.OnRspQryForQuote += new RspQryForQuote(OnRspQryForQuote);           //请求查询询价响应
+            trader.OnErrRtnForQuoteInsert += new ErrRtnForQuoteInsert(OnErrRtnForQuoteInsert); //询价录入错误回报
+            trader.OnRspQryQuote += new RspQryQuote(OnRspQryQuote);               //请求查询报价响应
             trader.OnRspQuoteInsert += new RspQuoteInsert(OnRspQuoteInsert);           //报价录入请求响应
             trader.OnRspQuoteAction += new RspQuoteAction(OnRspQuoteAction);           //报价操作请求响应
-            trader.OnRspQryForQuote += new RspQryForQuote(OnRspQryForQuote);           //请求查询询价响应
-            trader.OnRspQryQuote += new RspQryQuote(OnRspQryQuote);               //请求查询报价响应
-            trader.OnErrRtnForQuoteInsert += new ErrRtnForQuoteInsert(OnErrRtnForQuoteInsert); //询价录入错误回报
             trader.OnRtnQuote += new RtnQuote(OnRtnQuote);                       //报价通知
             trader.OnErrRtnQuoteInsert += new ErrRtnQuoteInsert(OnErrRtnQuoteInsert);     //报价录入错误回报
             trader.OnErrRtnQuoteAction += new ErrRtnQuoteAction(OnErrRtnQuoteAction);   //报价操作错误回报
-            trader.OnRtnForQuoteRsp += new RtnForQuoteRsp(OnRtnForQuoteRsp);         //询价通知
+
+            trader.OnRspQryExecOrder += new RspQryExecOrder(OnRspQryExecOrder);                    //请求查询执行宣告响应
+            trader.OnRtnExecOrder += new RtnExecOrder(OnRtnExecOrder);                             //执行宣告通知
+            trader.OnErrRtnExecOrderInsert += new ErrRtnExecOrderInsert(OnErrRtnExecOrderInsert);  //执行宣告录入错误回报
+            trader.OnErrRtnExecOrderAction += new ErrRtnExecOrderAction(OnErrRtnExecOrderAction);  //执行宣告操作错误回报
+            trader.OnRspExecOrderInsert += new RspExecOrderInsert(OnRspExecOrderInsert);           //执行宣告录入请求响应
+            trader.OnRspExecOrderAction += new RspExecOrderAction(OnRspExecOrderAction);           //执行宣告操作请求响应
         }
 
         int iRequestID = 0;
-        int MaxOrderExcuteCount = 50;
+        object ReqLock = new object();
+        int iForQuoteRef = 0;
+        string BROKER_ID = null;
+        string INVESTOR_ID = null;
+        int QUOTE_REF = 0;
+        int ORDER_REF = 0;
+        ThostFtdcOrderField CurrentOrder = null;
 
         // 会话参数
         public int StgOrderRef; //策略报单，TD实例自己维护；
 
-        private Thread ReSender = null;    //重发线程
-
-        bool ReSendRun = false;
-        bool ReSendRunning = false;
-        bool IsReSending = false;
-        object CancelOrderLock = new object();
-        object CancelQuoteLock = new object();
-
         public List<ThostFtdcInvestorPositionField> positionList = new List<ThostFtdcInvestorPositionField>();
-
-        //报价指令第一次收到的两条OnRtnOrder指令
-        List<ThostFtdcOrderField> QuoteOrderList = new List<ThostFtdcOrderField>();
-
-        object APITradeLock = new object();
-        ThostFtdcOrderField CurrentOrder = null;
-
-        SendOrderManager orderManager = new SendOrderManager();
-        SendQuoteManager quoteManager = new SendQuoteManager();
-
-        /// <summary>
-        /// 订单重发器
-        /// </summary>
-        private void ReSendCallBack()
-        {
-            ReSendRun = true;
-            ReSendRunning = true;
-            while (ReSendRun)
-            {
-                lock (CancelOrderLock)
-                {
-                    //优先撤单
-                    List<ThostFtdcInputOrderActionField> ReCancelList = orderManager.ReCancelOrder();
-                    //重新撤单
-                    foreach (ThostFtdcInputOrderActionField CancelOrder in ReCancelList)
-                    {
-                        ReReqOrderAction(CancelOrder);
-                    }
-
-                }
-                lock (CancelQuoteLock)
-                {
-                    //优先撤单
-                    List<ThostFtdcInputQuoteActionField> ReCancelList = quoteManager.ReCancelQuote();
-                    //重新撤单
-                    foreach (ThostFtdcInputQuoteActionField CancelQuote in ReCancelList)
-                    {
-                        ReReqQuoteAction(CancelQuote);
-                    }
-                }
-
-                if (orderManager.GetReInputOrderCount() > 0)
-                {
-                    List<ThostFtdcInputOrderField> ReInputOrderList = orderManager.ReInputOrder();
-                    foreach (ThostFtdcInputOrderField req in ReInputOrderList)
-                    {
-                        ReReqOrderInsert(req);
-                    }
-                }
-                else if (quoteManager.GetReInputQuoteCount() > 0)
-                {
-                    List<ThostFtdcInputQuoteField> ReInputQuoteList = quoteManager.ReInputQuote();
-                    foreach (ThostFtdcInputQuoteField req in ReInputQuoteList)
-                    {
-                        ReReqQuoteInsert(req);
-                    }
-                }
-                else if (orderManager.GetWaitInputOrderCount() > 0)
-                {
-                    List<ThostFtdcInputOrderField> WaitInputOrderList = orderManager.WaitInputOrder();
-                    foreach (ThostFtdcInputOrderField req in WaitInputOrderList)
-                    {
-                        ReReqOrderInsert(req);
-                    }
-                }
-                else if (quoteManager.GetWaitInputQuoteCount() > 0)
-                {
-                    List<ThostFtdcInputQuoteField> WaitInputQuoteList = quoteManager.WaitInputQuote();
-                    foreach (ThostFtdcInputQuoteField req in WaitInputQuoteList)
-                    {
-                        ReReqQuoteInsert(req);
-                    }
-                }
-                else
-                    IsReSending = false;
-
-                Thread.Sleep(100);
-            }
-            ReSendRunning = false;
-        }
 
         /// <summary>
         /// Private
@@ -214,30 +128,144 @@ namespace OptionMM
                 pOrder.OrderSysID == "");
         }
 
-        /// <summary>
-        /// 重发
-        /// </summary>
-        /// <param name="req"></param>
-        private void ReReqQuoteInsert(ThostFtdcInputQuoteField req)//ThostFtdcInputOrderField req)
+
+        private ThostFtdcInputOrderActionField GetNewInputOrderActionField(ThostFtdcOrderField pOrder)
         {
-            DateTime logtime = DateTime.Now;
-            lock (APITradeLock)
-            {
-                trader.ReqQuoteInsert(req, ++iRequestID);
-            }
+            ThostFtdcInputOrderActionField req = new ThostFtdcInputOrderActionField();
+            ///操作标志
+            req.ActionFlag = CTP.EnumActionFlagType.Delete;
+            ///经纪公司代码
+            req.BrokerID = pOrder.BrokerID;
+            ///交易所代码
+            //	TThostFtdcExchangeIDType	ExchangeID;
+            req.ExchangeID = pOrder.ExchangeID;
+            ///前置编号
+            req.FrontID = pOrder.FrontID;
+            ///投资者代码
+            req.InvestorID = pOrder.InvestorID;
+            ///合约代码
+            req.InstrumentID = pOrder.InstrumentID;
+            ///报单引用
+            req.OrderRef = pOrder.OrderRef;
+            ///报单编号
+            req.OrderSysID = pOrder.OrderSysID;
+            //请求编号
+            //req.RequestID = pOrder.RequestID;
+            ///会话编号
+            req.SessionID = pOrder.SessionID;
+            ///用户代码
+            req.UserID = pOrder.UserID;
+            ///价格
+            //	TThostFtdcPriceType	LimitPrice;
+            ///数量变化
+            //	TThostFtdcVolumeType	VolumeChange;
+
+            return req;
         }
 
-        /// <summary>
-        /// 报单重发
-        /// </summary>
-        /// <param name="req"></param>
-        private void ReReqOrderInsert(ThostFtdcInputOrderField pInputOrder)//ThostFtdcInputOrderField req)
+        private ThostFtdcInputOrderField GetNewInputOrderField(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
         {
-            DateTime logtime = DateTime.Now;
-            lock (APITradeLock)
-            {
-                trader.ReqOrderInsert(pInputOrder, ++iRequestID);
-            }
+            ThostFtdcInputOrderField req = new ThostFtdcInputOrderField();
+            ///经纪公司代码
+            req.BrokerID = BROKER_ID;
+            ///投资者代码
+            req.InvestorID = INVESTOR_ID;
+            ///合约代码
+            req.InstrumentID = instrumentID;
+            ///用户代码
+            //	TThostFtdcUserIDType	UserID;
+            ///报单价格条件: 限价
+            req.OrderPriceType = CTP.EnumOrderPriceTypeType.LimitPrice;
+            ///买卖方向: 
+            req.Direction = DIRECTION;
+            ///组合开平标志: 开仓
+            req.CombOffsetFlag_0 = Offset;
+
+            ///组合投机套保标志
+            req.CombHedgeFlag_0 = CTP.EnumHedgeFlagType.Speculation;
+            ///价格
+            req.LimitPrice = price;
+            ///数量: 1
+            req.VolumeTotalOriginal = lots;
+            ///有效期类型: 当日有效
+            req.TimeCondition = CTP.EnumTimeConditionType.GFD;
+            ///GTD日期
+            //	TThostFtdcDateType	GTDDate;
+            ///成交量类型: 任何数量
+            req.VolumeCondition = CTP.EnumVolumeConditionType.AV;
+            ///最小成交量: 1
+            req.MinVolume = 1;
+            ///触发条件: 立即
+            req.ContingentCondition = CTP.EnumContingentConditionType.Immediately;
+            ///止损价
+            //	TThostFtdcPriceType	StopPrice;
+            ///强平原因: 非强平
+            req.ForceCloseReason = CTP.EnumForceCloseReasonType.NotForceClose;
+            ///自动挂起标志: 否
+            req.IsAutoSuspend = 0;
+            ///业务单元
+            //	TThostFtdcBusinessUnitType	BusinessUnit;
+            ///请求编号
+            //	TThostFtdcRequestIDType	RequestID;
+            ///用户强评标志: 否
+            req.UserForceClose = 0;
+            ORDER_REF++;
+            req.OrderRef = ORDER_REF.ToString();
+
+            return req;
+        }
+
+        private ThostFtdcInputQuoteField GetNewInputQuoteField(string instrumentID, EnumOffsetFlagType AskOffset, int Asklots, double Askprice,
+            EnumOffsetFlagType BidOffset, int Bidlots, double Bidprice)
+        {
+            ThostFtdcInputQuoteField req = new ThostFtdcInputQuoteField();
+            req.BrokerID = BROKER_ID;
+            req.InvestorID = INVESTOR_ID;
+            req.InstrumentID = instrumentID;
+            req.AskHedgeFlag = EnumHedgeFlagType.Speculation;
+            req.AskOffsetFlag = AskOffset;
+            req.AskPrice = Askprice;
+            req.AskVolume = Asklots;
+            req.BidHedgeFlag = EnumHedgeFlagType.Speculation;
+            req.BidOffsetFlag = BidOffset;
+            req.BidPrice = Bidprice;
+            req.BidVolume = Bidlots;
+            QUOTE_REF++;
+            req.QuoteRef = QUOTE_REF.ToString();
+
+            return req;
+        }
+
+        private ThostFtdcInputQuoteActionField GetNewInputQuoteActionField(ThostFtdcQuoteField pQuote)
+        {
+            ThostFtdcInputQuoteActionField req = new ThostFtdcInputQuoteActionField();
+            req.ActionFlag = EnumActionFlagType.Delete;
+            req.BrokerID = BROKER_ID;
+            req.FrontID = pQuote.FrontID;
+            req.ExchangeID = pQuote.ExchangeID;
+            req.InstrumentID = pQuote.InstrumentID;
+            req.InvestorID = pQuote.InvestorID;
+            req.QuoteRef = pQuote.QuoteRef;
+            req.SessionID = pQuote.SessionID;
+            req.UserID = pQuote.UserID;
+
+            return req;
+        }
+
+        private ThostFtdcInputQuoteActionField GetNewInputQuoteActionField(string QuoteRef, string InstrumentID, int FRONT_ID, int SESSION_ID)
+        {
+            ThostFtdcInputQuoteActionField req = new ThostFtdcInputQuoteActionField();
+            req.ActionFlag = EnumActionFlagType.Delete;
+            req.BrokerID = BROKER_ID;
+            req.FrontID = FRONT_ID;
+            //req.ExchangeID = pQuote.ExchangeID;
+            req.InstrumentID = InstrumentID;
+            req.InvestorID = INVESTOR_ID;
+            req.QuoteRef = QuoteRef;
+            req.SessionID = SESSION_ID;
+            //req.UserID = pQuote.UserID;
+
+            return req;
         }
         #endregion
 
@@ -249,13 +277,6 @@ namespace OptionMM
         {
             if (trader != null)
             {
-                ReSendRun = false;
-                Thread.Sleep(50);
-                if (ReSendRunning)
-                {
-                    ReSender.Abort();
-                }
-
                 trader.Release();
                 trader = null;
             }
@@ -337,15 +358,55 @@ namespace OptionMM
         #endregion
 
         /// <summary>
-        /// 报单、报价、行权、询价回调
+        /// 错误回调
         /// </summary>
         #region
+        void OnRspError(ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+            DateTime logtime = DateTime.Now;
+            IsErrorRspInfo(pRspInfo);
+        }
+        #endregion
+
+        /// <summary>
+        /// 报单
+        /// </summary>
+        #region
+        private string ReqOrderInsert(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
+        {
+            int iResult = 0;
+            ThostFtdcInputOrderField req = GetNewInputOrderField(DIRECTION, Offset, instrumentID, lots, price);
+            iResult = trader.ReqOrderInsert(req, ++iRequestID);
+            return req.OrderRef;
+        }
+
+        public int ReqOrderAction(ThostFtdcInputOrderActionField pInputOrderAction)
+        {
+            lock (ReqLock)
+            {
+                int iResult = 0;
+                iResult = trader.ReqOrderAction(pInputOrderAction, ++iRequestID);
+                return iResult;
+            }
+        }
+
+        public int ReqOrderAction(ThostFtdcOrderField pOrder)
+        {
+            lock (ReqLock)
+            {
+                int iResult = 0;
+                ThostFtdcInputOrderActionField req = GetNewInputOrderActionField(pOrder);
+                iResult = trader.ReqOrderAction(req, ++iRequestID);
+                return iResult;
+            }
+        }
+
         void OnRspOrderInsert(ThostFtdcInputOrderField pInputOrder, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             //交易系统已接收报单
             IsErrorRspInfo(pRspInfo);
             {
-                orderManager.AddInputOrderError(pInputOrder);
+
             }
         }
         /// <summary>
@@ -378,46 +439,6 @@ namespace OptionMM
                 //撤单错误，需要重撤
             }
         }
-        void OnErrRtnQuoteAction(ThostFtdcQuoteActionField pQuoteAction, ThostFtdcRspInfoField pRspInfo)
-        {
-            DateTime logtime = DateTime.Now;
-            if (pQuoteAction.OrderActionStatus == EnumOrderActionStatusType.Rejected)
-            {
-                //撤单错误，需要重撤
-            }
-        }
-        void OnRtnQuote(ThostFtdcQuoteField pQuote)
-        {
-            DateTime logtime = DateTime.Now;
-            if (IsMyQuote(pQuote))
-            {
-                if (pQuote.QuoteStatus == EnumOrderStatusType.Unknown)
-                {
-                    if (pQuote.ExchangeID != null && pQuote.ExchangeID != "" && pQuote.QuoteSysID != null && pQuote.QuoteSysID != "")
-                    {
-                        if (QuoteOrderList.Count == 2)
-                        {
-                            quoteManager.AddTradingOrderQuote(pQuote, QuoteOrderList);
-                            QuoteOrderList.Clear();
-                        }
-                        else
-                        {
-                            //CTP错误
-                        }
-                    }
-                    else if (pQuote.QuoteStatus == EnumOrderStatusType.Touched)
-                    {
-                        //流量超限，需要重报
-                        quoteManager.QuoteTouched(pQuote);
-                        IsReSending = true;
-                    }
-                    else if (pQuote.QuoteStatus == EnumOrderStatusType.Canceled)
-                    {
-                        quoteManager.QuoteCanceled(pQuote);
-                    }
-                }
-            }
-        }
 
         ///报单通知
         public void OnRtnOrder(ThostFtdcOrderField pOrder)
@@ -431,22 +452,7 @@ namespace OptionMM
                     {
                         if (pOrder.OrderStatus != EnumOrderStatusType.Unknown)
                         {
-                            if (orderManager.ContainsTrading(pOrder.OrderRef))
-                            {
-                                orderManager.UpdateTradingOrderMap(pOrder);
-                            }
-                            else
-                            {
-                                quoteManager.UpdateTradingQuoteMap(pOrder);
-                            }
-                        }
-                        else
-                        {
-                            if (!orderManager.ContainsTrading(pOrder.OrderRef))
-                            {
-                                //双边报价单，此处需要处理
-                                QuoteOrderList.Add(pOrder);
-                            }
+
                         }
                     }
                 }
@@ -455,65 +461,23 @@ namespace OptionMM
             {
                 if (IsMyOrder(pOrder))
                 {
-                    string SignalOrderRef = pOrder.OrderRef;
-                    //TradingOrderMap.Remove(Signal);
-                    bool bNeedCallBack = false;
-                    if (orderManager.ContainsTrading(SignalOrderRef))
-                    {
-                        int iCanceled = orderManager.OrderCanceled(pOrder);
-                        if (iCanceled == 0)
-                            bNeedCallBack = true;
-                        else if (iCanceled == 1)
-                            IsReSending = true;
-                    }
-                    else if (quoteManager.ContainsTrading(SignalOrderRef))
-                    {
-                        //双边报价单
-                        quoteManager.OrderCanceled(pOrder);
-                    }
-                    if (bNeedCallBack)
-                    {
-                    }
+
                 }
             }
             else if (pOrder.OrderStatus == EnumOrderStatusType.AllTraded)
             {
                 if (IsMyOrder(pOrder))
                 {
-                    string SignalOrderRef = pOrder.OrderRef;
-                    if (orderManager.ContainsTrading(SignalOrderRef))
-                    {
-                        orderManager.OrderFinished(pOrder);
-                    }
-                    else
-                    {
-                        quoteManager.OrderFinished(pOrder);
-                    }
+
                 }
             }
             else if (pOrder.OrderStatus == EnumOrderStatusType.PartTradedNotQueueing)
             {
-                string SignalOrderRef = pOrder.OrderRef;
-                if (orderManager.ContainsTrading(SignalOrderRef))
-                {
-                    orderManager.OrderFinished(pOrder);
-                }
-                else
-                {
-                    quoteManager.OrderFinished(pOrder);
-                }
+
             }
             else if (pOrder.OrderStatus == EnumOrderStatusType.NoTradeNotQueueing)
             {
-                string SignalOrderRef = pOrder.OrderRef;
-                if (orderManager.ContainsTrading(SignalOrderRef))
-                {
-                    orderManager.OrderFinished(pOrder);
-                }
-                else
-                {
-                    quoteManager.OrderFinished(pOrder);
-                }
+
             }
         }
 
@@ -529,16 +493,82 @@ namespace OptionMM
             }
         }
 
+        void OnErrRtnOrderInsert(ThostFtdcInputOrderField pInputOrder, ThostFtdcRspInfoField pRspInfo)
+        {
+
+        }
+        #endregion
+
+        /// <summary>
+        /// 报价
+        /// </summary>
+        #region
+        private Dictionary<string, string> OrderQuoteIndexMap = new Dictionary<string, string>();
+        private Dictionary<string, ThostFtdcQuoteField> QuoteIndexMap = new Dictionary<string, ThostFtdcQuoteField>();
+        /// <summary>
+        /// 报价录入请求
+        /// </summary>
+        public string PlaceQuote(string instrumentID, EnumOffsetFlagType AskOffset, int Asklots, double Askprice,
+            EnumOffsetFlagType BidOffset, int Bidlots, double Bidprice)
+        {
+            int iRet = 0;
+            ThostFtdcInputQuoteField req = GetNewInputQuoteField(instrumentID, AskOffset, Asklots, Askprice, BidOffset, Bidlots, Bidprice);
+            iRet = trader.ReqQuoteInsert(req, ++iRequestID);
+            return req.QuoteRef;
+        }
+
+        /// <summary>
+        /// 报价操作请求
+        /// </summary>
+        public int ReqQuoteAction(ThostFtdcQuoteField pQuote)
+        {
+            lock (ReqLock)
+            {
+                int iRet = 0;
+                ThostFtdcInputQuoteActionField req = GetNewInputQuoteActionField(pQuote);
+                iRet = trader.ReqQuoteAction(req, ++iRequestID);
+                return iRet;
+            }
+        }
+
+        public int ReqQuoteAction(ThostFtdcInputQuoteActionField pInputQuoteAction)
+        {
+            lock (ReqLock)
+            {
+                int iRet = 0;
+                iRet = trader.ReqQuoteAction(pInputQuoteAction, ++iRequestID);
+                return iRet;
+            }
+        }
+
+        /// <summary>
+        /// 报价操作请求
+        /// </summary>
+        public int ReqQuoteAction(string QuoteRef, string InstrumentID)
+        {
+            lock (ReqLock)
+            {
+                int iRet = 0;
+                ThostFtdcInputQuoteActionField req = GetNewInputQuoteActionField(QuoteRef, InstrumentID, trader.FrontID, trader.SessionID);
+                iRet = trader.ReqQuoteAction(req, ++iRequestID);
+
+                return iRet;
+            }
+        }
+
+        //请求查询报价响应
+        void OnRspQryQuote(ThostFtdcQuoteField pQuote, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+
+        }
+
+        //报价录入请求响应
         void OnRspQuoteInsert(ThostFtdcInputQuoteField pInputQuote, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
 
         }
 
-        void OnErrRtnOrderInsert(ThostFtdcInputOrderField pInputOrder, ThostFtdcRspInfoField pRspInfo)
-        {
-
-        }
-
+        //报价操作请求响应
         void OnRspQuoteAction(ThostFtdcInputQuoteActionField pInputQuoteAction, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
         {
             DateTime logtime = DateTime.Now;
@@ -550,202 +580,151 @@ namespace OptionMM
                 //QuoteCancelAction(pInputQuoteAction, pRspInfo);
             }
         }
-        void OnRspForQuoteInsert(ThostFtdcInputForQuoteField pInputForQuote, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
 
-        }
-        void OnRspQryForQuote(ThostFtdcForQuoteField pForQuote, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-
-        }
-        void OnRspQryQuote(ThostFtdcQuoteField pQuote, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
-        {
-
-        }
-        void OnErrRtnForQuoteInsert(ThostFtdcInputForQuoteField pInputForQuote, ThostFtdcRspInfoField pRspInfo)
-        {
-
-        }
+        //报价录入错误回报
         void OnErrRtnQuoteInsert(ThostFtdcInputQuoteField pInputQuote, ThostFtdcRspInfoField pRspInfo)
         {
 
         }
-        void OnRtnForQuoteRsp(ThostFtdcForQuoteRspField pForQuoteRsp)
-        {
 
-        }
-        void OnRspError(ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        //报价操作错误回报
+        void OnErrRtnQuoteAction(ThostFtdcQuoteActionField pQuoteAction, ThostFtdcRspInfoField pRspInfo)
         {
             DateTime logtime = DateTime.Now;
-            IsErrorRspInfo(pRspInfo);
+            if (pQuoteAction.OrderActionStatus == EnumOrderActionStatusType.Rejected)
+            {
+                //撤单错误，需要重撤
+            }
+        }
+
+        //报价通知
+        void OnRtnQuote(ThostFtdcQuoteField pQuote)
+        {
+            DateTime logtime = DateTime.Now;
+            if (IsMyQuote(pQuote))
+            {
+                if (pQuote.QuoteStatus == EnumOrderStatusType.Unknown)
+                {
+                    if (pQuote.ExchangeID != null && pQuote.ExchangeID != "" && pQuote.QuoteSysID != null && pQuote.QuoteSysID != "")
+                    {
+
+                    }
+                }
+                else if (pQuote.QuoteStatus == EnumOrderStatusType.NoTradeQueueing)
+                {
+                    QuoteIndexMap.Add(pQuote.QuoteRef, pQuote);
+                    if (pQuote.AskOrderSysID != null || pQuote.AskOrderSysID != "")
+                    {
+                        OrderQuoteIndexMap.Add(pQuote.AskOrderSysID, pQuote.QuoteRef);
+                    }
+                    if (pQuote.BidOrderSysID != null || pQuote.BidOrderSysID != "")
+                    {
+                        OrderQuoteIndexMap.Add(pQuote.BidOrderSysID, pQuote.QuoteRef);
+                    }
+                }
+                else if (pQuote.QuoteStatus == EnumOrderStatusType.Touched)
+                {
+
+                }
+                else if (pQuote.QuoteStatus == EnumOrderStatusType.Canceled)
+                {
+                    //全部成交自动撤单
+                    if (OrderQuoteIndexMap.ContainsKey(pQuote.AskOrderSysID))
+                    {
+                        OrderQuoteIndexMap.Remove(pQuote.AskOrderSysID);
+                    }
+                    if (OrderQuoteIndexMap.ContainsKey(pQuote.BidOrderSysID))
+                    {
+                        OrderQuoteIndexMap.Remove(pQuote.BidOrderSysID);
+                    }
+                    QuoteIndexMap.Remove(pQuote.QuoteRef);
+                }
+            }
         }
         #endregion
 
         /// <summary>
-        /// 报单、报价、行权、询价请求
+        /// 询价
         /// </summary>
         #region
-        private string ReqOrderInsert(EnumDirectionType DIRECTION, EnumOffsetFlagType Offset, string instrumentID, int lots, double price)
-        {
-            int iResult = 0;
-            ThostFtdcInputOrderField req = orderManager.GetNewInputOrderField(DIRECTION, Offset, instrumentID, lots, price);
-            DateTime logtime = DateTime.Now;
-            OrderField newOrder = new OrderField(req, logtime);
-            if (IsReSending)
-            {
-                orderManager.ReqOrderInsertWhenReSending(req);
-            }
-            else
-            {
-                orderManager.ReqOrderInsertWhenNotReSending(req);
-                lock (APITradeLock)
-                {
-                    iResult = trader.ReqOrderInsert(req, ++iRequestID);
-                }
-            }
-
-            return req.OrderRef;
-        }
-
-        private int ReReqOrderAction(ThostFtdcInputOrderActionField pInputOrderAction)
-        {
-            int iResult = 0;
-            orderManager.ReReqOrderAction(pInputOrderAction);
-            lock (APITradeLock)
-            {
-                iResult = trader.ReqOrderAction(pInputOrderAction, ++iRequestID);
-            }
-
-            return iResult;
-        }
-        public int ReqOrderAction(ThostFtdcInputOrderActionField pInputOrderAction)
-        {
-            lock (CancelOrderLock)
-            {
-                int iResult = 0;
-                ThostFtdcInputOrderActionField req = orderManager.ReqOrderAction(pInputOrderAction);
-                lock (APITradeLock)
-                {
-                    iResult = trader.ReqOrderAction(req, ++iRequestID);
-                }
-                return iResult;
-            }
-        }
-
-        public int ReqOrderAction(ThostFtdcOrderField pOrder)
-        {
-            lock (CancelOrderLock)
-            {
-                int iResult = 0;
-                ThostFtdcInputOrderActionField req = orderManager.GetNewInputOrderActionField(pOrder);
-                req = orderManager.ReqOrderAction(req);
-                lock (APITradeLock)
-                {
-                    iResult = trader.ReqOrderAction(req, ++iRequestID);
-                }
-                return iResult;
-            }
-        }
-
-        /// <summary>
-        /// 报价录入请求
-        /// </summary>
-        public string PlaceQuote(string instrumentID, EnumOffsetFlagType AskOffset, int Asklots, double Askprice,
-            EnumOffsetFlagType BidOffset, int Bidlots, double Bidprice)
-        {
-            int iRet = 0;
-            ThostFtdcInputQuoteField req = quoteManager.GetNewInputQuoteField(instrumentID, AskOffset, Asklots, Askprice, BidOffset, Bidlots, Bidprice);
-            if (IsReSending)
-            {
-                quoteManager.ReqQuoteInsertWhenReSending(req);
-            }
-            else
-            {
-                quoteManager.ReqQuoteInsertWhenNotReSending(req);
-                lock (APITradeLock)
-                {
-                    iRet = trader.ReqQuoteInsert(req, ++iRequestID);
-                }
-            }
-            return req.QuoteRef;
-        }
-
-        /// <summary>
-        /// 报价操作请求
-        /// </summary>
-        public int ReqQuoteAction(ThostFtdcQuoteField pQuote)
-        {
-            lock (CancelQuoteLock)
-            {
-                int iRet = 0;
-                ThostFtdcInputQuoteActionField req = quoteManager.GetNewInputQuoteActionField(pQuote);
-                quoteManager.ReqQuoteAction(req);
-                lock (APITradeLock)
-                {
-                    iRet = trader.ReqQuoteAction(req, ++iRequestID);
-                }
-                return iRet;
-            }
-        }
-
-        public int ReqQuoteAction(ThostFtdcInputQuoteActionField pInputQuoteAction)
-        {
-            lock (CancelQuoteLock)
-            {
-                int iRet = 0;
-                quoteManager.ReqQuoteAction(pInputQuoteAction);
-                lock (APITradeLock)
-                {
-                    iRet = trader.ReqQuoteAction(pInputQuoteAction, ++iRequestID);
-                }
-                return iRet;
-            }
-        }
-
-        /// <summary>
-        /// 报价操作请求
-        /// </summary>
-        public int ReqQuoteAction(string QuoteRef, string InstrumentID)
-        {
-            lock (CancelQuoteLock)
-            {
-                int iRet = 0;
-                ThostFtdcInputQuoteActionField req = quoteManager.GetNewInputQuoteActionField(QuoteRef, InstrumentID, trader.FrontID, trader.SessionID);
-                quoteManager.ReqQuoteAction(req);
-                lock (APITradeLock)
-                {
-                    iRet = trader.ReqQuoteAction(req, ++iRequestID);
-                }
-                return iRet;
-            }
-        }
-
-        private int ReReqQuoteAction(ThostFtdcInputQuoteActionField pInputQuoteAction)
-        {
-            int iResult = 0;
-            quoteManager.ReReqQuoteAction(pInputQuoteAction);
-            lock (APITradeLock)
-            {
-                iResult = trader.ReqQuoteAction(pInputQuoteAction, ++iRequestID);
-            }
-
-            return iResult;
-        }
-
         /// <summary>
         /// 询价录入请求
         /// </summary>
         public int ReqForQuoteInsert(string instrumentID)
         {
-            int iRet = 0;
-            ThostFtdcInputForQuoteField req = new ThostFtdcInputForQuoteField();
-            req.BrokerID = trader.BrokerID;
-            req.InvestorID = trader.InvestorID;
-            req.InstrumentID = instrumentID;
-            //req.ForQuoteRef = "1";    //?
-            iRet = trader.ReqForQuoteInsert(req, ++iRequestID);
+            lock (ReqLock)
+            {
+                int iRet = 0;
+                ThostFtdcInputForQuoteField req = new ThostFtdcInputForQuoteField();
+                req.BrokerID = trader.BrokerID;
+                req.InvestorID = trader.InvestorID;
+                req.InstrumentID = instrumentID;
+                iForQuoteRef++;
+                req.ForQuoteRef = iForQuoteRef.ToString();
+                //req.ForQuoteRef = "1";    //?
+                iRet = trader.ReqForQuoteInsert(req, ++iRequestID);
+                return iRet;
+            }
+        }
 
-            return iRet;
+        //询价录入请求响应
+        void OnRspForQuoteInsert(ThostFtdcInputForQuoteField pInputForQuote, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+
+        }
+
+        //请求查询询价响应
+        void OnRspQryForQuote(ThostFtdcForQuoteField pForQuote, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+
+        }
+
+        //询价录入错误回报
+        void OnErrRtnForQuoteInsert(ThostFtdcInputForQuoteField pInputForQuote, ThostFtdcRspInfoField pRspInfo)
+        {
+
+        }
+        #endregion
+
+
+        /// <summary>
+        /// 行权
+        /// </summary>
+        #region
+        ///执行宣告操作请求响应
+        void OnRspQryExecOrder(ThostFtdcExecOrderField pExecOrder, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+
+        }
+
+        ///执行宣告通知
+        void OnRtnExecOrder(ThostFtdcExecOrderField pExecOrder)
+        {
+
+        }
+
+        ///执行宣告录入错误回报
+        void OnErrRtnExecOrderInsert(ThostFtdcInputExecOrderField pInputExecOrder, ThostFtdcRspInfoField pRspInfo)
+        {
+
+        }
+
+        ///执行宣告操作错误回报
+        void OnErrRtnExecOrderAction(ThostFtdcExecOrderActionField pExecOrderAction, ThostFtdcRspInfoField pRspInfo)
+        {
+
+        }
+
+        ///执行宣告录入请求响应
+        void OnRspExecOrderInsert(ThostFtdcInputExecOrderField pInputExecOrder, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+
+        }
+
+        ///执行宣告操作请求响应
+        void OnRspExecOrderAction(ThostFtdcInputExecOrderActionField pInputExecOrderAction, ThostFtdcRspInfoField pRspInfo, int nRequestID, bool bIsLast)
+        {
+
         }
         #endregion
     }

@@ -96,7 +96,7 @@
             this.investorID.Name = "investorID";
             this.investorID.Size = new System.Drawing.Size(100, 21);
             this.investorID.TabIndex = 5;
-            this.investorID.Text = "60002968";
+            this.investorID.Text = "202100327";
             // 
             // password
             // 
@@ -104,7 +104,7 @@
             this.password.Name = "password";
             this.password.Size = new System.Drawing.Size(100, 21);
             this.password.TabIndex = 6;
-            this.password.Text = "60002968";
+            this.password.Text = "215215";
             // 
             // brokerID
             // 
@@ -113,7 +113,7 @@
             this.brokerID.Name = "brokerID";
             this.brokerID.Size = new System.Drawing.Size(100, 21);
             this.brokerID.TabIndex = 7;
-            this.brokerID.Text = "66666";
+            this.brokerID.Text = "1032";
             // 
             // MDFrontAddress
             // 
@@ -122,7 +122,7 @@
             this.MDFrontAddress.Name = "MDFrontAddress";
             this.MDFrontAddress.Size = new System.Drawing.Size(304, 21);
             this.MDFrontAddress.TabIndex = 8;
-            this.MDFrontAddress.Text = "tcp://27.115.78.201:31213";
+            this.MDFrontAddress.Text = "tcp://124.160.109.58:51213";
             // 
             // TDFrontAddress
             // 
@@ -131,7 +131,7 @@
             this.TDFrontAddress.Name = "TDFrontAddress";
             this.TDFrontAddress.Size = new System.Drawing.Size(304, 21);
             this.TDFrontAddress.TabIndex = 9;
-            this.TDFrontAddress.Text = "tcp://27.115.78.201:31205";
+            this.TDFrontAddress.Text = "tcp://124.160.109.58:51205";
             // 
             // login_Button
             // 
@@ -172,7 +172,7 @@
             this.loginStatusLabel.Size = new System.Drawing.Size(0, 16);
             this.loginStatusLabel.TabIndex = 13;
             // 
-            // Login
+            // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -194,7 +194,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Login";
+            this.Name = "LoginForm";
             this.Text = "Login";
             this.Load += new System.EventHandler(this.LoginForm_Load);
             this.ResumeLayout(false);

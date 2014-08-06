@@ -96,15 +96,7 @@ namespace OptionMM
         {
 
             int daysToMaturity = 0;
-            if (instrumentID.Contains("1406"))
-            {
-                daysToMaturity = GlobalValues.DaysToMaturity[0];
-            }
-            else if (instrumentID.Contains("1407"))
-            {
-                daysToMaturity = GlobalValues.DaysToMaturity[1];
-            }
-            else if (instrumentID.Contains("1408"))
+            if (instrumentID.Contains("1408"))
             {
                 daysToMaturity = GlobalValues.DaysToMaturity[2];
             }
@@ -117,6 +109,22 @@ namespace OptionMM
                 daysToMaturity = GlobalValues.DaysToMaturity[4];
             }
             return daysToMaturity;
+        }
+
+        /// <summary>
+        /// 获取价格的格式说明符
+        /// </summary>
+        /// <param name="PriceTick">最小变动价位</param>
+        /// <returns>格式说明符</returns>
+        public static string GetPriceFormat(double PriceTick)
+        {
+            int c = 0;
+            while (PriceTick < 1)
+            {
+                PriceTick *= 10;
+                c++;
+            }
+            return "F" + c.ToString();
         }
     }
 }

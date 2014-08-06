@@ -216,7 +216,7 @@ namespace OptionMM
                 { 
                     s += gauss[i, j] * a[j]; 
                 } 
-                a[i] = Math.Round((gauss[i, matrixLine] - s) / gauss[i, i], 6); 
+                a[i] = Math.Round((gauss[i, matrixLine] - s) / gauss[i, i], 10); 
             }              
             //返回方程的解 即拟合曲线的系数             
             return a;

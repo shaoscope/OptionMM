@@ -8,7 +8,6 @@ namespace OptionMM
 {
     class ActiveContract
     {
-
         /// <summary>
         /// 行情更新时该事件被触发
         /// </summary>
@@ -40,6 +39,11 @@ namespace OptionMM
         public ThostFtdcDepthMarketDataField PreMarketData { get; private set; }
 
         /// <summary>
+        /// 期权基本值
+        /// </summary>
+        public OptionValue OptionValue { get; set; }
+
+        /// <summary>
         /// 是否自选锁定的标志
         /// </summary>
         public bool Locked { get; set; }
@@ -54,6 +58,7 @@ namespace OptionMM
             this.Contract = contract;
             LongPosition = new ThostFtdcInvestorPositionField();
             ShortPosition = new ThostFtdcInvestorPositionField();
+            OptionValue = new OptionValue();
         }
 
         /// <summary>
@@ -79,6 +84,36 @@ namespace OptionMM
                 this.ForQuoteArrived(this, EventArgs.Empty);
             }
         }
+
+        /// <summary>
+        /// 期权类型
+        /// </summary>
+        public OptionTypeEnum OptionType 
+        { 
+            get
+            {
+                return this.Contract.InstrumentID.Contains('C') ? OptionTypeEnum.call : OptionTypeEnum.put;
+            }
+        }
+
+        /// <summary>
+        /// 执行价格
+        /// </summary>
+        public double StrikePrice
+        {
+            get
+            {
+                return double.Parse(this.Contract.InstrumentID.Split('-')[2]);
+            }
+        }
+
+        /// <summary>
+        /// 隐含波动率
+        /// </summary>
+        public double ImpliedVolatility { get; set; }
+
+
+
 
 
     }//class
