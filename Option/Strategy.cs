@@ -348,7 +348,7 @@ namespace OptionMM
                 ////计算隐含波动率
                 if (MainForm.Future.LastMarket != null)
                 {
-                    this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice,
+                    this.option.ImpliedVolatility = StaticFunction.CalculateImpliedVolatilityBisection(MainForm.Future.LastMarket.LastPrice, this.option.StrikePrice,
                         StaticFunction.GetDaysToMaturity(this.option.InstrumentID), GlobalValues.InterestRate, md.LastPrice, this.option.OptionType);
 
                     string[] updateDateTimeString = md.UpdateTime.Split(':');

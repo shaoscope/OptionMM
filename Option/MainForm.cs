@@ -141,40 +141,8 @@ namespace OptionMM
             #endregion
 
             TraderManager = new TradeManager(trader);
-            //trader.OnRtnOrder += TraderManager.OnRtnOrder;
-            //trader.OnRtnTrade += TraderManager.OnRtnTrade;
-
-            //Dictionary<string, string[]> MMConfigValues = ReadOptionXML("Option.xml");
-            //Future = new Future("IF1407");
-            //foreach (string instrumentID in MMConfigValues.Keys)
-            //{
-            //    Strategy strategy = new Strategy();
-            //    strategy.Option.InstrumentID = instrumentID;
-            //    string[] strTemp = instrumentID.Split('-');
-            //    strategy.Option.StrikePrice = double.Parse(strTemp[2]);
-            //    strategy.Option.OptionType = strTemp[1] == "C" ? OptionTypeEnum.call : OptionTypeEnum.put;
-            //    strategy.IsMarketMakingContract = MMConfigValues[instrumentID][1] == "1" ? true : false;
-            //    //加入仓位信息
-            //    foreach (ThostFtdcInvestorPositionField position in MainForm.PositionList)
-            //    {
-            //        if (position != null)
-            //        {
-            //            if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Long)
-            //            {
-            //                strategy.Option.longPosition = position;
-            //            }
-            //            else if (position.InstrumentID == instrumentID && position.PosiDirection == EnumPosiDirectionType.Short)
-            //            {
-            //                strategy.Option.shortPosition = position;
-            //            }
-            //        }
-            //    }
-            //    strategy.Option.longPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][3]);
-            //    strategy.Option.shortPosition.PositionCost = double.Parse(MMConfigValues[instrumentID][5]);
-            //    strategy.Configuration();
-            //    this.optionPanel.AddStrategy(strategy);
-            //}
-
+            TraderManager.OnQuoteTraded += TraderManager_OnQuoteTraded;
+            TraderManager.OnArbitrageTraded += TraderManager_OnArbitrageTraded;
             #region 加载平价套利
             //Dictionary<string, string[]> ParityConfigValues = ReadParityXML("Parity.xml");
             //foreach (string instrumentID in ParityConfigValues.Keys)
@@ -192,6 +160,34 @@ namespace OptionMM
             //this.positionHedgeTimer = new System.Threading.Timer(this.positionHedgeCallBack, null, 3 * 1000, 5 * 1000);
             //this.recordVolatilityTimer = new System.Threading.Timer(this.recordVolatilityCallBack, null, 20 * 1000, 10 * 60 * 1000);
             //this.writeXmlTimer = new System.Threading.Timer(this.writerXmlCallBack, null, 10 * 1000, 10 * 1000);
+        }
+
+        /// <summary>
+        /// 做市单被成交时执行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void TraderManager_OnQuoteTraded(object sender, RtnTradeEventArgs e)
+        {
+            ActiveContract activeContract;
+            if (MarketManeger.ActiveContractDictionary.TryGetValue(e.TradeFiled.InstrumentID, out activeContract))
+            {
+                activeContract.OnQuoteTraded(e.TradeFiled);
+            }
+        }
+
+        /// <summary>
+        /// 套利单被成交是执行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void TraderManager_OnArbitrageTraded(object sender, RtnTradeEventArgs e)
+        {
+            ActiveContract activeContract;
+            if (MarketManeger.ActiveContractDictionary.TryGetValue(e.TradeFiled.InstrumentID, out activeContract))
+            {
+                activeContract.OnArbitrageTraded(e.TradeFiled);
+            }
         }
 
         /// <summary>

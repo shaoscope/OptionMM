@@ -50,6 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveContract.cs" />
+    <Compile Include="ApiEventArgs.cs" />
+    <Compile Include="Arbitrage.cs" />
     <Compile Include="Covered.cs" />
     <Compile Include="CoveredPanel.cs">
       <SubType>UserControl</SubType>

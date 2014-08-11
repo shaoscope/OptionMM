@@ -46,9 +46,9 @@ namespace OptionMM
         public bool IsQuoting { get; private set; }
 
         /// <summary>
-        /// 有成交时该事件被触发
+        /// 做市商报单引用到成交回报的映射
         /// </summary>
-        public event EventHandler OnTrade;
+        private Dictionary<string, ThostFtdcTradeField> quoteRef2TradeFieldMap = new Dictionary<string, ThostFtdcTradeField>();
 
         /// <summary>
         /// 构造一个新实例
@@ -61,23 +61,37 @@ namespace OptionMM
             this.call = call;
             this.call.MarketUpdated += call_MarketUpdated;
             this.call.ForQuoteArrived += call_ForQuoteArrived;
+            this.call.QuoteTraded += call_QuoteTraded;
             this.put = put;
             this.put.MarketUpdated += put_MarketUpdated;
             this.put.ForQuoteArrived += put_ForQuoteArrived;
+            this.put.QuoteTraded += put_QuoteTraded;
             this.underlying = underlying;
             this.underlying.MarketUpdated += underlying_MarketUpdated;
-            this.OnTrade += Quote_OnTrade;
             this.QuotePanelRefreshTimer = new System.Threading.Timer(this.QuotePanelRefreshCallback, null, 1000, 1000);
             this.call_MarketUpdated(this, EventArgs.Empty);
             this.put_MarketUpdated(this, EventArgs.Empty);
         }
 
         /// <summary>
-        /// 报价有成交时方法被调用
+        /// 看涨期权报价被成交时调用
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Quote_OnTrade(object sender, EventArgs e)
+        void call_QuoteTraded(object sender, RtnTradeEventArgs e)
+        {
+            //if(e.TradeFiled.InstrumentID.Contains('C'))
+            //{
+
+            //}
+        }
+
+        /// <summary>
+        /// 看跌期权报价被成交时调用
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void put_QuoteTraded(object sender, RtnTradeEventArgs e)
         {
             
         }
@@ -88,7 +102,7 @@ namespace OptionMM
         public void Start()
         {
             this.IsQuoting = true;
-            MainForm.Instance.TraderManager.PlaceQuote(this.call.Contract.InstrumentID, EnumOffsetFlagType.Open, 10, this.call.MarketData.UpperLimitPrice, EnumOffsetFlagType.Open, 10, this.call.MarketData.LowerLimitPrice);
+            string quoteRef = MainForm.Instance.TraderManager.PlaceQuote(this, this.call.Contract.InstrumentID, EnumOffsetFlagType.Open, 10, this.call.MarketData.UpperLimitPrice, EnumOffsetFlagType.Open, 10, this.call.MarketData.LowerLimitPrice);
         }
 
         /// <summary>
@@ -184,10 +198,9 @@ namespace OptionMM
                     StaticFunction.GetDaysToMaturity(this.call.Contract.InstrumentID));
                 this.call.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
                 //计算隐含波动率
-                this.call.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.underlying.MarketData.LastPrice, 
+                this.call.ImpliedVolatility = StaticFunction.CalculateImpliedVolatilityNewton(this.underlying.MarketData.LastPrice, 
                     this.call.StrikePrice, StaticFunction.GetDaysToMaturity(this.call.Contract.InstrumentID), 
                     GlobalValues.InterestRate, this.call.MarketData.LastPrice, this.call.OptionType);
-
             }
         }
 
@@ -207,10 +220,9 @@ namespace OptionMM
                     StaticFunction.GetDaysToMaturity(this.put.Contract.InstrumentID));
                 this.put.OptionValue = OptionPricingModel.EuropeanBS(optionPricingModelParams);
                 //计算隐含波动率
-                this.put.ImpliedVolatility = StaticFunction.CalculateImpliedVolatility(this.underlying.MarketData.LastPrice, 
-                    this.put.StrikePrice, StaticFunction.GetDaysToMaturity(this.put.Contract.InstrumentID), 
+                this.put.ImpliedVolatility = StaticFunction.CalculateImpliedVolatilityNewton(this.underlying.MarketData.LastPrice,
+                    this.put.StrikePrice, StaticFunction.GetDaysToMaturity(this.put.Contract.InstrumentID),
                     GlobalValues.InterestRate, this.put.MarketData.LastPrice, this.put.OptionType);
-
             }
         }
 

@@ -96,7 +96,7 @@
             this.investorID.Name = "investorID";
             this.investorID.Size = new System.Drawing.Size(100, 21);
             this.investorID.TabIndex = 5;
-            this.investorID.Text = "202100327";
+            this.investorID.Text = "101300673";
             // 
             // password
             // 
@@ -104,7 +104,7 @@
             this.password.Name = "password";
             this.password.Size = new System.Drawing.Size(100, 21);
             this.password.TabIndex = 6;
-            this.password.Text = "215215";
+            this.password.Text = "275119";
             // 
             // brokerID
             // 

@@ -19,6 +19,18 @@ namespace OptionMM
         public event EventHandler ForQuoteArrived;
 
         /// <summary>
+        /// 报价单被成交时触发
+        /// </summary>
+        //public event RtnOrderEventHandler QuoteTraded;
+        public event EventHandler<RtnTradeEventArgs> QuoteTraded;
+
+        /// <summary>
+        /// 套利单成交时触发
+        /// </summary>
+        //public event RtnOrderEventHandler ArbitrageTraded;
+        public event EventHandler<RtnTradeEventArgs> ArbitrageTraded;
+
+        /// <summary>
         /// 合约信息
         /// </summary>
         public ThostFtdcInstrumentField Contract { get; private set; }
@@ -82,6 +94,30 @@ namespace OptionMM
             if(this.ForQuoteArrived != null)
             {
                 this.ForQuoteArrived(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// 报价被成交
+        /// </summary>
+        /// <param name="order"></param>
+        public void OnQuoteTraded(ThostFtdcTradeField trade)
+        {
+            if (this.QuoteTraded != null)
+            {
+                this.QuoteTraded(this, new RtnTradeEventArgs(trade));
+            }
+        }
+
+        /// <summary>
+        /// 套利被成交
+        /// </summary>
+        /// <param name="order"></param>
+        public void OnArbitrageTraded(ThostFtdcTradeField order)
+        {
+            if (this.ArbitrageTraded != null)
+            {
+                this.ArbitrageTraded(this, new RtnTradeEventArgs(order));
             }
         }
 
